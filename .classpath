@@ -3,5 +3,7 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="/Users/ryanloutos/Desktop/CSE 237S/Project/project-safestore/lib/sqlite-jdbc-3.30.1.jar"/>
+	<classpathentry kind="lib" path="/Users/ryanloutos/Desktop/CSE 237S/Project/project-safestore/lib/ormlite-core-5.1.jar"/>
+	<classpathentry kind="lib" path="/Users/ryanloutos/Desktop/CSE 237S/Project/project-safestore/lib/ormlite-jdbc-5.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
