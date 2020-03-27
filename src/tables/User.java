@@ -9,7 +9,7 @@ import com.j256.ormlite.table.DatabaseTable;
 @DatabaseTable(tableName = "Users")
 public class User extends BaseDaoEnabled<User, String> {
 	
-	@DatabaseField(columnName = "username", id = true)
+	@DatabaseField(columnName = "username", id = true, canBeNull = false)
 	private String username;
 	
 	@DatabaseField(columnName = "password_hashed", canBeNull = false)

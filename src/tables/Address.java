@@ -9,7 +9,7 @@ import com.j256.ormlite.table.DatabaseTable;
 @DatabaseTable(tableName = "Addresses")
 public class Address extends BaseDaoEnabled<Address, Integer> {
 	
-	@DatabaseField(generatedId = true, columnName = "id")
+	@DatabaseField(generatedId = true, columnName = "id", canBeNull = false)
 	private int id;
 	
 	@DatabaseField(columnName = "street_address", canBeNull = false)

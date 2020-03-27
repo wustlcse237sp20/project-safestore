@@ -7,29 +7,31 @@ import com.j256.ormlite.table.DatabaseTable;
 @DatabaseTable(tableName = "WebsiteAccounts")
 public class WebsiteAccount extends BaseDaoEnabled<WebsiteAccount, Integer> {
 
-	@DatabaseField(columnName = "id", generatedId = true)
+	@DatabaseField(columnName = "id", canBeNull = false, generatedId = true)
 	private int id;
 	
-	@DatabaseField(columnName = "user_username", canBeNull = false, foreign = true, foreignAutoRefresh = true)
+	@DatabaseField(columnName = "safe_store_username", canBeNull = false, 
+			foreign = true, foreignColumnName = "username", foreignAutoRefresh = true,
+			foreignAutoCreate = true)
 	private User safeStoreUser;
 	
 	@DatabaseField(columnName = "nickname", canBeNull = false)
 	private String nickname;
 	
-	@DatabaseField(columnName = "login", canBeNull = false)
-	private String login;
+	@DatabaseField(columnName = "website_login", canBeNull = false)
+	private String websiteLogin;
 	
-	@DatabaseField(columnName = "password", canBeNull = false)
-	private String password;
+	@DatabaseField(columnName = "website_password", canBeNull = false)
+	private String websitePassword;
 	
 	// ORMLite needs a no-argument constructor
 	public WebsiteAccount() {}
 	
-	public WebsiteAccount(User safeStoreUser, String nickname, String login, String password) {
+	public WebsiteAccount(User safeStoreUser, String nickname, String websiteLogin, String websitePassword) {
 		this.safeStoreUser = safeStoreUser;
 		this.nickname = nickname;
-		this.login = login;
-		this.password = password;
+		this.websiteLogin = websiteLogin;
+		this.websitePassword = websitePassword;
 	}
 	
 	public int getId() {
@@ -55,20 +57,20 @@ public class WebsiteAccount extends BaseDaoEnabled<WebsiteAccount, Integer> {
 		this.nickname = nickname;
 	}
 	
-	public String getLogin() {
-		return login;
+	public String getWebsiteLogin() {
+		return websiteLogin;
 	}
 	
-	public void setLogin(String login) {
-		this.login = login;
+	public void setWebsiteLogin(String websiteLogin) {
+		this.websiteLogin = websiteLogin;
 	}
 	
-	public String getPassword() {
-		return password;
+	public String getWebsitePassword() {
+		return websitePassword;
 	}
 	
-	public void setPassword(String password) {
-		this.password = password;
+	public void setWebsitePassword(String websitePassword) {
+		this.websitePassword = websitePassword;
 	}
 	
 	

@@ -8,9 +8,10 @@ import com.j256.ormlite.misc.BaseDaoEnabled;
 import com.j256.ormlite.table.DatabaseTable;
 
 @DatabaseTable(tableName = "DebitCards")
-public class DebitCard extends BaseDaoEnabled<DebitCard, String>{
+public class DebitCard extends BaseDaoEnabled<DebitCard, String> {
 	
-	@DatabaseField(columnName = "user_username", canBeNull = false, foreign = true, foreignAutoRefresh = true)
+	@DatabaseField(columnName = "safe_store_username", canBeNull = false, 
+			foreign = true, foreignColumnName = "username", foreignAutoCreate = true)
 	private User safeStoreUser;
 	
 	@DatabaseField(columnName = "nickname")
@@ -19,8 +20,8 @@ public class DebitCard extends BaseDaoEnabled<DebitCard, String>{
 	// reason for String is that a card number is usally in the form:
 	//	#### #### #### #### which is easiest to store as a string in 
 	// 	a database for our uses
-	@DatabaseField(columnName = "number", id = true)
-	private String number;
+	@DatabaseField(columnName = "debit_card_number", id = true, canBeNull = false)
+	private String debitCardNumber;
 	
 	@DatabaseField(columnName = "expiration_date", canBeNull = false, dataType = DataType.DATE_STRING)
 	private Date expirationDate;
@@ -31,17 +32,19 @@ public class DebitCard extends BaseDaoEnabled<DebitCard, String>{
 	@DatabaseField(columnName = "pin", canBeNull = false)
 	private int pin;
 	
-	@DatabaseField(columnName = "address_id", canBeNull = false, foreign = true, foreignAutoRefresh = true)
+	@DatabaseField(columnName = "address_id", canBeNull = false, 
+			foreign = true, foreignAutoRefresh = true, 
+			foreignAutoCreate = true, foreignColumnName = "id")
 	private Address billingAddress;
 	
 	// ORMLite needs a no-argument constructor
 	public DebitCard() {}
 	
-	public DebitCard(User safeStoreUser, String nickname, String number,
+	public DebitCard(User safeStoreUser, String nickname, String debitCardNumber,
 			Date expirationDate, int cvv, int pin, Address billingAddress) {
 		this.safeStoreUser = safeStoreUser;
 		this.nickname = nickname;
-		this.number = number;
+		this.debitCardNumber = debitCardNumber;
 		this.expirationDate = expirationDate;
 		this.cvv = cvv;
 		this.billingAddress = billingAddress;
@@ -64,12 +67,12 @@ public class DebitCard extends BaseDaoEnabled<DebitCard, String>{
 		this.nickname = nickname;
 	}
 	
-	public String getNumber() {
-		return number;
+	public String getDebitCardNumber() {
+		return debitCardNumber;
 	}
 	
-	public void setNumber(String number) {
-		this.number = number;
+	public void setDebitCardNumber(String debitCardNumber) {
+		this.debitCardNumber = debitCardNumber;
 	}
 	
 	public Date getExpirationDate() {

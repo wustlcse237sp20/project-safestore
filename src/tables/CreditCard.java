@@ -13,10 +13,12 @@ public class CreditCard extends BaseDaoEnabled<CreditCard, String> {
 	// reason for String is that a card number is usally in the form:
 	//	#### #### #### #### which is easiest to store as a string in 
 	// 	a database for our uses
-	@DatabaseField(columnName = "number", id = true)
-	private String number;
+	@DatabaseField(columnName = "credit_card_number", id = true, canBeNull = false)
+	private String creditCardNumber;
 	
-	@DatabaseField(columnName = "user_username", canBeNull = false, foreign = true, foreignAutoRefresh = true)
+	@DatabaseField(columnName = "safe_store_username", canBeNull = false, 
+			foreign = true, foreignColumnName = "username", foreignAutoRefresh = true,
+			foreignAutoCreate = true)
 	private User safeStoreUser;
 	
 	@DatabaseField(columnName = "nickname")
@@ -28,17 +30,19 @@ public class CreditCard extends BaseDaoEnabled<CreditCard, String> {
 	@DatabaseField(columnName = "cvv", canBeNull = false)
 	private int cvv;
 	
-	@DatabaseField(columnName = "address_id", canBeNull = false, foreign = true, foreignAutoRefresh = true)
+	@DatabaseField(columnName = "address_id", canBeNull = false, 
+			foreign = true, foreignColumnName = "id", foreignAutoRefresh = true,
+			foreignAutoCreate = true)
 	private Address billingAddress;
 	
 	// ORMLite needs a no-argument constructor
 	public CreditCard() {}
 	
 	public CreditCard(User safeStoreUser, String nickname,
-			String number, Date expirationDate, int cvv, Address billingAddress) {
+			String creditCardNumber, Date expirationDate, int cvv, Address billingAddress) {
 		this.safeStoreUser = safeStoreUser;
 		this.nickname = nickname;
-		this.number = number;
+		this.creditCardNumber = creditCardNumber;
 		this.expirationDate = expirationDate;
 		this.cvv = cvv;
 		this.billingAddress = billingAddress;
@@ -60,12 +64,12 @@ public class CreditCard extends BaseDaoEnabled<CreditCard, String> {
 		this.nickname = nickname;
 	}
 	
-	public String getNumber() {
-		return number;
+	public String getCreditCardNumber() {
+		return creditCardNumber;
 	}
 	
-	public void setNumber(String number) {
-		this.number = number;
+	public void setCreditCardNumber(String creditCardNumber) {
+		this.creditCardNumber = creditCardNumber;
 	}
 	
 	public Date getExpirationDate() {
