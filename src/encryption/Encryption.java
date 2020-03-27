@@ -21,11 +21,10 @@ public class Encryption {
 		String baseKey = "coronavirus";
 		String salt = "d0ntb3s@lty";
 		
-		SecretKeyFactory factory;
 		try {
-			factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
-			KeySpec spec = new PBEKeySpec(baseKey.toCharArray(), salt.getBytes(), 65536 ,256);
-	        SecretKey tmp = factory.generateSecret(spec);
+			SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
+			KeySpec keySpecifications = new PBEKeySpec(baseKey.toCharArray(), salt.getBytes(), 65536 ,256);
+	        SecretKey tmp = keyFactory.generateSecret(keySpecifications);
 	        SecretKeySpec secretKey = new SecretKeySpec(tmp.getEncoded(), "AES");
 	        return secretKey;
 		} catch (Exception e) {
