@@ -22,7 +22,7 @@ public class Address extends BaseDaoEnabled<Address, Integer> {
 	private String state;
 	
 	@DatabaseField(columnName = "zip_code", canBeNull = false)
-	private int zipCode;
+	private String zipCode;
 	
 	// these two are used to store the accounts and cards for the address
 	// 	they are NOT database columns, they are just used to store 
@@ -35,7 +35,7 @@ public class Address extends BaseDaoEnabled<Address, Integer> {
 	
 	public Address() {}
 	
-	public Address(String streetAddress, String city, String state, int zipCode) {
+	public Address(String streetAddress, String city, String state, String zipCode) {
 		this.streetAddress = streetAddress;
 		this.city = city;
 		this.state = state;
@@ -72,11 +72,11 @@ public class Address extends BaseDaoEnabled<Address, Integer> {
 		this.state = state;
 	}
 
-	public int getZipCode() {
+	public String getZipCode() {
 		return zipCode;
 	}
 
-	public void setZipCode(int zipCode) {
+	public void setZipCode(String zipCode) {
 		this.zipCode = zipCode;
 	}
 

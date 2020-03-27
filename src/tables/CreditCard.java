@@ -24,11 +24,12 @@ public class CreditCard extends BaseDaoEnabled<CreditCard, String> {
 	@DatabaseField(columnName = "nickname")
 	private String nickname;
 	
-	@DatabaseField(columnName = "expiration_date", canBeNull = false, dataType = DataType.DATE_STRING)
-	private Date expirationDate;
+	//, dataType = DataType.DATE_STRING
+	@DatabaseField(columnName = "expiration_date", canBeNull = false)
+	private String expirationDate;
 	
 	@DatabaseField(columnName = "cvv", canBeNull = false)
-	private int cvv;
+	private String cvv;
 	
 	@DatabaseField(columnName = "address_id", canBeNull = false, 
 			foreign = true, foreignColumnName = "id", foreignAutoRefresh = true,
@@ -39,7 +40,7 @@ public class CreditCard extends BaseDaoEnabled<CreditCard, String> {
 	public CreditCard() {}
 	
 	public CreditCard(User safeStoreUser, String nickname,
-			String creditCardNumber, Date expirationDate, int cvv, Address billingAddress) {
+			String creditCardNumber, String expirationDate, String cvv, Address billingAddress) {
 		this.safeStoreUser = safeStoreUser;
 		this.nickname = nickname;
 		this.creditCardNumber = creditCardNumber;
@@ -72,19 +73,19 @@ public class CreditCard extends BaseDaoEnabled<CreditCard, String> {
 		this.creditCardNumber = creditCardNumber;
 	}
 	
-	public Date getExpirationDate() {
+	public String getExpirationDate() {
 		return expirationDate;
 	}
 	
-	public void setExpirationDate(Date expirationDate) {
+	public void setExpirationDate(String expirationDate) {
 		this.expirationDate = expirationDate;
 	}
 	
-	public int getCvv() {
+	public String getCvv() {
 		return cvv;
 	}
 	
-	public void setCvv(int cvv) {
+	public void setCvv(String cvv) {
 		this.cvv = cvv;
 	}
 	

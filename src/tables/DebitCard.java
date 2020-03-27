@@ -23,14 +23,15 @@ public class DebitCard extends BaseDaoEnabled<DebitCard, String> {
 	@DatabaseField(columnName = "debit_card_number", id = true, canBeNull = false)
 	private String debitCardNumber;
 	
-	@DatabaseField(columnName = "expiration_date", canBeNull = false, dataType = DataType.DATE_STRING)
-	private Date expirationDate;
+	//, dataType = DataType.DATE_STRING
+	@DatabaseField(columnName = "expiration_date", canBeNull = false)
+	private String expirationDate;
 	
 	@DatabaseField(columnName = "cvv", canBeNull = false)
-	private int cvv;
+	private String cvv;
 	
 	@DatabaseField(columnName = "pin", canBeNull = false)
-	private int pin;
+	private String pin;
 	
 	@DatabaseField(columnName = "address_id", canBeNull = false, 
 			foreign = true, foreignAutoRefresh = true, 
@@ -41,7 +42,7 @@ public class DebitCard extends BaseDaoEnabled<DebitCard, String> {
 	public DebitCard() {}
 	
 	public DebitCard(User safeStoreUser, String nickname, String debitCardNumber,
-			Date expirationDate, int cvv, int pin, Address billingAddress) {
+			String expirationDate, String cvv, String pin, Address billingAddress) {
 		this.safeStoreUser = safeStoreUser;
 		this.nickname = nickname;
 		this.debitCardNumber = debitCardNumber;
@@ -75,27 +76,27 @@ public class DebitCard extends BaseDaoEnabled<DebitCard, String> {
 		this.debitCardNumber = debitCardNumber;
 	}
 	
-	public Date getExpirationDate() {
+	public String getExpirationDate() {
 		return expirationDate;
 	}
 	
-	public void setExpirationDate(Date expirationDate) {
+	public void setExpirationDate(String expirationDate) {
 		this.expirationDate = expirationDate;
 	}
 	
-	public int getCvv() {
+	public String getCvv() {
 		return cvv;
 	}
 	
-	public void setCvv(int cvv) {
+	public void setCvv(String cvv) {
 		this.cvv = cvv;
 	}
 	
-	public int getPin() {
+	public String getPin() {
 		return pin;
 	}
 	
-	public void setPin(int pin) {
+	public void setPin(String pin) {
 		this.pin = pin;
 	}
 	
