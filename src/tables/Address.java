@@ -70,7 +70,7 @@ public class Address extends BaseDaoEnabled<Address, Integer> {
 
 	public void setState(String state) {
 		this.state = state;
-	}
+	} 
 
 	public String getZipCode() {
 		return zipCode;

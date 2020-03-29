@@ -9,7 +9,7 @@ public class WebsiteAccount extends BaseDaoEnabled<WebsiteAccount, Integer> {
 
 	@DatabaseField(columnName = "id", canBeNull = false, generatedId = true)
 	private int id;
-	
+	  
 	@DatabaseField(columnName = "safe_store_username", canBeNull = false, 
 			foreign = true, foreignColumnName = "username", foreignAutoRefresh = true,
 			foreignAutoCreate = true)

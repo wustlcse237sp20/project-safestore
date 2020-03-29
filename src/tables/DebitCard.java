@@ -66,7 +66,7 @@ public class DebitCard extends BaseDaoEnabled<DebitCard, String> {
 	
 	public void setNickname(String nickname) {
 		this.nickname = nickname;
-	}
+	} 
 	
 	public String getDebitCardNumber() {
 		return debitCardNumber;

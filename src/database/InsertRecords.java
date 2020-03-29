@@ -14,7 +14,7 @@ public class InsertRecords {
 	
 	
 	public static void insertSafeStoreUser(User user) {
-		
+		 
 	}
 	
 	public static void insertWebAccount(WebsiteAccount webAcct) {

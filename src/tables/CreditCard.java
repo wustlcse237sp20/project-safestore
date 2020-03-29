@@ -1,6 +1,6 @@
 package tables;
 
-import java.util.Date;
+import java.util.Date; 
 
 import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;

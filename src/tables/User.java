@@ -11,7 +11,7 @@ public class User extends BaseDaoEnabled<User, String> {
 	
 	@DatabaseField(columnName = "username", id = true, canBeNull = false)
 	private String username;
-	
+	 
 	@DatabaseField(columnName = "password_hashed", canBeNull = false)
 	private String passwordHashed;
 	

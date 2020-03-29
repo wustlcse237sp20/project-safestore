@@ -43,7 +43,7 @@ import tables.WebsiteAccount;
 /** 
  * !!! sql col types are found here 
  * https://www.tutorialspoint.com/java-resultsetmetadata-getcolumntype-method-with-example
- */
+ */ 
 
 public class DatabaseTester {
 	ConnectionSource connectionSource;

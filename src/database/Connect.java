@@ -7,7 +7,7 @@ import java.sql.SQLException;
 /**
  * https://www.sqlitetutorial.net/sqlite-java/sqlite-jdbc-driver/
  * @author sqlitetutorial.net
- */
+ */ 
 public class Connect {
      /**
      * Connect to a sample database
