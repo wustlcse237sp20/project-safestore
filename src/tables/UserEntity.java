@@ -7,7 +7,7 @@ import com.j256.ormlite.misc.BaseDaoEnabled;
 import com.j256.ormlite.table.DatabaseTable;
 
 @DatabaseTable(tableName = "Users")
-public class User extends BaseDaoEnabled<User, String> {
+public class UserEntity extends BaseDaoEnabled<UserEntity, String> {
 	
 	@DatabaseField(columnName = "username", id = true, canBeNull = false)
 	private String username;
@@ -22,18 +22,18 @@ public class User extends BaseDaoEnabled<User, String> {
 	// 	they are NOT database columns, they are just used to store 
 	//	the objects to make life easier
 	@ForeignCollectionField(eager = true, orderColumnName = "nickname")
-	private ForeignCollection<WebsiteAccount> websiteAccounts;
+	private ForeignCollection<WebsiteAccountEntity> websiteAccounts;
 	
 	@ForeignCollectionField(eager = true, orderColumnName = "nickname")
-	private ForeignCollection<CreditCard> creditCards;
+	private ForeignCollection<CreditCardEntity> creditCards;
 	
 	@ForeignCollectionField(eager = true, orderColumnName = "nickname")
-	private ForeignCollection<DebitCard> debitCards;
+	private ForeignCollection<DebitCardEntity> debitCards;
 	
 	// ORMLite needs a no-argument constructor
-	public User() {}
+	public UserEntity() {}
 	
-	public User(String username, String password, String salt) {
+	public UserEntity(String username, String password, String salt) {
 		this.username = username;
 		this.passwordHashed = password;
 		this.salt = salt;
@@ -64,15 +64,15 @@ public class User extends BaseDaoEnabled<User, String> {
 	}
 	
 	// no setters here because the queries will do that automatically
-	public ForeignCollection<WebsiteAccount> getWebsiteAccounts() {
+	public ForeignCollection<WebsiteAccountEntity> getWebsiteAccounts() {
 		return websiteAccounts;
 	}
 	
-	public ForeignCollection<CreditCard> getCreditCards() {
+	public ForeignCollection<CreditCardEntity> getCreditCards() {
 		return creditCards;
 	}
 	
-	public ForeignCollection<DebitCard> getDebitCards() {
+	public ForeignCollection<DebitCardEntity> getDebitCards() {
 		return debitCards;
 	}
 

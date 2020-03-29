@@ -8,11 +8,11 @@ import com.j256.ormlite.jdbc.JdbcConnectionSource;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
 
-import tables.Address;
-import tables.CreditCard;
-import tables.DebitCard;
-import tables.User;
-import tables.WebsiteAccount;
+import tables.AddressEntity;
+import tables.CreditCardEntity;
+import tables.DebitCardEntity;
+import tables.UserEntity;
+import tables.WebsiteAccountEntity;
 
 public class SetUpDatabaseTables {
 	
@@ -24,11 +24,11 @@ public class SetUpDatabaseTables {
 		ConnectionSource connectionSource;
 		try {
 			connectionSource = new JdbcConnectionSource(databaseUrl);
-			List<String> userTableClassCreation = TableUtils.getCreateTableStatements(connectionSource, User.class);
-			List<String> addressTableClassCreation = TableUtils.getCreateTableStatements(connectionSource, Address.class);
-			List<String> websiteAccountTableClassCreation = TableUtils.getCreateTableStatements(connectionSource, WebsiteAccount.class);
-			List<String> creditCardTableClassCreation = TableUtils.getCreateTableStatements(connectionSource, CreditCard.class);
-			List<String> debitCardTableClassCreation = TableUtils.getCreateTableStatements(connectionSource, DebitCard.class);
+			List<String> userTableClassCreation = TableUtils.getCreateTableStatements(connectionSource, UserEntity.class);
+			List<String> addressTableClassCreation = TableUtils.getCreateTableStatements(connectionSource, AddressEntity.class);
+			List<String> websiteAccountTableClassCreation = TableUtils.getCreateTableStatements(connectionSource, WebsiteAccountEntity.class);
+			List<String> creditCardTableClassCreation = TableUtils.getCreateTableStatements(connectionSource, CreditCardEntity.class);
+			List<String> debitCardTableClassCreation = TableUtils.getCreateTableStatements(connectionSource, DebitCardEntity.class);
 			System.out.println(userTableClassCreation);
 			System.out.println(addressTableClassCreation);
 			System.out.println(websiteAccountTableClassCreation);

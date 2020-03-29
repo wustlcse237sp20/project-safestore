@@ -1,14 +1,11 @@
 package tables;
 
-import java.util.Date; 
-
-import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.misc.BaseDaoEnabled;
 import com.j256.ormlite.table.DatabaseTable;
 
 @DatabaseTable(tableName = "CreditCards")
-public class CreditCard extends BaseDaoEnabled<CreditCard, String> {
+public class CreditCardEntity extends BaseDaoEnabled<CreditCardEntity, String> {
 	
 	// reason for String is that a card number is usally in the form:
 	//	#### #### #### #### which is easiest to store as a string in 
@@ -19,12 +16,11 @@ public class CreditCard extends BaseDaoEnabled<CreditCard, String> {
 	@DatabaseField(columnName = "safe_store_username", canBeNull = false, 
 			foreign = true, foreignColumnName = "username", foreignAutoRefresh = true,
 			foreignAutoCreate = true)
-	private User safeStoreUser;
+	private UserEntity safeStoreUser;
 	
 	@DatabaseField(columnName = "nickname")
 	private String nickname;
 	
-	//, dataType = DataType.DATE_STRING
 	@DatabaseField(columnName = "expiration_date", canBeNull = false)
 	private String expirationDate;
 	
@@ -34,13 +30,13 @@ public class CreditCard extends BaseDaoEnabled<CreditCard, String> {
 	@DatabaseField(columnName = "address_id", canBeNull = false, 
 			foreign = true, foreignColumnName = "id", foreignAutoRefresh = true,
 			foreignAutoCreate = true)
-	private Address billingAddress;
+	private AddressEntity billingAddress;
 	
 	// ORMLite needs a no-argument constructor
-	public CreditCard() {}
+	public CreditCardEntity() {}
 	
-	public CreditCard(User safeStoreUser, String nickname,
-			String creditCardNumber, String expirationDate, String cvv, Address billingAddress) {
+	public CreditCardEntity(UserEntity safeStoreUser, String nickname,
+			String creditCardNumber, String expirationDate, String cvv, AddressEntity billingAddress) {
 		this.safeStoreUser = safeStoreUser;
 		this.nickname = nickname;
 		this.creditCardNumber = creditCardNumber;
@@ -49,11 +45,11 @@ public class CreditCard extends BaseDaoEnabled<CreditCard, String> {
 		this.billingAddress = billingAddress;
 	}
 	
-	public User getSafeStoreUser() {
+	public UserEntity getSafeStoreUser() {
 		return safeStoreUser;
 	}
 	
-	public void setSafeStoreUser(User safeStoreUser) {
+	public void setSafeStoreUser(UserEntity safeStoreUser) {
 		this.safeStoreUser = safeStoreUser;
 	}
 	
@@ -89,11 +85,11 @@ public class CreditCard extends BaseDaoEnabled<CreditCard, String> {
 		this.cvv = cvv;
 	}
 	
-	public Address getBillingAddress() {
+	public AddressEntity getBillingAddress() {
 		return billingAddress;
 	}
 	
-	public void setBillingAddress(Address billingAddress) {
+	public void setBillingAddress(AddressEntity billingAddress) {
 		this.billingAddress = billingAddress;
 	}
 	

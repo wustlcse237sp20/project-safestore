@@ -7,7 +7,7 @@ import com.j256.ormlite.misc.BaseDaoEnabled;
 import com.j256.ormlite.table.DatabaseTable;
 
 @DatabaseTable(tableName = "Addresses")
-public class Address extends BaseDaoEnabled<Address, Integer> {
+public class AddressEntity extends BaseDaoEnabled<AddressEntity, Integer> {
 	
 	@DatabaseField(generatedId = true, columnName = "id", canBeNull = false)
 	private int id;
@@ -28,14 +28,14 @@ public class Address extends BaseDaoEnabled<Address, Integer> {
 	// 	they are NOT database columns, they are just used to store 
 	//	the objects to make life easier
 	@ForeignCollectionField(eager = true, orderColumnName = "nickname")
-	private ForeignCollection<CreditCard> creditCards;
+	private ForeignCollection<CreditCardEntity> creditCards;
 	
 	@ForeignCollectionField(eager = true, orderColumnName = "nickname")
-	private ForeignCollection<DebitCard> debitCards;
+	private ForeignCollection<DebitCardEntity> debitCards;
 	
-	public Address() {}
+	public AddressEntity() {}
 	
-	public Address(String streetAddress, String city, String state, String zipCode) {
+	public AddressEntity(String streetAddress, String city, String state, String zipCode) {
 		this.streetAddress = streetAddress;
 		this.city = city;
 		this.state = state;
@@ -80,11 +80,11 @@ public class Address extends BaseDaoEnabled<Address, Integer> {
 		this.zipCode = zipCode;
 	}
 
-	public ForeignCollection<CreditCard> getCreditCards() {
+	public ForeignCollection<CreditCardEntity> getCreditCards() {
 		return creditCards;
 	}
 
-	public ForeignCollection<DebitCard> getDebitCards() {
+	public ForeignCollection<DebitCardEntity> getDebitCards() {
 		return debitCards;
 	}
 

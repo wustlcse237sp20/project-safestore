@@ -1,18 +1,15 @@
 package tables;
 
-import java.util.Date;
-
-import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.misc.BaseDaoEnabled;
 import com.j256.ormlite.table.DatabaseTable;
 
 @DatabaseTable(tableName = "DebitCards")
-public class DebitCard extends BaseDaoEnabled<DebitCard, String> {
+public class DebitCardEntity extends BaseDaoEnabled<DebitCardEntity, String> {
 	
 	@DatabaseField(columnName = "safe_store_username", canBeNull = false, 
 			foreign = true, foreignColumnName = "username", foreignAutoCreate = true)
-	private User safeStoreUser;
+	private UserEntity safeStoreUser;
 	
 	@DatabaseField(columnName = "nickname")
 	private String nickname;
@@ -36,13 +33,13 @@ public class DebitCard extends BaseDaoEnabled<DebitCard, String> {
 	@DatabaseField(columnName = "address_id", canBeNull = false, 
 			foreign = true, foreignAutoRefresh = true, 
 			foreignAutoCreate = true, foreignColumnName = "id")
-	private Address billingAddress;
+	private AddressEntity billingAddress;
 	
 	// ORMLite needs a no-argument constructor
-	public DebitCard() {}
+	public DebitCardEntity() {}
 	
-	public DebitCard(User safeStoreUser, String nickname, String debitCardNumber,
-			String expirationDate, String cvv, String pin, Address billingAddress) {
+	public DebitCardEntity(UserEntity safeStoreUser, String nickname, String debitCardNumber,
+			String expirationDate, String cvv, String pin, AddressEntity billingAddress) {
 		this.safeStoreUser = safeStoreUser;
 		this.nickname = nickname;
 		this.debitCardNumber = debitCardNumber;
@@ -52,11 +49,11 @@ public class DebitCard extends BaseDaoEnabled<DebitCard, String> {
 		this.pin = pin;
 	}
 	
-	public User getSafeStoreUser() {
+	public UserEntity getSafeStoreUser() {
 		return safeStoreUser;
 	}
 	
-	public void setSafeStoreUser(User safeStoreUser) {
+	public void setSafeStoreUser(UserEntity safeStoreUser) {
 		this.safeStoreUser = safeStoreUser;
 	}
 	
@@ -100,11 +97,11 @@ public class DebitCard extends BaseDaoEnabled<DebitCard, String> {
 		this.pin = pin;
 	}
 	
-	public Address getBillingAddress() {
+	public AddressEntity getBillingAddress() {
 		return billingAddress;
 	}
 	
-	public void setBillingAddress(Address billingAddress) {
+	public void setBillingAddress(AddressEntity billingAddress) {
 		this.billingAddress = billingAddress;
 	}
 	

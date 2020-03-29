@@ -5,7 +5,7 @@ import com.j256.ormlite.misc.BaseDaoEnabled;
 import com.j256.ormlite.table.DatabaseTable;
 
 @DatabaseTable(tableName = "WebsiteAccounts")
-public class WebsiteAccount extends BaseDaoEnabled<WebsiteAccount, Integer> {
+public class WebsiteAccountEntity extends BaseDaoEnabled<WebsiteAccountEntity, Integer> {
 
 	@DatabaseField(columnName = "id", canBeNull = false, generatedId = true)
 	private int id;
@@ -13,7 +13,7 @@ public class WebsiteAccount extends BaseDaoEnabled<WebsiteAccount, Integer> {
 	@DatabaseField(columnName = "safe_store_username", canBeNull = false, 
 			foreign = true, foreignColumnName = "username", foreignAutoRefresh = true,
 			foreignAutoCreate = true)
-	private User safeStoreUser;
+	private UserEntity safeStoreUser;
 	
 	@DatabaseField(columnName = "nickname", canBeNull = false)
 	private String nickname;
@@ -25,9 +25,9 @@ public class WebsiteAccount extends BaseDaoEnabled<WebsiteAccount, Integer> {
 	private String websitePassword;
 	
 	// ORMLite needs a no-argument constructor
-	public WebsiteAccount() {}
+	public WebsiteAccountEntity() {}
 	
-	public WebsiteAccount(User safeStoreUser, String nickname, String websiteLogin, String websitePassword) {
+	public WebsiteAccountEntity(UserEntity safeStoreUser, String nickname, String websiteLogin, String websitePassword) {
 		this.safeStoreUser = safeStoreUser;
 		this.nickname = nickname;
 		this.websiteLogin = websiteLogin;
@@ -41,11 +41,11 @@ public class WebsiteAccount extends BaseDaoEnabled<WebsiteAccount, Integer> {
 	// didn't make an setter for id because it is unique, auto generated, and shouldn't 
 	//	be adjusted once created and put in the database
 	
-	public User getSafeStoreUser() {
+	public UserEntity getSafeStoreUser() {
 		return safeStoreUser;
 	}
 	
-	public void setSafeStoreUser(User safeStoreUser) {
+	public void setSafeStoreUser(UserEntity safeStoreUser) {
 		this.safeStoreUser = safeStoreUser;
 	}
 	
