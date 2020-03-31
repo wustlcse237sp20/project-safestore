@@ -23,12 +23,11 @@ public class Encryption {
 		
 		try {
 			SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
-			KeySpec keySpecifications = new PBEKeySpec(baseKey.toCharArray(), salt.getBytes(), 65536 ,256);
+			KeySpec keySpecifications = new PBEKeySpec(baseKey.toCharArray(), salt.getBytes(), 65536 ,128);
 	        SecretKey tmp = keyFactory.generateSecret(keySpecifications);
 	        SecretKeySpec secretKey = new SecretKeySpec(tmp.getEncoded(), "AES");
 	        return secretKey;
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			System.out.println("Error while generating key: " + e.toString());
 			e.printStackTrace();	
 		}

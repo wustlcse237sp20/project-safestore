@@ -9,7 +9,7 @@ import encryption.Encryption;
 class EncryptionTest {
 	
 	private String [] plainTexts = {"cse327", "Franklin", "638294720", "m!@b3NdY"};
-	private String [] cipherTexts = {"216d7raM+kXcmzlguiYpcQ==", "ZL2c+vyf1RTnQxigjB7W2Q==", "bv7KtJOLLpTW1oGZm7HncA==" , "7bNRgu8siusn8fb4gK8m2g=="};
+	private String [] cipherTexts = {"VsbQfiTkMTmYGXrXWLHitQ==", "Swo0Wun1jW3diBjSiQzPtg==", "bdTCLUY2d38dQzlWdO72Tw==" , "Z/tQKBXMwbmwQv8jSz2X7A=="};
 
 	@Test
 	void testEncrypt() {
