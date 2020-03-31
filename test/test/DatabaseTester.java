@@ -29,7 +29,7 @@ import tables.Address;
 import tables.CreditCard;
 import tables.DebitCard;
 import tables.User;
-import tables.WebsiteAccount;
+import websiteAccount.WebsiteAccount;
 
 /**
  * Things to test:
