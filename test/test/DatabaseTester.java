@@ -13,6 +13,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.rules.ExpectedException;
 
@@ -23,13 +24,11 @@ import com.j256.ormlite.jdbc.JdbcConnectionSource;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.support.DatabaseConnection;
 
-import database.Connect;
-import database.InsertRecords;
-import tables.Address;
-import tables.CreditCard;
-import tables.DebitCard;
-import tables.User;
-import tables.WebsiteAccount;
+import tables.AddressEntity;
+import tables.CreditCardEntity;
+import tables.DebitCardEntity;
+import tables.UserEntity;
+import tables.WebsiteAccountEntity;
 
 /**
  * Things to test:
@@ -49,37 +48,37 @@ public class DatabaseTester {
 	ConnectionSource connectionSource;
 	
 	//table Daos
-	Dao<User, String> userDao;
-	Dao<CreditCard, String> creditCardDao;
-	Dao<DebitCard, String> debitCardDao;
-	Dao<WebsiteAccount, String> websiteDao;
-	Dao<Address, String> addressDao;
+	Dao<UserEntity, String> userDao;
+	Dao<CreditCardEntity, String> creditCardDao;
+	Dao<DebitCardEntity, String> debitCardDao;
+	Dao<WebsiteAccountEntity, String> websiteDao;
+	Dao<AddressEntity, String> addressDao;
 	
 	//generic record objects
-	User testUser = new User();
-	WebsiteAccount testWebAcct = new WebsiteAccount();
-	Address testAddress = new Address();
-	CreditCard testCreditCard = new CreditCard();
-	DebitCard testDebitCard = new DebitCard();
+	UserEntity testUser = new UserEntity();
+	WebsiteAccountEntity testWebAcct = new WebsiteAccountEntity();
+	AddressEntity testAddress = new AddressEntity();
+	CreditCardEntity testCreditCard = new CreditCardEntity();
+	DebitCardEntity testDebitCard = new DebitCardEntity();
 	
 	/**
 	 * Setup connection to database.
 	 * Tests connecting to db doesn't throw SQLExceptions 
 	 * If no exception thrown, tests connection isn't null
 	 */
-	@Before
+	@BeforeEach
     public void setUp() throws Exception {
 		String databaseUrl = "jdbc:sqlite:src/database/app.db";
 		try {
 			connectionSource = new JdbcConnectionSource(databaseUrl);
 			assertNotNull(connectionSource, "Connection is null. Failed to Connect.");
 			
-			userDao = DaoManager.createDao(connectionSource, User.class);
-			creditCardDao = DaoManager.createDao(connectionSource, CreditCard.class);
-			debitCardDao = DaoManager.createDao(connectionSource, DebitCard.class);
-			websiteDao = DaoManager.createDao(connectionSource, WebsiteAccount.class);
-			addressDao = DaoManager.createDao(connectionSource, Address.class);
-			
+			userDao = DaoManager.createDao(connectionSource, UserEntity.class);
+			creditCardDao = DaoManager.createDao(connectionSource, CreditCardEntity.class);
+			debitCardDao = DaoManager.createDao(connectionSource, DebitCardEntity.class);
+			websiteDao = DaoManager.createDao(connectionSource, WebsiteAccountEntity.class);
+			addressDao = DaoManager.createDao(connectionSource, AddressEntity.class);
+						
 			testUser.setUsername("test user");
 			testUser.setPasswordHashed("not a hashed password");
 			testUser.setSalt("actually kind of a salt");
