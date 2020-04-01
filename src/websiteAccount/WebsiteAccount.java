@@ -14,18 +14,12 @@ import tables.WebsiteAccountEntity;
 public class WebsiteAccount {
 	
 	private WebsiteAccountEntity websiteAccount;
-	private Dao<WebsiteAccountEntity, Integer> websiteAccountDao;
 	
 	//TODO: change UserEntity to User once Tali finished
 	public WebsiteAccount(UserEntity safeStoreUser, String nickname, String websiteLogin, 
-			String websitePassword, ConnectionSource connectionSource) throws SQLException {
-		try {
-			websiteAccount = new WebsiteAccountEntity(
-					safeStoreUser, Encryption.encrypt(nickname), Encryption.encrypt(websiteLogin), Encryption.encrypt(websitePassword));
-			websiteAccountDao = DaoManager.createDao(connectionSource, WebsiteAccountEntity.class);
-		} catch (SQLException e) { // if the connection to database failed
-			e.printStackTrace();
-		}
+			String websitePassword) throws SQLException {
+			websiteAccount = new WebsiteAccountEntity(safeStoreUser, Encryption.encrypt(nickname), 
+					Encryption.encrypt(websiteLogin), Encryption.encrypt(websitePassword));
 	}
 	
 	public WebsiteAccountEntity getWebsiteAccount() {
@@ -35,17 +29,11 @@ public class WebsiteAccount {
 	public void setWebsiteAccount(WebsiteAccountEntity websiteAccount) {
 		this.websiteAccount = websiteAccount;
 	}
-
-	public Dao<WebsiteAccountEntity, Integer> getWebsiteAccountDao() {
-		return websiteAccountDao;
-	}
-
-	public void setWebsiteAccountDao(Dao<WebsiteAccountEntity, Integer> websiteAccountDao) {
-		this.websiteAccountDao = websiteAccountDao;
-	}
 	
-	public void insertIntoDatabase() throws SQLException {
+	public void addWebsiteAccount(ConnectionSource connectionSource) throws SQLException {
 		try {
+			Dao<WebsiteAccountEntity, Integer> websiteAccountDao = 
+					DaoManager.createDao(connectionSource, WebsiteAccountEntity.class);
 			websiteAccountDao.create(websiteAccount);
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -54,8 +42,6 @@ public class WebsiteAccount {
 
 	public static void main(String[] args) {
 
-		
-		
 	}
 
 }
