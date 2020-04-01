@@ -20,22 +20,22 @@ import user.User;
 public class SafeStore {
 
 	public static void main(String[] args) {
-		ConnectionSource connectionSource;
+		ConnectionSource databaseConnection;
 		String databaseUrl = "jdbc:sqlite:src/database/app.db";
 		try {
-			connectionSource = new JdbcConnectionSource(databaseUrl);
+			databaseConnection = new JdbcConnectionSource(databaseUrl);
 			@SuppressWarnings("resource")
 			Scanner keyboard = new Scanner(System.in);
 			System.out.println("Type 'create' to create an account. Type 'login' to log into existing account.");
 			String userInput = keyboard.nextLine();
 			while (!userInput.trim().equals("create") && !userInput.trim().equals("login")) {
-		        System.out.println("Enter 'view' or 'edit' ");
+		        System.out.println("Enter 'create' or 'login' ");
 		        userInput = keyboard.nextLine();
 		    }
 			if(userInput.equals("create")) {
 				System.out.println("Type your usernmae:");
 				String username = keyboard.nextLine();
-				while(username.trim() == "" || !User.isUniqueUsername(connectionSource, username)) {
+				while(username.trim() == "" || !User.isUniqueUsername(databaseConnection, username)) {
 					System.out.println("Your username cannot be empty and it must be unique. Try another.");
 					username = keyboard.nextLine();
 				}
@@ -46,7 +46,7 @@ public class SafeStore {
 					password = keyboard.nextLine();
 				}
 				User newUser = new User(username, password);
-				boolean createdNewUser = newUser.createSafeStoreAccount(connectionSource);
+				boolean createdNewUser = newUser.createSafeStoreAccount(databaseConnection);
 				if(createdNewUser) {
 					System.out.println("Successfully created account. Welcome, " + username);
 				}

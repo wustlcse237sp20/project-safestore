@@ -44,13 +44,13 @@ public class User {
 	
 	/**
 	 * 
-	 * @param connectionSource to connect to UserEntity table 
+	 * @param databaseSource to connect to UserEntity table 
 	 * @param username to check against usernames in UserEntity table
 	 * @return true if unique username is UserEntity table
 	 */
-	public static boolean isUniqueUsername(ConnectionSource connectionSource, String username) {
+	public static boolean isUniqueUsername(ConnectionSource databaseSource, String username) {
 		try {
-			Dao<UserEntity, String> userEntityDao = DaoManager.createDao(connectionSource, UserEntity.class);
+			Dao<UserEntity, String> userEntityDao = DaoManager.createDao(databaseSource, UserEntity.class);
 			UserEntity matchedUser = userEntityDao.queryForId(username);
 			if(matchedUser == null) {
 				return true;
@@ -116,12 +116,12 @@ public class User {
 	
 	/**
 	 * Tries to input new SafeStore user account info into database
-	 * @param connectionSource to connect to UserEntity table 
+	 * @param databaseSource to connect to UserEntity table 
 	 * @return true if safe store account successfully created 
 	 */
-	public boolean createSafeStoreAccount(ConnectionSource connectionSource) {
+	public boolean createSafeStoreAccount(ConnectionSource databaseSource) {
 		try {
-			Dao<UserEntity, String> userEntityDao = DaoManager.createDao(connectionSource, UserEntity.class);
+			Dao<UserEntity, String> userEntityDao = DaoManager.createDao(databaseSource, UserEntity.class);
 			//returns number of records user entity DAO created
 			//Can only be 1 or 0 here as username is id
 			int numRecordsCreated = userEntityDao.create(userEntity);
