@@ -6,8 +6,10 @@ import com.j256.ormlite.support.ConnectionSource;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
 import java.sql.SQLException;
+import java.util.Base64;
 
 import tables.UserEntity;
 
@@ -34,7 +36,7 @@ public class User {
 			userEntity = new UserEntity();
 			userEntity.setUsername(username);
 			userEntity.setPasswordHashed(hashPassword);
-			userEntity.setSalt(salt.toString());
+			userEntity.setSalt(salt);
 		}
 	}
 	
@@ -44,16 +46,41 @@ public class User {
 	
 	/**
 	 * 
-	 * @param databaseSource to connect to UserEntity table 
+	 * @param databaseConnection to connect to UserEntity table 
 	 * @param username to check against usernames in UserEntity table
 	 * @return true if unique username is UserEntity table
 	 */
-	public static boolean isUniqueUsername(ConnectionSource databaseSource, String username) {
+	public static boolean isUniqueUsername(ConnectionSource databaseConnection, String username) {
 		try {
-			Dao<UserEntity, String> userEntityDao = DaoManager.createDao(databaseSource, UserEntity.class);
+			Dao<UserEntity, String> userEntityDao = DaoManager.createDao(databaseConnection, UserEntity.class);
 			UserEntity matchedUser = userEntityDao.queryForId(username);
 			if(matchedUser == null) {
 				return true;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+	
+	/**
+	 * 
+	 * @param databaseConnection to connect to UserEntity table
+	 * @param username from user interaction 
+	 * @param password plaintext from user interaction
+	 * @return true if username and password match a registered user 
+	 */
+	public static boolean login(ConnectionSource databaseConnection, String username, String password) {
+		try {
+			Dao<UserEntity, String> userEntityDao = DaoManager.createDao(databaseConnection, UserEntity.class);
+			UserEntity loginUser = userEntityDao.queryForId(username);
+			if(loginUser != null) {
+				String storedHashPassword = loginUser.getPassordHashed();
+				byte[] salt = loginUser.getSalt();
+				String hashedTypedPassword = getSecurePassword(password, salt);
+				if(storedHashPassword.equals(hashedTypedPassword)) {
+					return true;
+				}
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -67,7 +94,7 @@ public class User {
 	 * @return random md5 salt
 	 * @throws NoSuchAlgorithmException
 	 */
-	private static byte[] getSalt()
+	public static byte[] getSalt()
 	{
 	    //Always use a SecureRandom generator
 	    SecureRandom sr;
@@ -90,7 +117,7 @@ public class User {
 	 * @param salt randomly generated from getSalt()
 	 * @return
 	 */
-	private static String getSecurePassword(String passwordToHash, byte[] salt)
+	public static String getSecurePassword(String passwordToHash, byte[] salt)
     {
         String generatedPassword = null;
         try {
@@ -116,12 +143,12 @@ public class User {
 	
 	/**
 	 * Tries to input new SafeStore user account info into database
-	 * @param databaseSource to connect to UserEntity table 
+	 * @param databaseConnection to connect to UserEntity table 
 	 * @return true if safe store account successfully created 
 	 */
-	public boolean createSafeStoreAccount(ConnectionSource databaseSource) {
+	public boolean createSafeStoreAccount(ConnectionSource databaseConnection) {
 		try {
-			Dao<UserEntity, String> userEntityDao = DaoManager.createDao(databaseSource, UserEntity.class);
+			Dao<UserEntity, String> userEntityDao = DaoManager.createDao(databaseConnection, UserEntity.class);
 			//returns number of records user entity DAO created
 			//Can only be 1 or 0 here as username is id
 			int numRecordsCreated = userEntityDao.create(userEntity);
