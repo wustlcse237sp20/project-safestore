@@ -1,6 +1,7 @@
 package tables;
 
 import com.j256.ormlite.dao.ForeignCollection;
+import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.field.ForeignCollectionField;
 import com.j256.ormlite.misc.BaseDaoEnabled;
@@ -15,8 +16,8 @@ public class UserEntity extends BaseDaoEnabled<UserEntity, String> {
 	@DatabaseField(columnName = "password_hashed", canBeNull = false)
 	private String passwordHashed;
 	
-	@DatabaseField(columnName = "salt", canBeNull = false)
-	private String salt;
+	@DatabaseField(columnName = "salt", canBeNull = false, dataType=DataType.BYTE_ARRAY)
+	private byte[] salt;
 	
 	// these three are used to store the accounts and cards for the user
 	// 	they are NOT database columns, they are just used to store 
@@ -33,7 +34,7 @@ public class UserEntity extends BaseDaoEnabled<UserEntity, String> {
 	// ORMLite needs a no-argument constructor
 	public UserEntity() {}
 	
-	public UserEntity(String username, String password, String salt) {
+	public UserEntity(String username, String password, byte[] salt) {
 		this.username = username;
 		this.passwordHashed = password;
 		this.salt = salt;
@@ -55,11 +56,11 @@ public class UserEntity extends BaseDaoEnabled<UserEntity, String> {
 		this.passwordHashed = passwordHashed;
 	}
 	
-	public String getSalt() {
+	public byte[] getSalt() {
 		return salt;
 	}
 	
-	public void setSalt(String salt) {
+	public void setSalt(byte[] salt) {
 		this.salt = salt;
 	}
 	
