@@ -53,6 +53,23 @@ class UserTest {
 		}
 	}
 	
+	@Test
+	void testUniqueUsername() {
+		String username = "testNewUser";
+		String password = "testNewPassword";	
+		User newUser = new User(username, password);
+		newUser.createSafeStoreAccount(connectionSource);
+		assertFalse(User.isUniqueUsername(connectionSource, username), "not a unique username. should return false.");
+		assertTrue(User.isUniqueUsername(connectionSource, "this should be unique"), "unique username. should return true.");
+		try {
+			Dao<UserEntity, String> userDao = DaoManager.createDao(connectionSource, UserEntity.class);
+			userDao.deleteById("testNewUser");
+		} catch (SQLException e) {
+			fail("failed to create user dao");
+			e.printStackTrace();
+		}
+	}
+	
 	@AfterEach 
 	void cleanUp() {
 		if(connectionSource != null) {
