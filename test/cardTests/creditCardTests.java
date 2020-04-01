@@ -86,8 +86,8 @@ class creditCardTests {
 		
 		try {
 			List<AddressEntity> returnedAddresses = addressDao.queryForFieldValues(addressQueryParams);
-			System.out.println("LOOK BOI: " + returnedAddresses.size());
-			assertTrue(returnedAddresses.size() == 1, "Should not have added another address");
+			String errMsg = "Only one address should exist in the table with this particular street address, city, state, and zip code";
+			assertTrue(returnedAddresses.size() == 1, errMsg);
 			
 			AddressEntity returnedAddressEntity = returnedAddresses.get(0);
 			ForeignCollection<CreditCardEntity> associatedCreditCards = returnedAddressEntity.getCreditCards();
@@ -111,7 +111,41 @@ class creditCardTests {
 	
 	@Test
 	void testAddCreditCardNewAddress() {
+		String encryptedCreditCardNumber = Encryption.encrypt("1234567890");
+		Address newAddress = new Address("123 oak st", "STL", "MO", "63130");
+		CreditCard testCreditCard = new CreditCard(testUser, "1234567890", "04/23", "123", newAddress);
+		testCreditCard.addCard(databaseConnection);
+		CreditCardEntity testCreditCardEntity = testCreditCard.getCreditCardEntity();
 		
+		Map<String, Object> addressQueryParams = new HashMap<String, Object>();
+		addressQueryParams.put("street_address", Encryption.encrypt(newAddress.getStreetAddress()));
+		addressQueryParams.put("city", Encryption.encrypt(newAddress.getCity()));
+		addressQueryParams.put("state", Encryption.encrypt(newAddress.getState()));
+		addressQueryParams.put("zip_code", Encryption.encrypt(newAddress.getZipCode()));
+		try {
+			List<AddressEntity> returnedAddresses = addressDao.queryForFieldValues(addressQueryParams);
+			String errMsg = "Only one address should exist in the table with this particular street address, city, state, and zip code";
+			assertTrue(returnedAddresses.size() == 1, errMsg);
+			
+			AddressEntity returnedAddressEntity = returnedAddresses.get(0);
+			ForeignCollection<CreditCardEntity> associatedCreditCards = returnedAddressEntity.getCreditCards();
+			System.out.println("LOOK BOI: " + associatedCreditCards.size());
+			assertTrue(associatedCreditCards.size() == 1, "Address should only have one card associated with it");
+			
+			Dao<CreditCardEntity, String> creditCardDao = DaoManager.createDao(databaseConnection, CreditCardEntity.class);
+			CreditCardEntity queriedCard = creditCardDao.queryForId(encryptedCreditCardNumber);
+			CreditCard queriedCreditCard = new CreditCard(queriedCard);
+			assertTrue(queriedCreditCard.getCreditCardNumber().equals("1234567890"), "Credit card number doesn't match");
+			assertTrue(queriedCreditCard.getExpirationDate().equals("04/23"), "Expiration date doesn't match");
+			assertTrue(queriedCreditCard.getCvv().equals("123"), "CVV doesn't match");
+			
+			creditCardDao.delete(testCreditCardEntity);
+			newAddress.deleteAddress(databaseConnection);
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 }

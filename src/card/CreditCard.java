@@ -1,6 +1,7 @@
 package card;
 
 import java.sql.SQLException;
+import java.util.Scanner;
 
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
@@ -29,8 +30,13 @@ public class CreditCard implements Card{
 		this.billingAddress = billingAddress;
 	}
 	
-	public CreditCard(UserEntity safeStoreUser, String nickname, String creditCardNumber, String expirationDate, String cvv, Address billingAddress) {
-		this.creditCardEntity = new CreditCardEntity(safeStoreUser, nickname, creditCardNumber, expirationDate, cvv, billingAddress.getAddressEntity());
+	public CreditCard(User safeStoreUser, String nickname, String creditCardNumber, String expirationDate, String cvv, Address billingAddress) {
+		UserEntity safeStoreUserEntity = safeStoreUser.getUserEntity();
+		String encryptedCCNumber = Encryption.encrypt(creditCardNumber);
+		String encryptedExpDate = Encryption.encrypt(expirationDate);
+		String encryptedCvv = Encryption.encrypt(cvv);
+		this.creditCardEntity = new CreditCardEntity(safeStoreUserEntity, nickname, encryptedCCNumber, encryptedExpDate, encryptedCvv, billingAddress.getAddressEntity());
+		this.billingAddress = billingAddress;
 	}
 	
 	public CreditCard(CreditCardEntity creditCardEntity) {
@@ -76,6 +82,90 @@ public class CreditCard implements Card{
 			e.printStackTrace();
 		}
 		
+	}
+	
+	public static void addCreditCard(ConnectionSource databaseConnection, Scanner keyboard) {
+			String userInput = "";
+		
+			//Setting up Credit Card Variables
+			String creditCardNumber = "";
+			String expirationDate = "";
+			String cvv = "";
+			boolean hasNickname = false;
+			String nickname = "";
+			
+			//Setting up Address Variables
+			String streetAddress = "";
+			String city = "";
+			String state = "";
+			String zipCode = "";
+			
+			System.out.println("What is the Credit Card Number? ");
+	        creditCardNumber = keyboard.nextLine();
+	        System.out.println("What is the Expiration Date?");
+	        expirationDate = keyboard.nextLine();
+	        System.out.println("What is the CVV?");
+	        cvv = keyboard.nextLine();
+	        System.out.println("Do you want a nickname for this credit card? Y/N (default is the last 4 digits)");
+	        userInput = keyboard.nextLine();
+	        while (!userInput.equals("Y") && !userInput.equals("N")) {
+	        	System.out.println("Enter 'Y' or 'N'");
+	        	userInput = keyboard.nextLine();
+	        }
+	        if (userInput.equals("Y")) {
+	        	hasNickname = true;
+	        }
+	        else {
+	        	hasNickname = false;
+	        }
+	        if(hasNickname) {
+	        	System.out.println("What is the nickname?");
+	        	nickname = keyboard.nextLine();
+	        }
+	        
+	        System.out.println("What is the street address?");
+	        streetAddress = keyboard.nextLine();
+	        System.out.println("What is the city?");
+	        city = keyboard.nextLine();
+	        System.out.println("What is the state?");
+	        state = keyboard.nextLine();
+	        System.out.println("What is the zip code?");
+	        zipCode = keyboard.nextLine();
+	        
+	        Address billingAddress = new Address(streetAddress, city, state, zipCode);
+	        //random for now, but would be the User object for the logged in user 
+	        User safeStoreUser = new User("testUser", "testPassword");
+	        CreditCard creditCard;
+	        if(hasNickname) {
+	        	creditCard = new CreditCard(safeStoreUser, nickname, creditCardNumber, expirationDate, cvv, billingAddress);
+	        }
+	        else {
+	        	creditCard = new CreditCard(safeStoreUser, creditCardNumber, expirationDate, cvv, billingAddress);
+	        }
+	        creditCard.addCard(databaseConnection);
+	        
+	}
+	
+	public static void main(String[] args) {
+		ConnectionSource databaseConnection;
+		String databaseUrl = "jdbc:sqlite:src/database/app.db";
+		try {
+			databaseConnection = new JdbcConnectionSource(databaseUrl);
+			@SuppressWarnings("resource")
+			Scanner keyboard = new Scanner(System.in);
+			System.out.println("Would you like to add a Website Account, Credit Card, or Debit Card?");
+			String userInput = keyboard.nextLine();
+			while (!userInput.trim().equals("WebsiteAccount") && !userInput.trim().equals("Credit Card") && !userInput.trim().equals("Debit Card")) {
+				System.out.println("Enter 'Website Account', 'Credit Card', or 'Debit Card'");
+		        userInput = keyboard.nextLine();
+		    }
+			if(userInput.equals("Credit Card")) {
+				CreditCard.addCreditCard(databaseConnection, keyboard);
+			}
+		}
+		catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 
 }
