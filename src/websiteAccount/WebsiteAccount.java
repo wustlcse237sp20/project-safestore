@@ -15,20 +15,43 @@ public class WebsiteAccount {
 	private WebsiteAccountEntity websiteAccountEntity;
 	
 	public WebsiteAccount(User safeStoreUser, String nickname, String websiteLogin, String websitePassword) {
-			websiteAccountEntity = new WebsiteAccountEntity(safeStoreUser.getUserEntity(), Encryption.encrypt(nickname), 
-					Encryption.encrypt(websiteLogin), Encryption.encrypt(websitePassword));
+		String encryptedNickname = Encryption.encrypt(nickname);
+		String encryptedLogin = Encryption.encrypt(websiteLogin);
+		String encryptedPassword = Encryption.encrypt(websitePassword);
+		websiteAccountEntity = new WebsiteAccountEntity(
+				safeStoreUser.getUserEntity(), encryptedNickname, encryptedLogin, encryptedPassword);
 	}
 	
 	public WebsiteAccount(WebsiteAccountEntity websiteAccountEntity) {
 		this.websiteAccountEntity = websiteAccountEntity;
 	}
 	
-	public WebsiteAccountEntity getWebsiteAccountEntity() {
-		return this.websiteAccountEntity;
+	public int getId() {
+		return this.websiteAccountEntity.getId();
 	}
-
-	public void setWebsiteAccountEntity(WebsiteAccountEntity websiteAccount) {
-		this.websiteAccountEntity = websiteAccount;
+	
+	public String getNickname() {
+		return Encryption.decrypt(this.websiteAccountEntity.getNickname());
+	}
+	
+	public void setNickname(String nickname) {
+		this.websiteAccountEntity.setNickname(Encryption.encrypt(nickname));
+	}
+	
+	public String getWebsiteLogin() {
+		return Encryption.decrypt(this.websiteAccountEntity.getWebsiteLogin());
+	}
+	
+	public void setWebsiteLogin(String websiteLogin) {
+		this.websiteAccountEntity.setNickname(Encryption.encrypt(websiteLogin));
+	}
+	
+	public String getWebsitePassword() {
+		return Encryption.decrypt(this.websiteAccountEntity.getWebsitePassword());
+	}
+	
+	public void setWebsitePassword(String websitePassword) {
+		this.websiteAccountEntity.setNickname(Encryption.encrypt(websitePassword));
 	}
 	
 	public void addWebsiteAccount(ConnectionSource databaseConnection) throws SQLException {

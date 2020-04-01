@@ -40,6 +40,7 @@ class WebsiteAccountTests {
 			this.databaseConnection = new JdbcConnectionSource("jdbc:sqlite:src/database/app.db");
 			assertNotNull(databaseConnection, "Connection is null. Failed to Connect.");
 			websiteAccountDao = DaoManager.createDao(databaseConnection, WebsiteAccountEntity.class);
+			userDao = DaoManager.createDao(databaseConnection, UserEntity.class);
 		} catch (SQLException e) {
 			fail("Failed to connect to database and set up DAO.");
 			e.printStackTrace();
@@ -49,31 +50,19 @@ class WebsiteAccountTests {
 	@Test
 	void testInsertWebsiteAccountToDatabase() {
 		try {
-			// insert both into database both ways
-			User testUser = new User(testUserEntity);
-			testUser.createSafeStoreAccount(databaseConnection);
-			websiteAccountDao.create(testWebsiteAccountEntity);
-			
-			WebsiteAccount websiteAccountQuery = // insert query object into database
-					new WebsiteAccount(testUser, testAccountNickname, testAccountLogin, testAccountPassword);
-			websiteAccountQuery.addWebsiteAccount(databaseConnection);
-			
-			// pull from database both objects and make sure they are equal
-			WebsiteAccountEntity testEntityPulledFromDb = websiteAccountDao.queryForId(testWebsiteAccountEntity.getId());
-			WebsiteAccountEntity queryEntityPulledFromDb = websiteAccountDao.queryForId(websiteAccountQuery.getWebsiteAccountEntity().getId());
-			System.out.println(testEntityPulledFromDb.getSafeStoreUser());
-			assertEquals("Usernames foreign keys not equal", 
-					testEntityPulledFromDb.getSafeStoreUser().getUsername(), queryEntityPulledFromDb.getSafeStoreUser().getUsername());
-			assertEquals("Nicknames not equal", testEntityPulledFromDb.getNickname(), Encryption.decrypt(queryEntityPulledFromDb.getNickname()));
-			assertEquals("Logins not equal", testEntityPulledFromDb.getWebsiteLogin(), Encryption.decrypt(queryEntityPulledFromDb.getWebsiteLogin()));
-			assertEquals("Passwords not equal", testEntityPulledFromDb.getWebsitePassword(), Encryption.decrypt(queryEntityPulledFromDb.getWebsitePassword()));
+			User testUser = new User(testUserUsername, testUserPassword);
+			userDao.create(testUserEntity);
+			WebsiteAccount account = new WebsiteAccount(testUser, testAccountNickname, testAccountLogin, testAccountPassword);
+			account.addWebsiteAccount(databaseConnection);
+			WebsiteAccountEntity accountPulledFromDb = websiteAccountDao.queryForId(account.getId());
+			assertEquals("Usernames foreign keys not equal", accountPulledFromDb.getSafeStoreUser().getUsername(), testUserUsername);
+			assertEquals("Nicknames not equal", testAccountNickname, Encryption.decrypt(accountPulledFromDb.getNickname()));
+			assertEquals("Logins not equal", testAccountLogin, Encryption.decrypt(accountPulledFromDb.getWebsiteLogin()));
+			assertEquals("Passwords not equal", testAccountPassword, Encryption.decrypt(accountPulledFromDb.getWebsitePassword()));
 			
 			// delete rows from database once completed test
-			websiteAccountDao.delete(testEntityPulledFromDb); 
-			websiteAccountDao.delete(queryEntityPulledFromDb);
-			
-			// Need to delete user manually because delete not working for some reason
-			//userDao.delete(testUser.getUserEntity());
+			websiteAccountDao.deleteById(account.getId()); 
+			userDao.delete(testUserEntity);
 			
 		} catch (SQLException e) {
 			e.printStackTrace();
