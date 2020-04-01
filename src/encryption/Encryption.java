@@ -17,6 +17,10 @@ public class Encryption {
 	
 	private static SecretKeySpec secretKey = generateKey();
 	
+	/**
+	 * Generates the secret key so that it is not stored in plaintext in the code 
+	 * @return the secret key to use for encryption
+	 */
 	private static SecretKeySpec generateKey() {
 		String baseKey = "coronavirus";
 		String salt = "d0ntb3s@lty";
@@ -34,6 +38,11 @@ public class Encryption {
         return null; 
 	}
 	
+	/**
+	 * Encrypts a string using AES-128
+	 * @param stringToEncrypt
+	 * @return the encrypted string
+	 */
 	public static String encrypt(String stringToEncrypt) {
 		try {
 			
@@ -52,6 +61,12 @@ public class Encryption {
 		
 	}
 	
+	
+	/**
+	 * Decrypts a string that was encrypted using AES-128
+	 * @param stringToDecrypt
+	 * @return the decrypted string
+	 */
 	public static String decrypt(String stringToDecrypt) {
 		try {	
 			byte[] iv = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
