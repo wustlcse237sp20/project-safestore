@@ -72,15 +72,15 @@ public class Address {
 		return this.addressEntity;
 	}
 	
-	public boolean addressExists(ConnectionSource connectionSource){
+	public boolean addressExists(ConnectionSource databaseConnection){
 		//checks if an address with this streetAddress, city, state, zipCode exists 
 		try {
-			Dao<AddressEntity, String> addressDao = DaoManager.createDao(connectionSource, AddressEntity.class);
+			Dao<AddressEntity, String> addressDao = DaoManager.createDao(databaseConnection, AddressEntity.class);
 			Map<String, Object> queryParams = new HashMap<String, Object>();
-			queryParams.put("street_address", this.getStreetAddress());
-			queryParams.put("city", this.getCity());
-			queryParams.put("state", this.getState());
-			queryParams.put("zip_code", this.getZipCode());
+			queryParams.put("street_address", this.addressEntity.getStreetAddress());
+			queryParams.put("city", this.addressEntity.getCity());
+			queryParams.put("state", this.addressEntity.getState());
+			queryParams.put("zip_code", this.addressEntity.getZipCode());
 			
 			List<AddressEntity> returnedAddresses = addressDao.queryForFieldValues(queryParams);
 			if(returnedAddresses.isEmpty()) {
@@ -97,14 +97,14 @@ public class Address {
 		return false; 
 	}
 	
-	private AddressEntity getExistingEntity(ConnectionSource connectionSource) {
+	private AddressEntity getExistingEntity(ConnectionSource databaseConnection) {
 		try {
-			Dao<AddressEntity, String> addressDao = DaoManager.createDao(connectionSource, AddressEntity.class);
+			Dao<AddressEntity, String> addressDao = DaoManager.createDao(databaseConnection, AddressEntity.class);
 			Map<String, Object> queryParams = new HashMap<String, Object>();
-			queryParams.put("street_address", this.getStreetAddress());
-			queryParams.put("city", this.getCity());
-			queryParams.put("state", this.getState());
-			queryParams.put("zip_code", this.getZipCode());
+			queryParams.put("street_address", this.addressEntity.getStreetAddress());
+			queryParams.put("city", this.addressEntity.getCity());
+			queryParams.put("state", this.addressEntity.getState());
+			queryParams.put("zip_code", this.addressEntity.getZipCode());
 			
 			List<AddressEntity> returnedAddresses = addressDao.queryForFieldValues(queryParams);
 			if (returnedAddresses.isEmpty()) {
@@ -120,22 +120,21 @@ public class Address {
 	
 	/**
 	 * 
-	 * @param connectionSource connection to the database
+	 * @param databaseConnection connection to the database
 	 * @return true if it updated to an existing address, false if there was not an existing address to update to
 	 */
-	public boolean updateToExistingAddress(ConnectionSource connectionSource) {
-		if (this.addressExists(connectionSource)) {
-			AddressEntity updatedEntity = this.getExistingEntity(connectionSource);
+	public boolean updateToExistingAddress(ConnectionSource databaseConnection) {
+		if (this.addressExists(databaseConnection)) {
+			AddressEntity updatedEntity = this.getExistingEntity(databaseConnection);
 			this.addressEntity = updatedEntity;
 			return true;
 		}
 		return false;
 	}
 	
-	public boolean addAddress(ConnectionSource connectionSource) {
-		//question: what does the connectionSource represent? Could it be named better? 
+	public boolean addAddress(ConnectionSource databaseConnection) {
 		try {
-			Dao<AddressEntity, String> addressDao = DaoManager.createDao(connectionSource, AddressEntity.class);
+			Dao<AddressEntity, String> addressDao = DaoManager.createDao(databaseConnection, AddressEntity.class);
 			int result = addressDao.create(this.addressEntity);
 			return result == 1;
 		} catch (SQLException e) {
@@ -147,13 +146,13 @@ public class Address {
 	
 	/**
 	 * Method only used for cleaning up after tests
-	 * @param connectionSource
+	 * @param databaseConnection
 	 */
-	public void deleteAddress(ConnectionSource connectionSource) {
-		if (this.addressExists(connectionSource)) {
-			this.updateToExistingAddress(connectionSource);
+	public void deleteAddress(ConnectionSource databaseConnection) {
+		if (this.addressExists(databaseConnection)) {
+			this.updateToExistingAddress(databaseConnection);
 			try {
-				Dao<AddressEntity, String> addressDao = DaoManager.createDao(connectionSource, AddressEntity.class);
+				Dao<AddressEntity, String> addressDao = DaoManager.createDao(databaseConnection, AddressEntity.class);
 				addressDao.delete(this.addressEntity);
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block

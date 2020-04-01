@@ -19,7 +19,7 @@ import tables.AddressEntity;
 
 class addressTests {
 	
-	ConnectionSource connectionSource;
+	ConnectionSource databaseConnection;
 	AddressEntity testAddressEntity;
 	Dao<AddressEntity, String> addressDao;
 	
@@ -27,10 +27,10 @@ class addressTests {
     public void setUp() {
 		String databaseUrl = "jdbc:sqlite:src/database/app.db";
 		try {
-			connectionSource = new JdbcConnectionSource(databaseUrl);
-			assertNotNull(connectionSource, "Connection is null. Failed to Connect.");
+			databaseConnection = new JdbcConnectionSource(databaseUrl);
+			assertNotNull(databaseConnection, "Connection is null. Failed to Connect.");
 			
-			addressDao = DaoManager.createDao(connectionSource, AddressEntity.class);
+			addressDao = DaoManager.createDao(databaseConnection, AddressEntity.class);
 			
 			testAddressEntity = new AddressEntity();
 			
@@ -52,12 +52,7 @@ class addressTests {
 		try {
 			addressDao.delete(testAddressEntity);
 			
-			List<AddressEntity> addresses = addressDao.queryForAll();
-			System.out.println("address all query start");
-			for (AddressEntity entity : addresses) {
-				System.out.println("LOOK HERE  " + entity.getId());
-			}
-			connectionSource.close();
+			databaseConnection.close();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -66,22 +61,22 @@ class addressTests {
 
 	@Test
 	void testAddressExistsExistingAddresses() {
-		Address testAddress = new Address("test street address", "test city", "test state", "test zip code");
-		boolean result = testAddress.addressExists(connectionSource);
+		Address testAddress = new Address(testAddressEntity);
+		boolean result = testAddress.addressExists(databaseConnection);
 		assertTrue(result, "Address didn't exist, but it should");
 	}
 	
 	@Test
 	void testAddressExistsNonExistingAddresses() {
 		Address testAddress = new Address("fake", "fake", "fake", "fake");
-		boolean result = testAddress.addressExists(connectionSource);
+		boolean result = testAddress.addressExists(databaseConnection);
 		assertFalse(result, "Address exists, but it shouldn't");
 	}
 	
 	@Test
 	void testUpdateToExistingAddress() {
-		Address testAddress = new Address("test street address", "test city", "test state", "test zip code");
-		boolean result = testAddress.updateToExistingAddress(connectionSource);
+		Address testAddress = new Address(testAddressEntity);
+		boolean result = testAddress.updateToExistingAddress(databaseConnection);
 		assertTrue(result, "Returned false, but should return true if updated to existing address");
 		assertTrue(testAddress.getId() == testAddressEntity.getId(), "Did not actually update address");
 	}
@@ -89,7 +84,7 @@ class addressTests {
 	@Test 
 	void testUpdateToExistingAddressNoAddress() {
 		Address testAddress = new Address("fake", "fake", "fake", "fake");
-		boolean result = testAddress.updateToExistingAddress(connectionSource);
+		boolean result = testAddress.updateToExistingAddress(databaseConnection);
 		assertFalse(result, "Returned true, but should return false if updated to existing address");
 		assertTrue(testAddress.getId() == 0, "Updated address, but should not have");
 	}
@@ -98,7 +93,7 @@ class addressTests {
 	void testAddAddress() {
 		AddressEntity newEntity = new AddressEntity("123 oak st", "STL", "MO", "20394");
 		Address testAddress = new Address(newEntity);
-		boolean result = testAddress.addAddress(connectionSource);
+		boolean result = testAddress.addAddress(databaseConnection);
 		assertTrue(result, "Should return true if added");
 		try {
 			List<AddressEntity> queryResults = addressDao.queryForMatching(newEntity);
@@ -119,7 +114,7 @@ class addressTests {
 	void testDeleteAddress() {
 		AddressEntity toDeleteEntity = new AddressEntity("4 cherry ln", "STL", "MO", "0934");
 		Address toDelete = new Address(toDeleteEntity);
-		toDelete.deleteAddress(connectionSource);
+		toDelete.deleteAddress(databaseConnection);
 		try {
 			List<AddressEntity> queryResults = addressDao.queryForMatching(toDeleteEntity);
 			assertTrue(queryResults.isEmpty(), "Should get no results when finding the address added");	
