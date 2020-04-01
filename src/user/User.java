@@ -14,10 +14,19 @@ import tables.UserEntity;
 public class User {
 	private UserEntity userEntity;
 	
+	/**
+	 * Constructor for logging into existing SafeStore User account
+	 * @param userEntity record for SafeStore User account from UserEntity table
+	 */
 	public User(UserEntity userEntity) {
 		this.userEntity = userEntity;
 	}
 	
+	/**
+	 * Constructor for when creating a new SafeStore User account 
+	 * @param username
+	 * @param password
+	 */
 	public User(String username, String password) {
 		byte[] salt = getSalt();
 		if(salt != null) {
@@ -33,6 +42,12 @@ public class User {
 		return userEntity;
 	}
 	
+	/**
+	 * 
+	 * @param connectionSource to connect to UserEntity table 
+	 * @param username to check against usernames in UserEntity table
+	 * @return true if unique username is UserEntity table
+	 */
 	public static boolean isUniqueUsername(ConnectionSource connectionSource, String username) {
 		try {
 			Dao<UserEntity, String> userEntityDao = DaoManager.createDao(connectionSource, UserEntity.class);
@@ -63,7 +78,6 @@ public class User {
 		    sr.nextBytes(salt);
 		    return salt;
 		} catch (NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;
@@ -82,9 +96,7 @@ public class User {
         try {
             // Create MessageDigest instance for MD5
             MessageDigest md = MessageDigest.getInstance("MD5");
-            //Add password bytes to digest
             md.update(salt);
-            //Get the hash's bytes 
             byte[] bytes = md.digest(passwordToHash.getBytes());
             //This bytes[] has bytes in decimal format;
             //Convert it to hexadecimal format
@@ -103,7 +115,7 @@ public class User {
     }
 	
 	/**
-	 * 
+	 * Tries to input new SafeStore user account info into database
 	 * @param connectionSource to connect to UserEntity table 
 	 * @return true if safe store account successfully created 
 	 */
