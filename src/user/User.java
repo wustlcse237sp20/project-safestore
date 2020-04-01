@@ -33,6 +33,19 @@ public class User {
 		return userEntity;
 	}
 	
+	public static boolean isUniqueUsername(ConnectionSource connectionSource, String username) {
+		try {
+			Dao<UserEntity, String> userEntityDao = DaoManager.createDao(connectionSource, UserEntity.class);
+			UserEntity matchedUser = userEntityDao.queryForId(username);
+			if(matchedUser == null) {
+				return true;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+	
 	/**
 	 *  method from: 
 	 *  https://howtodoinjava.com/security/how-to-generate-secure-password-hash-md5-sha-pbkdf2-bcrypt-examples/
