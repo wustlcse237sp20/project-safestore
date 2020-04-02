@@ -84,7 +84,7 @@ public class CreditCard implements Card{
 		
 	}
 	
-	public static void addCreditCard(ConnectionSource databaseConnection, Scanner keyboard) {
+	public static void addCreditCard(ConnectionSource databaseConnection, Scanner keyboard, User safeStoreUser) {
 			String userInput = "";
 		
 			//Setting up Credit Card Variables
@@ -132,9 +132,7 @@ public class CreditCard implements Card{
 	        System.out.println("What is the zip code?");
 	        zipCode = keyboard.nextLine();
 	        
-	        Address billingAddress = new Address(streetAddress, city, state, zipCode);
-	        //random for now, but would be the User object for the logged in user 
-	        User safeStoreUser = new User("testUser", "testPassword");
+	        Address billingAddress = new Address(streetAddress, city, state, zipCode);	        
 	        CreditCard creditCard;
 	        if(hasNickname) {
 	        	creditCard = new CreditCard(safeStoreUser, nickname, creditCardNumber, expirationDate, cvv, billingAddress);
@@ -160,7 +158,8 @@ public class CreditCard implements Card{
 		        userInput = keyboard.nextLine();
 		    }
 			if(userInput.equals("Credit Card")) {
-				CreditCard.addCreditCard(databaseConnection, keyboard);
+				User safeStoreUser = new User("testUser", "testPassword");
+				CreditCard.addCreditCard(databaseConnection, keyboard, safeStoreUser);
 			}
 		}
 		catch (SQLException e) {

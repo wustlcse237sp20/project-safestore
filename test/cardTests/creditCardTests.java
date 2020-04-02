@@ -2,10 +2,13 @@ package cardTests;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -93,6 +96,10 @@ class creditCardTests {
 			ForeignCollection<CreditCardEntity> associatedCreditCards = returnedAddressEntity.getCreditCards();
 			assertTrue(associatedCreditCards.size() == 1, "Address should only have one card associated with it");
 			
+			UserEntity returnedUser = userDao.queryForSameId(testUserEntity);
+			ForeignCollection<CreditCardEntity> usersAssociatedCreditCards = returnedUser.getCreditCards();
+			assertTrue(usersAssociatedCreditCards.size() == 1, "User should only have one card associated with it");
+			
 			Dao<CreditCardEntity, String> creditCardDao = DaoManager.createDao(databaseConnection, CreditCardEntity.class);
 			CreditCardEntity queriedCard = creditCardDao.queryForId(encryptedCreditCardNumber);
 			CreditCard queriedCreditCard = new CreditCard(queriedCard);
@@ -129,8 +136,11 @@ class creditCardTests {
 			
 			AddressEntity returnedAddressEntity = returnedAddresses.get(0);
 			ForeignCollection<CreditCardEntity> associatedCreditCards = returnedAddressEntity.getCreditCards();
-			System.out.println("LOOK BOI: " + associatedCreditCards.size());
 			assertTrue(associatedCreditCards.size() == 1, "Address should only have one card associated with it");
+			
+			UserEntity returnedUser = userDao.queryForSameId(testUserEntity);
+			ForeignCollection<CreditCardEntity> usersAssociatedCreditCards = returnedUser.getCreditCards();
+			assertTrue(usersAssociatedCreditCards.size() == 1, "User should only have one card associated with it");
 			
 			Dao<CreditCardEntity, String> creditCardDao = DaoManager.createDao(databaseConnection, CreditCardEntity.class);
 			CreditCardEntity queriedCard = creditCardDao.queryForId(encryptedCreditCardNumber);
@@ -146,6 +156,19 @@ class creditCardTests {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	@Test
+	void testStaticAddCreditCardDefaultNickname() {
+		File file = new File("addCardDefaultNicknameInput.txt");
+		try {
+			Scanner keyboard = new Scanner(file);
+		} catch (FileNotFoundException e) {
+			System.out.println("Scanner initialization failed");
+			e.printStackTrace();
+		}
+		
+		
 	}
 
 }
