@@ -81,6 +81,7 @@ class WebsiteAccountTests {
 		try {
 			Scanner keyboard = new Scanner(file);
 			User testUser = new User(testUserUsername, testUserPassword);
+			userDao.create(testUserEntity);
 			assertTrue(WebsiteAccount.addWebsiteAccountPrompts(databaseConnection, keyboard, testUser), "Insert account failed");
 			
 			QueryBuilder<WebsiteAccountEntity, Integer> queryBuilder = websiteAccountDao.queryBuilder();
@@ -95,6 +96,7 @@ class WebsiteAccountTests {
 			assertEquals("Passwords not equal", "pas938wo4045rd", Encryption.decrypt(accountPulledFromDb.getWebsitePassword()));
 			
 			websiteAccountDao.delete(accountPulledFromDb); 
+			userDao.delete(testUserEntity);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (SQLException e) {

@@ -1,11 +1,15 @@
 package websiteAccount;
 
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Scanner;
 
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.jdbc.JdbcConnectionSource;
+import com.j256.ormlite.stmt.PreparedQuery;
+import com.j256.ormlite.stmt.QueryBuilder;
+import com.j256.ormlite.stmt.Where;
 import com.j256.ormlite.support.ConnectionSource;
 
 import encryption.Encryption;
@@ -66,6 +70,20 @@ public class WebsiteAccount {
 		try {
 			Dao<WebsiteAccountEntity, Integer> websiteAccountDao = 
 					DaoManager.createDao(databaseConnection, WebsiteAccountEntity.class);
+			
+			QueryBuilder<WebsiteAccountEntity, Integer> queryBuilder = websiteAccountDao.queryBuilder();
+			Where<WebsiteAccountEntity, Integer> where = queryBuilder.where();
+			where.eq("nickname", this.getNickname());
+			where.and();
+			where.eq("safe_store_username", this.websiteAccountEntity.getSafeStoreUser().getUsername());
+			PreparedQuery<WebsiteAccountEntity> preparedQuery = queryBuilder.prepare();
+			List<WebsiteAccountEntity> accountsWithMatchingNicknames = websiteAccountDao.query(preparedQuery);
+			
+			// there is an account with this existing nickname
+			if (accountsWithMatchingNicknames.size() != 0) {
+				return false;
+			}
+			
 			websiteAccountDao.create(websiteAccountEntity);
 		} catch (SQLException e) {
 			e.printStackTrace();
