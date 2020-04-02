@@ -54,6 +54,12 @@ public class WebsiteAccount {
 		this.websiteAccountEntity.setNickname(Encryption.encrypt(websitePassword));
 	}
 	
+	/**
+	 * Adds the WebsiteAccount to the database
+	 * @param databaseConnection - the ConnectionSource object to the database where the 
+	 * 								the web account will be stored
+	 * @throws SQLException
+	 */
 	public void addWebsiteAccount(ConnectionSource databaseConnection) throws SQLException {
 		try {
 			Dao<WebsiteAccountEntity, Integer> websiteAccountDao = 
