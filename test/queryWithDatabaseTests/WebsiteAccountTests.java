@@ -3,7 +3,11 @@ package queryWithDatabaseTests;
 import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.sql.SQLException;
+import java.util.List;
+import java.util.Scanner;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,6 +15,8 @@ import org.junit.jupiter.api.Test;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.jdbc.JdbcConnectionSource;
+import com.j256.ormlite.stmt.PreparedQuery;
+import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.support.ConnectionSource;
 
 import encryption.Encryption;
@@ -67,6 +73,33 @@ class WebsiteAccountTests {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} 
+	}
+	
+	@Test
+	void testStaticAddWebsiteAccount() {
+		File file = new File("test/queryWithDatabaseTests/addWebAccountInput.txt");
+		try {
+			Scanner keyboard = new Scanner(file);
+			User testUser = new User(testUserUsername, testUserPassword);
+			assertTrue(WebsiteAccount.addWebsiteAccountPrompts(databaseConnection, keyboard, testUser), "Insert account failed");
+			
+			QueryBuilder<WebsiteAccountEntity, Integer> queryBuilder = websiteAccountDao.queryBuilder();
+			queryBuilder.where().eq("safe_store_username", testUserUsername);
+			PreparedQuery<WebsiteAccountEntity> preparedQuery = queryBuilder.prepare();
+			List<WebsiteAccountEntity> accountList = websiteAccountDao.query(preparedQuery);
+			WebsiteAccountEntity accountPulledFromDb = accountList.get(0);
+			assertTrue(accountList.size() == 1, "Should have inserted exactly 1 account into db but was not the case");
+			
+			assertEquals("Nicknames not equal", "niiicckknnaammmee", Encryption.decrypt(accountPulledFromDb.getNickname()));
+			assertEquals("Logins not equal", "uusseernna3948me", Encryption.decrypt(accountPulledFromDb.getWebsiteLogin()));
+			assertEquals("Passwords not equal", "pas938wo4045rd", Encryption.decrypt(accountPulledFromDb.getWebsitePassword()));
+			
+			websiteAccountDao.delete(accountPulledFromDb); 
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 		
 	}
 

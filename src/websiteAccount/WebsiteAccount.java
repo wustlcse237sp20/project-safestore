@@ -62,14 +62,16 @@ public class WebsiteAccount {
 	 * 								the web account will be stored
 	 * @throws SQLException
 	 */
-	public void addWebsiteAccount(ConnectionSource databaseConnection) throws SQLException {
+	public boolean addWebsiteAccount(ConnectionSource databaseConnection) {
 		try {
 			Dao<WebsiteAccountEntity, Integer> websiteAccountDao = 
 					DaoManager.createDao(databaseConnection, WebsiteAccountEntity.class);
 			websiteAccountDao.create(websiteAccountEntity);
 		} catch (SQLException e) {
 			e.printStackTrace();
+			return false;
 		}
+		return true;
 	}
 	
 	/**
@@ -78,7 +80,7 @@ public class WebsiteAccount {
 	 * 								the web account will be stored
 	 * @param keyboard - the input stream for entering in info which will be the keyboard
 	 */
-	public static void addWebsiteAccountPrompts(ConnectionSource databaseConnection, Scanner keyboard) {
+	public static boolean addWebsiteAccountPrompts(ConnectionSource databaseConnection, Scanner keyboard, User safeStoreUser) {
 		// Setting up website account variables
 		String nickname = "";
 		String login = "";
@@ -91,37 +93,8 @@ public class WebsiteAccount {
 		System.out.println("Please provide the password for this account: ");
 		password = keyboard.nextLine();
 		
-		User safeStoreUser = new User("testUser", "testPassword");
 		WebsiteAccount websiteAccount = new WebsiteAccount(safeStoreUser, nickname, login, password);
-		try {
-			websiteAccount.addWebsiteAccount(databaseConnection);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		
+		return websiteAccount.addWebsiteAccount(databaseConnection);
 	}
 	
-	public static void main(String[] args) {
-		ConnectionSource databaseConnection;
-		String databaseUrl = "jdbc:sqlite:src/database/app.db";
-		try {
-			databaseConnection = new JdbcConnectionSource(databaseUrl);
-			Scanner keyboard = new Scanner(System.in);
-			System.out.println("Would you like to add a Website Account, Credit Card, or Debit Card?");
-			String userInput = keyboard.nextLine();
-			while (!userInput.trim().equals("Website Account") && !userInput.trim().equals("Credit Card") && !userInput.trim().equals("Debit Card")) {
-				System.out.println("Enter 'Website Account', 'Credit Card', or 'Debit Card'");
-		        userInput = keyboard.nextLine();
-		    }
-			if (userInput.equals("Website Account")) {
-				WebsiteAccount.addWebsiteAccountPrompts(databaseConnection, keyboard);
-			}
-		}
-		catch (SQLException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	
-
 }
