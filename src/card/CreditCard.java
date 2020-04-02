@@ -1,6 +1,9 @@
 package card;
 
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 import com.j256.ormlite.dao.Dao;
@@ -67,36 +70,45 @@ public class CreditCard implements Card{
 	/**
 	 * Checks if the address associated already exists, if it does then just adds the 
 	 * credit card with a the foreign key to the appropriate existing address. If it can't
-	 * update to the existing address, the card isn't added and method returns false.
+	 * update to the existing address, an exception is thrown.
 	 * If address doesn't exist, adds the address to the database, and then the credit
-	 * card with the appropriate foreign key. Returns false if the new addresses wasn't added.
+	 * card with the appropriate foreign key. If address isn't added, an exception is thrown.
 	 * 
 	 * @param databaseConnection
-	 * @return true if the credit card was successfully added, false if not
+	 * @return true if the credit card was successfully added, false if nickname already in use
+	 * @throws Exception if the 
 	 */
-	public boolean addCard(ConnectionSource databaseConnection) {
+	public boolean addCard(ConnectionSource databaseConnection) throws Exception {
 		if (this.billingAddress.addressExists(databaseConnection)) {
 			boolean updateSuccessful = this.billingAddress.updateToExistingAddress(databaseConnection);
 			this.creditCardEntity.setBillingAddress(this.billingAddress.getAddressEntity());
 			if (!updateSuccessful) {
-				return false;
+				throw(new Exception("Exisitng address not gotten properly, abort add card"));
 			}
 		}
 		else {
 			boolean addAddressSuccessful = this.billingAddress.addAddress(databaseConnection);
 			this.creditCardEntity.setBillingAddress(this.billingAddress.getAddressEntity());
 			if(!addAddressSuccessful) {
-				return false;
+				throw(new Exception("Address not added properly, abort add card"));
 			}
 		}
 		
 		try {
 			Dao<CreditCardEntity, String> creditCardDao = DaoManager.createDao(databaseConnection, CreditCardEntity.class);
+			Map<String, Object> queryParams = new HashMap<String, Object>();
+			queryParams.put("nickname", this.getNickname());
+			queryParams.put("safe_store_username", this.creditCardEntity.getSafeStoreUser());
+			List<CreditCardEntity> returnedCreditCards = creditCardDao.queryForFieldValues(queryParams);
+			if (returnedCreditCards.size() > 0) {
+				return false;
+			}
+			
 			creditCardDao.create(this.creditCardEntity);
 			return true;
 		} catch (SQLException e) {
 			e.printStackTrace();
-			return false;
+			throw(new Exception("Failed to connect to database"));
 		}
 		
 	}
@@ -166,8 +178,12 @@ public class CreditCard implements Card{
 	        else {
 	        	creditCard = new CreditCard(safeStoreUser, creditCardNumber, expirationDate, cvv, billingAddress);
 	        }
-	        return creditCard.addCard(databaseConnection);
-	        
+	        try {
+				return creditCard.addCard(databaseConnection);
+			} catch (Exception e) {
+				System.out.println(e);
+				return false;
+			}
 	}
 	
 	/**
