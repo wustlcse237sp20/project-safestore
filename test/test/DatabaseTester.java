@@ -3,42 +3,22 @@ package test;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.sql.Statement;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.rules.ExpectedException;
 
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
-import com.j256.ormlite.dao.GenericRawResults;
 import com.j256.ormlite.jdbc.JdbcConnectionSource;
 import com.j256.ormlite.support.ConnectionSource;
-import com.j256.ormlite.support.DatabaseConnection;
 import tables.AddressEntity;
 import tables.CreditCardEntity;
 import tables.DebitCardEntity;
 import tables.UserEntity;
 import tables.WebsiteAccountEntity;
-import database.Connect;
-import database.InsertRecords;
 
-/**
- * Things to test:
- * connect to database, disconnect (done)
- * database tables/columns exist and are correct (done)
- * can add data to tables
- * can query data from tables
- *
- */
 
 /** 
  * !!! sql col types are found here 
@@ -54,14 +34,7 @@ public class DatabaseTester {
 	Dao<DebitCardEntity, String> debitCardDao;
 	Dao<WebsiteAccountEntity, String> websiteDao;
 	Dao<AddressEntity, String> addressDao;
-	
-	//generic record objects
-	UserEntity testUser = new UserEntity();
-	WebsiteAccountEntity testWebAcct = new WebsiteAccountEntity();
-	AddressEntity testAddress = new AddressEntity();
-	CreditCardEntity testCreditCard = new CreditCardEntity();
-	DebitCardEntity testDebitCard = new DebitCardEntity();
-	
+
 	/**
 	 * Setup connection to database.
 	 * Tests connecting to db doesn't throw SQLExceptions 
@@ -79,35 +52,7 @@ public class DatabaseTester {
 			debitCardDao = DaoManager.createDao(connectionSource, DebitCardEntity.class);
 			websiteDao = DaoManager.createDao(connectionSource, WebsiteAccountEntity.class);
 			addressDao = DaoManager.createDao(connectionSource, AddressEntity.class);
-						
-			testUser.setUsername("test user");
-			testUser.setPasswordHashed("not a hashed password");
-			testUser.setSalt("actually kind of a salt");
 			
-			testWebAcct.setNickname("test website");
-			testWebAcct.setSafeStoreUser(testUser);
-			testWebAcct.setWebsiteLogin("test login");
-			testWebAcct.setWebsitePassword("test website pswd");
-			
-			testAddress.setCity("test city");
-			testAddress.setState("test state");
-			testAddress.setStreetAddress("test street address");
-			testAddress.setZipCode("test zip code");
-			
-			testCreditCard.setBillingAddress(testAddress);
-			testCreditCard.setCreditCardNumber("test credit card number");
-			testCreditCard.setCvv("test cvv");
-			testCreditCard.setNickname("test nickname");
-			testCreditCard.setSafeStoreUser(testUser);
-			testCreditCard.setExpirationDate("test date");
-			
-			testDebitCard.setBillingAddress(testAddress);
-			testDebitCard.setCvv("test cvv");
-			testDebitCard.setNickname("test nickname");
-			testDebitCard.setDebitCardNumber("test debit card number");
-			testDebitCard.setExpirationDate("test date");
-			testDebitCard.setPin("test pin");
-			testDebitCard.setSafeStoreUser(testUser);
 		}
 		catch (SQLException e) {
 			fail("failed to connect to database.");
@@ -179,7 +124,7 @@ public class DatabaseTester {
 		assertTrue(connectionSource.isOpen("Address"), "Failed to connect to Address Table");
 	}
 	
-	@After
+	@AfterEach
 	@Test
 	public void testDisconnect() {
 		if(connectionSource != null) {
