@@ -73,7 +73,7 @@ public class WebsiteAccount {
 			
 			QueryBuilder<WebsiteAccountEntity, Integer> queryBuilder = websiteAccountDao.queryBuilder();
 			Where<WebsiteAccountEntity, Integer> where = queryBuilder.where();
-			where.eq("nickname", this.getNickname());
+			where.eq("nickname", Encryption.encrypt(this.getNickname()));
 			where.and();
 			where.eq("safe_store_username", this.websiteAccountEntity.getSafeStoreUser().getUsername());
 			PreparedQuery<WebsiteAccountEntity> preparedQuery = queryBuilder.prepare();
@@ -83,14 +83,15 @@ public class WebsiteAccount {
 			if (accountsWithMatchingNicknames.size() != 0) {
 				return false;
 			}
-			
-			websiteAccountDao.create(websiteAccountEntity);
+			else {
+				websiteAccountDao.create(websiteAccountEntity);
+				return true;
+			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return false;
 		}
-		return true;
-	}
+	}	
 	
 	/**
 	 * Prompts the user to add info for a website account 

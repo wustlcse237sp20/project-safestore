@@ -104,5 +104,24 @@ class WebsiteAccountTests {
 		}
 		
 	}
+	
+
+	@Test
+	void testInsertWebsiteAccountToDatabaseWithSameNickname() {
+		try {
+			User testUser = new User(testUserUsername, testUserPassword);
+			userDao.create(testUserEntity);
+			WebsiteAccount account = new WebsiteAccount(testUser, testAccountNickname, testAccountLogin, testAccountPassword);
+			account.addWebsiteAccount(databaseConnection);
+			assertFalse(account.addWebsiteAccount(databaseConnection), "Was able to add same nickname");
+			
+			// delete rows from database once completed test
+			websiteAccountDao.deleteById(account.getId()); 
+			userDao.delete(testUserEntity);
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} 
+	}
 
 }
