@@ -6,13 +6,14 @@ import java.util.Scanner;
 
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
-import com.j256.ormlite.jdbc.JdbcConnectionSource;
+import com.j256.ormlite.dao.ForeignCollection;
 import com.j256.ormlite.stmt.PreparedQuery;
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.stmt.Where;
 import com.j256.ormlite.support.ConnectionSource;
 
 import encryption.Encryption;
+import tables.UserEntity;
 import tables.WebsiteAccountEntity;
 import user.User;
 
@@ -100,20 +101,53 @@ public class WebsiteAccount {
 	 * @param keyboard - the input stream for entering in info which will be the keyboard
 	 */
 	public static boolean addWebsiteAccountPrompts(ConnectionSource databaseConnection, Scanner keyboard, User safeStoreUser) {
-		// Setting up website account variables
-		String nickname = "";
-		String login = "";
-		String password = "";
-		
 		System.out.println("Please provide a name for this account: ");
-		nickname = keyboard.nextLine();
+		String nickname = keyboard.nextLine();
 		System.out.println("Please provide the login (username or email adddress) for this account: ");
-		login = keyboard.nextLine();
+		String login = keyboard.nextLine();
 		System.out.println("Please provide the password for this account: ");
-		password = keyboard.nextLine();
+		String password = keyboard.nextLine();
 		
 		WebsiteAccount websiteAccount = new WebsiteAccount(safeStoreUser, nickname, login, password);
 		return websiteAccount.addWebsiteAccount(databaseConnection);
+	}
+	
+	public static String viewWebsiteAccountLogin(ConnectionSource databaseConnection, Scanner keyboard, User safeStoreUser) {
+		try {
+			// get user object from db to view accounts
+			Dao<UserEntity, String> userDao = DaoManager.createDao(databaseConnection, UserEntity.class);
+			UserEntity returnedFromDb = userDao.queryForSameId(safeStoreUser.getUserEntity());
+			ForeignCollection<WebsiteAccountEntity> websiteAccounts = returnedFromDb.getWebsiteAccounts();
+			
+			// print out all the accounts for the user
+			if (websiteAccounts.isEmpty()) {
+				System.out.println("No accounts");
+				return "No accounts";
+			}
+			for (WebsiteAccountEntity account : websiteAccounts) {
+				System.out.println(Encryption.decrypt(account.getNickname()));
+			}
+			
+			// get the user to type in which one they want to view, and keep asking 
+			String login = "";
+			System.out.println("Type the account that you want to see the username for:");
+			while (login.equals("")) {
+				String nickname = keyboard.nextLine();
+				for (WebsiteAccountEntity account : websiteAccounts) {
+					if (nickname.equals(Encryption.decrypt(account.getNickname()))) {
+						login = Encryption.decrypt(account.getWebsiteLogin());
+						System.out.println("Login: " + Encryption.decrypt(account.getWebsiteLogin()));
+					}
+				}
+				if (login.equals("")) {
+					System.out.println("Invalid account name. Type the name exactly how it printed above.");
+				}
+			}
+			return login;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return "SQL Error Occured";
+		}
 	}
 	
 }

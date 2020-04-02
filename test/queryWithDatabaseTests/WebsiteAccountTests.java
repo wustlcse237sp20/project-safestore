@@ -3,8 +3,11 @@ package queryWithDatabaseTests;
 import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Scanner;
@@ -122,6 +125,33 @@ class WebsiteAccountTests {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} 
+	}
+	
+	@Test
+	void testViewWebsiteAccountLogin() {
+		File file = new File("test/queryWithDatabaseTests/viewLoginForWebAccount.txt");
+		try {
+			// add user and account to db
+			User testUser = new User(testUserUsername, testUserPassword);
+			testUser.createSafeStoreAccount(databaseConnection);
+			WebsiteAccount account = new WebsiteAccount(testUser, testAccountNickname, testAccountLogin, testAccountPassword);
+			account.addWebsiteAccount(databaseConnection);
+			
+			// try to view the website account login
+			Scanner keyboard = new Scanner(file);
+			String loginPrinted = WebsiteAccount.viewWebsiteAccountLogin(databaseConnection, keyboard, testUser);
+			assertEquals(testAccountLogin, loginPrinted);
+			
+			// delete rows from database once completed test
+			websiteAccountDao.deleteById(account.getId()); 
+			userDao.delete(testUser.getUserEntity());
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		
 	}
 
 }
