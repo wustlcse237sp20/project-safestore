@@ -23,12 +23,13 @@ import com.j256.ormlite.dao.GenericRawResults;
 import com.j256.ormlite.jdbc.JdbcConnectionSource;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.support.DatabaseConnection;
-
 import tables.AddressEntity;
 import tables.CreditCardEntity;
 import tables.DebitCardEntity;
 import tables.UserEntity;
 import tables.WebsiteAccountEntity;
+import database.Connect;
+import database.InsertRecords;
 
 /**
  * Things to test:
