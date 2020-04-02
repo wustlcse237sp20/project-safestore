@@ -101,7 +101,6 @@ public class CreditCard implements Card{
 			queryParams.put("safe_store_username", this.creditCardEntity.getSafeStoreUser());
 			List<CreditCardEntity> returnedCreditCards = creditCardDao.queryForFieldValues(queryParams);
 			if (returnedCreditCards.size() > 0) {
-				System.out.println("It returned false??");
 				return false;
 			}
 			
