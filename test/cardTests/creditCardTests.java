@@ -34,6 +34,8 @@ class creditCardTests {
 	Address testAddress;
 	UserEntity testUserEntity;
 	User testUser;
+	User testUserTwo;
+	UserEntity testUserEntityTwo;
 	Dao<AddressEntity, String> addressDao;
 	Dao<UserEntity, String> userDao;
 	
@@ -50,11 +52,16 @@ class creditCardTests {
 			testAddress.addAddress(databaseConnection);
 			
 			testUserEntity = new UserEntity("username", "password", "salt");
+			testUserEntityTwo = new UserEntity("usernametwo", "password", "salt");
 			
 			userDao = DaoManager.createDao(databaseConnection, UserEntity.class);
 			userDao.create(testUserEntity);
 			
 			testUser = new User(testUserEntity);
+			
+			userDao.create(testUserEntityTwo);
+			
+			testUserTwo = new User(testUserEntityTwo);
 			
 		}
 		catch (SQLException e) {
@@ -69,6 +76,7 @@ class creditCardTests {
 		
 		try {
 			userDao.delete(testUserEntity);
+			userDao.delete(testUserEntityTwo);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -191,6 +199,30 @@ class creditCardTests {
 			if(returnedCreditCard != null) {
 				creditCardDao.delete(returnedCreditCard);
 			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Test
+	void testAddCreditCardExistingNicknameDifferentUser() {
+		CreditCard testCreditCard = new CreditCard(testUser, "testNickname", "1234567890", "04/23", "123", testAddress);
+		try {
+			boolean firstAddResult = testCreditCard.addCard(databaseConnection);
+			assertTrue(firstAddResult, "first time adding should be successful");
+			CreditCardEntity firstCreditCard = testCreditCard.getCreditCardEntity();
+			
+			String encryptedCreditCardNumberTwo = Encryption.encrypt("0987654321");
+			CreditCard testCreditCardTwo = new CreditCard(testUserTwo, "testNickname", "0987654321", "04/23", "123", testAddress);
+			boolean secondAddResult = testCreditCardTwo.addCard(databaseConnection);
+			assertTrue(secondAddResult, "Second add should return true due to different user");
+			
+			Dao<CreditCardEntity, String> creditCardDao = DaoManager.createDao(databaseConnection, CreditCardEntity.class);
+			CreditCardEntity returnedCreditCard = creditCardDao.queryForId(encryptedCreditCardNumberTwo);
+			assertFalse(returnedCreditCard == null, "The second credit card should be in the database");
+			creditCardDao.delete(firstCreditCard);
+			creditCardDao.delete(returnedCreditCard);
 			
 		} catch (Exception e) {
 			e.printStackTrace();

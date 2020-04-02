@@ -96,10 +96,12 @@ public class CreditCard implements Card{
 		
 		try {
 			Dao<CreditCardEntity, String> creditCardDao = DaoManager.createDao(databaseConnection, CreditCardEntity.class);
-			Map<String, Object> queryParam = new HashMap<String, Object>();
-			queryParam.put("nickname", this.getNickname());
-			List<CreditCardEntity> returnedCreditCards = creditCardDao.queryForFieldValues(queryParam);
+			Map<String, Object> queryParams = new HashMap<String, Object>();
+			queryParams.put("nickname", this.getNickname());
+			queryParams.put("safe_store_username", this.creditCardEntity.getSafeStoreUser());
+			List<CreditCardEntity> returnedCreditCards = creditCardDao.queryForFieldValues(queryParams);
 			if (returnedCreditCards.size() > 0) {
+				System.out.println("It returned false??");
 				return false;
 			}
 			
