@@ -72,6 +72,13 @@ public class Address {
 		return this.addressEntity;
 	}
 	
+	/**
+	 * Checks if an address with the same street address, city, state, and zip code
+	 * already exists in the database 
+	 * 
+	 * @param databaseConnection
+	 * @return true if the address exists already in the database, false otherwise
+	 */
 	public boolean addressExists(ConnectionSource databaseConnection){
 		//checks if an address with this streetAddress, city, state, zipCode exists 
 		try {
@@ -97,6 +104,11 @@ public class Address {
 		return false; 
 	}
 	
+	/**
+	 * Gets the entity from the database based on the street address, city, state, and zip code
+	 * @param databaseConnection
+	 * @return the AddressEntity
+	 */
 	private AddressEntity getExistingEntity(ConnectionSource databaseConnection) {
 		try {
 			Dao<AddressEntity, String> addressDao = DaoManager.createDao(databaseConnection, AddressEntity.class);
@@ -119,6 +131,7 @@ public class Address {
 	}
 	
 	/**
+	 * Tries to update the Address to have the entity for the existing address.
 	 * 
 	 * @param databaseConnection connection to the database
 	 * @return true if it updated to an existing address, false if there was not an existing address to update to
@@ -132,6 +145,11 @@ public class Address {
 		return false;
 	}
 	
+	/**
+	 * Adds an address to the database
+	 * @param databaseConnection
+	 * @return true if the address was added, false if not
+	 */
 	public boolean addAddress(ConnectionSource databaseConnection) {
 		try {
 			Dao<AddressEntity, String> addressDao = DaoManager.createDao(databaseConnection, AddressEntity.class);

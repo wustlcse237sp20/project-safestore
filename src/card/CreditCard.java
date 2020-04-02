@@ -64,27 +64,53 @@ public class CreditCard implements Card{
 		return Encryption.decrypt(this.creditCardEntity.getCvv());
 	}
 	
-	
-	public void addCard(ConnectionSource databaseConnection) {
+	/**
+	 * Checks if the address associated already exists, if it does then just adds the 
+	 * credit card with a the foreign key to the appropriate existing address. If it can't
+	 * update to the existing address, the card isn't added and method returns false.
+	 * If address doesn't exist, adds the address to the database, and then the credit
+	 * card with the appropriate foreign key. Returns false if the new addresses wasn't added.
+	 * 
+	 * @param databaseConnection
+	 * @return true if the credit card was successfully added, false if not
+	 */
+	public boolean addCard(ConnectionSource databaseConnection) {
 		if (this.billingAddress.addressExists(databaseConnection)) {
-			this.billingAddress.updateToExistingAddress(databaseConnection);
+			boolean updateSuccessful = this.billingAddress.updateToExistingAddress(databaseConnection);
 			this.creditCardEntity.setBillingAddress(this.billingAddress.getAddressEntity());
+			if (!updateSuccessful) {
+				return false;
+			}
 		}
 		else {
-			this.billingAddress.addAddress(databaseConnection);
+			boolean addAddressSuccessful = this.billingAddress.addAddress(databaseConnection);
 			this.creditCardEntity.setBillingAddress(this.billingAddress.getAddressEntity());
+			if(!addAddressSuccessful) {
+				return false;
+			}
 		}
 		
 		try {
 			Dao<CreditCardEntity, String> creditCardDao = DaoManager.createDao(databaseConnection, CreditCardEntity.class);
 			creditCardDao.create(this.creditCardEntity);
+			return true;
 		} catch (SQLException e) {
 			e.printStackTrace();
+			return false;
 		}
 		
 	}
 	
-	public static void addCreditCard(ConnectionSource databaseConnection, Scanner keyboard, User safeStoreUser) {
+	/**
+	 * A static method to prompt user for necessary information to make a credit card 
+	 * and add it to the database
+	 * 
+	 * @param databaseConnection 
+	 * @param keyboard
+	 * @param safeStoreUser
+	 * @return true if the credit card was successfully added, false if not
+	 */
+	public static boolean addCreditCard(ConnectionSource databaseConnection, Scanner keyboard, User safeStoreUser) {
 			String userInput = "";
 		
 			//Setting up Credit Card Variables
@@ -140,10 +166,14 @@ public class CreditCard implements Card{
 	        else {
 	        	creditCard = new CreditCard(safeStoreUser, creditCardNumber, expirationDate, cvv, billingAddress);
 	        }
-	        creditCard.addCard(databaseConnection);
+	        return creditCard.addCard(databaseConnection);
 	        
 	}
 	
+	/**
+	 * Main here is just to test out adding a card through the console, would be deleted when functionality
+	 * added to SafeStore.java
+	 */
 	public static void main(String[] args) {
 		ConnectionSource databaseConnection;
 		String databaseUrl = "jdbc:sqlite:src/database/app.db";
