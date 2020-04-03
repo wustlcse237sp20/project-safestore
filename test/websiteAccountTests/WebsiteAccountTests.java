@@ -1,4 +1,4 @@
-package queryWithDatabaseTests;
+package websiteAccountTests;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.*;
@@ -80,7 +80,7 @@ class WebsiteAccountTests {
 	
 	@Test
 	void testStaticAddWebsiteAccount() {
-		File file = new File("test/queryWithDatabaseTests/addWebAccountInput.txt");
+		File file = new File("test/websiteAccountTests/addWebAccountInput.txt");
 		try {
 			Scanner keyboard = new Scanner(file);
 			User testUser = new User(testUserUsername, testUserPassword);
@@ -129,7 +129,7 @@ class WebsiteAccountTests {
 	
 	@Test
 	void testViewWebsiteAccountLogin() {
-		File file = new File("test/queryWithDatabaseTests/viewLoginForWebAccount.txt");
+		File file = new File("test/websiteAccountTests/viewLoginForWebAccount.txt");
 		try {
 			// add user and account to db
 			User testUser = new User(testUserUsername, testUserPassword);
