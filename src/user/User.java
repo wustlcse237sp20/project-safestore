@@ -34,7 +34,7 @@ public class User {
 			userEntity = new UserEntity();
 			userEntity.setUsername(username);
 			userEntity.setPasswordHashed(hashPassword);
-			userEntity.setSalt(salt.toString());
+			userEntity.setSalt(salt);
 		}
 	}
 	
