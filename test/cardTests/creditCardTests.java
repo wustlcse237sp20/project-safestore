@@ -380,6 +380,38 @@ class creditCardTests {
 		}
 	}
 	
+	@Test
+	void testGetCreditCardFromNickname() {
+		String nickname = "testNickname";
+		String cardNumber = "99998888877776666";
+		String expirationDate = "04/23";
+		String cvv = "987";
+		try {
+			CreditCard testCreditCard = new CreditCard(testUser, nickname, cardNumber, expirationDate, cvv, testAddress);
+			CreditCardEntity testCreditCardEntity = testCreditCard.getCreditCardEntity();
+			Dao<CreditCardEntity, String> creditCardDao = DaoManager.createDao(databaseConnection, CreditCardEntity.class);
+			creditCardDao.create(testCreditCardEntity);
+			String expectedOutput = testCreditCard.toString();
+			
+			CreditCard gottenCard;
+			try {
+				gottenCard = CreditCard.getCreditCardFromNickname(nickname, testUser, databaseConnection);
+				String output = gottenCard.toString();
+				assertTrue(output.equals(expectedOutput), "Expected: " + expectedOutput + " but got: " + output);
+				
+			} catch (Exception e) {
+				e.printStackTrace();
+				creditCardDao.delete(testCreditCardEntity);
+				fail(e);
+			}
+				
+			creditCardDao.delete(testCreditCardEntity);			
+		} catch (SQLException e) {			
+			e.printStackTrace();
+			fail("Error inserting test card (Database failure)");
+		}
+	}
+	
 	
 	@Test
 	void testGetCreditCardInformationAll() {
@@ -401,6 +433,7 @@ class creditCardTests {
 				
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
+				creditCardDao.delete(testCreditCardEntity);			
 				fail("Error with user input text file");
 			}
 			
@@ -431,6 +464,7 @@ class creditCardTests {
 				
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
+				creditCardDao.delete(testCreditCardEntity);			
 				fail("Error with user input text file");
 			}
 			
@@ -461,6 +495,7 @@ class creditCardTests {
 				
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
+				creditCardDao.delete(testCreditCardEntity);			
 				fail("Error with user input text file");
 			}
 			
@@ -491,6 +526,7 @@ class creditCardTests {
 				
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
+				creditCardDao.delete(testCreditCardEntity);			
 				fail("Error with user input text file");
 			}
 			
@@ -521,6 +557,7 @@ class creditCardTests {
 				
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
+				creditCardDao.delete(testCreditCardEntity);			
 				fail("Error with user input text file");
 			}
 			
@@ -551,6 +588,7 @@ class creditCardTests {
 				
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
+				creditCardDao.delete(testCreditCardEntity);			
 				fail("Error with user input text file");
 			}
 			
