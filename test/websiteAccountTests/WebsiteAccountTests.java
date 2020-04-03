@@ -33,7 +33,7 @@ class WebsiteAccountTests {
 	ConnectionSource databaseConnection;
 	String testUserUsername = "username";
 	String testUserPassword = "password";
-	String testUserSalt = "salt";
+	byte[] testUserSalt = new byte[2];
 	UserEntity testUserEntity = new UserEntity(testUserUsername, testUserPassword, testUserSalt);
 	String testAccountNickname = "nickname";
 	String testAccountLogin = "login@login";
