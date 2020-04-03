@@ -115,7 +115,7 @@ class WebsiteAccountTests {
 			User testUser = new User(testUserUsername, testUserPassword);
 			userDao.create(testUserEntity);
 			WebsiteAccount account = new WebsiteAccount(testUser, testAccountNickname, testAccountLogin, testAccountPassword);
-			account.addWebsiteAccount(databaseConnection);
+			assertTrue(account.addWebsiteAccount(databaseConnection), "Wasn't able to add the first account");
 			assertFalse(account.addWebsiteAccount(databaseConnection), "Was able to add same nickname");
 			
 			// delete rows from database once completed test

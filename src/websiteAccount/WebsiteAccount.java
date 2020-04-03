@@ -102,11 +102,23 @@ public class WebsiteAccount {
 	 */
 	public static boolean addWebsiteAccountPrompts(ConnectionSource databaseConnection, Scanner keyboard, User safeStoreUser) {
 		System.out.println("Please provide a name for this account: ");
-		String nickname = keyboard.nextLine();
+		String nickname = keyboard.nextLine().trim();
+		while (nickname.isEmpty()) {
+			System.out.println("Name cannot be blank, please try again: ");
+			nickname = keyboard.nextLine().trim();
+		}
 		System.out.println("Please provide the login (username or email adddress) for this account: ");
-		String login = keyboard.nextLine();
+		String login = keyboard.nextLine().trim();
+		while (login.isEmpty()) {
+			System.out.println("Login cannot be blank, please try again: ");
+			login = keyboard.nextLine().trim();
+		}
 		System.out.println("Please provide the password for this account: ");
-		String password = keyboard.nextLine();
+		String password = keyboard.nextLine().trim();
+		while (password.isEmpty()) {
+			System.out.println("Password cannot be blank, please try again: ");
+			password = keyboard.nextLine().trim();
+		}
 		
 		WebsiteAccount websiteAccount = new WebsiteAccount(safeStoreUser, nickname, login, password);
 		return websiteAccount.addWebsiteAccount(databaseConnection);
@@ -128,18 +140,22 @@ public class WebsiteAccount {
 				System.out.println(Encryption.decrypt(account.getNickname()));
 			}
 			
-			// get the user to type in which one they want to view, and keep asking 
+			// get the user to type in which one they want to view, and keep asking if the account
+			//	doesn't exist of they type in a blank string
 			String login = "";
 			System.out.println("Type the account that you want to see the username for:");
-			while (login.equals("")) {
-				String nickname = keyboard.nextLine();
+			while (login == "") {
+				String nickname = keyboard.nextLine().trim();
 				for (WebsiteAccountEntity account : websiteAccounts) {
 					if (nickname.equals(Encryption.decrypt(account.getNickname()))) {
 						login = Encryption.decrypt(account.getWebsiteLogin());
 						System.out.println("Login: " + Encryption.decrypt(account.getWebsiteLogin()));
 					}
 				}
-				if (login.equals("")) {
+				// if the account they typed in doesn't exist, login will never be updated and continue
+				//	to be an empty string, so this writes a little prompt telling the user to enter a 
+				//	re enter the account
+				if (login == "") {
 					System.out.println("Invalid account name. Type the name exactly how it printed above.");
 				}
 			}
