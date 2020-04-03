@@ -2,8 +2,14 @@ package userTest;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.sql.SQLException;
+import java.util.Scanner;
 
 import org.junit.After;
 import org.junit.jupiter.api.AfterEach;
@@ -36,11 +42,11 @@ class UserTest {
 	}
 
 	@Test
-	void testCreateAccount() {
+	void testCreateAccountDatabaseEnd() {
 		String username = "testNewUser";
 		String password = "testNewPassword";	
 		User newUser = new User(username, password);
-		newUser.createSafeStoreAccount(databaseConnection);
+		assertTrue(newUser.createSafeStoreAccountThroughDatabase(databaseConnection), "should be successful creation");
 		try {
 			Dao<UserEntity, String> userDao = DaoManager.createDao(databaseConnection, UserEntity.class);
 			UserEntity matchedUser = userDao.queryForId(newUser.getUserEntity().extractId());
@@ -53,12 +59,80 @@ class UserTest {
 		}
 	}
 	
+
+	@Test
+	void testCreateAccountThroughTerminal() throws IOException {
+		File createAccountUserInput = new File("test/userTest/terminalCreateAccount");
+		
+		//Prepare to redirect output
+		ByteArrayOutputStream os = new ByteArrayOutputStream();
+		PrintStream ps = new PrintStream(os);
+		System.setOut(ps);
+		
+		try {
+			Scanner terminalCreateAcounnt = new Scanner(createAccountUserInput);
+			
+			//case: empty line before unique username. password  entered normally.
+			assertEquals("test user", User.createSafeStoreAccountTerminal(databaseConnection, terminalCreateAcounnt));
+			assertEquals("Type your username:" + System.getProperty("line.separator")
+					+ "Your username cannot be empty and it must be unique. Try another." 
+					+ System.getProperty("line.separator") + "Type your password:"
+					+ System.getProperty("line.separator"), os.toString());
+			//Restore normal output
+			System.setOut(System.out);
+			os.reset();
+			
+			//case: unique username entered normally. empty line entered before password
+			assertEquals("test user2", User.createSafeStoreAccountTerminal(databaseConnection, terminalCreateAcounnt));
+			assertEquals("Type your username:" + System.getProperty("line.separator")
+				 + "Type your password:" + System.getProperty("line.separator")
+				 + "Your password cannot be empty."+ System.getProperty("line.separator")
+				 , os.toString());
+			System.setOut(System.out);
+			os.reset();
+		
+			//case: unique username and password entered normally
+			assertEquals("test user3", User.createSafeStoreAccountTerminal(databaseConnection, terminalCreateAcounnt));
+			assertEquals("Type your username:" + System.getProperty("line.separator")
+			 	+ "Type your password:"
+				+ System.getProperty("line.separator"), os.toString());
+			System.setOut(System.out);
+			os.reset();
+			
+			//case: non-unique username entered first. Unique username entered
+			//after with password entered normally
+			assertEquals("test user4", User.createSafeStoreAccountTerminal(databaseConnection, terminalCreateAcounnt));
+			assertEquals("Type your username:" + System.getProperty("line.separator")
+			+ "Your username cannot be empty and it must be unique. Try another." 
+			+ System.getProperty("line.separator") + "Type your password:"
+			+ System.getProperty("line.separator"), os.toString());
+			System.setOut(System.out);
+			os.reset();
+			
+			os.close();
+			ps.close();
+			try {
+				Dao<UserEntity, String> userDao = DaoManager.createDao(databaseConnection, UserEntity.class);
+				userDao.deleteById("test user");
+				userDao.deleteById("test user2");
+				userDao.deleteById("test user3");
+				userDao.deleteById("test user4");
+			} catch (SQLException e) {
+				fail("failed to create user dao");
+				e.printStackTrace();
+			}
+			terminalCreateAcounnt.close();
+		} catch (FileNotFoundException e1) {
+			e1.printStackTrace();
+		}
+	}
+	
 	@Test
 	void testUniqueUsername() {
 		String username = "testNewUser";
 		String password = "testNewPassword";	
 		User newUser = new User(username, password);
-		newUser.createSafeStoreAccount(databaseConnection);
+		newUser.createSafeStoreAccountThroughDatabase(databaseConnection);
 		assertFalse(User.isUniqueUsername(databaseConnection, username), "not a unique username. should return false.");
 		assertTrue(User.isUniqueUsername(databaseConnection, "this should be unique"), "unique username. should return true.");
 		try {
@@ -75,9 +149,9 @@ class UserTest {
 		String username = "testNewUser";
 		String password = "testNewPassword";	
 		User newUser = new User(username, password);
-		newUser.createSafeStoreAccount(databaseConnection);
+		newUser.createSafeStoreAccountThroughDatabase(databaseConnection);
 		assertFalse(User.isUniqueUsername(databaseConnection, username), "User is inputed in database.");
-		assertTrue(User.login(databaseConnection, username, password), "User should be able to login");
+		assertTrue(User.loginThroughDatabase(databaseConnection, username, password), "User should be able to login");
 		try {
 			Dao<UserEntity, String> userDao = DaoManager.createDao(databaseConnection, UserEntity.class);
 			userDao.deleteById("testNewUser");
@@ -89,9 +163,9 @@ class UserTest {
 	
 	@Test
 	void testLoginForNonRegisteredUser() {
-		String username = "testNewUser";
-		String password = "testNewPassword";	
-		assertFalse(User.login(databaseConnection, username, password), "User should not be able to login. They are not a registered user.");
+		String username = "testUser";
+		String password = "testPassword";	
+		assertFalse(User.loginThroughDatabase(databaseConnection, username, password), "User should not be able to login. They are not a registered user.");
 	}
 	
 	@Test
@@ -99,7 +173,7 @@ class UserTest {
 		String username = "testNewUser";
 		String password = "testNewPassword";	
 		User newUser = new User(username, password);
-		newUser.createSafeStoreAccount(databaseConnection);
+		newUser.createSafeStoreAccountThroughDatabase(databaseConnection);
 		try {
 			Dao<UserEntity, String> userDao = DaoManager.createDao(databaseConnection, UserEntity.class);
 			UserEntity matchedUser = userDao.queryForId(username);
@@ -109,6 +183,42 @@ class UserTest {
 			userDao.deleteById("testNewUser");
 		} catch (SQLException e) {
 			fail("failed to create user dao");
+			e.printStackTrace();
+		}
+	}
+	
+	@Test
+	void testLoginViaTerminal() {
+		String username = "testNewUser";
+		String password = "testNewPassword";	
+		User newUser = new User(username, password);
+		assertTrue(newUser.createSafeStoreAccountThroughDatabase(databaseConnection), "should be successful account creation.");
+		try {
+			File loginUserInput = new File("test/userTest/terminalLoginTest");
+			Scanner terminalLogin = new Scanner(loginUserInput);
+			
+			//normal case: correct username and password
+			assertEquals(username, User.terminalLogin(databaseConnection, terminalLogin), 
+					"Should return username for a successful login.");
+			
+			//registered username but incorrect password
+			assertNull(User.terminalLogin(databaseConnection, terminalLogin), "Should return null"
+					+ "for an unsuccessful login");
+			
+			//not a registered username 
+			assertNull(User.terminalLogin(databaseConnection, terminalLogin), "Should return null"
+					+ "for an unsuccessful login");
+			
+			terminalLogin.close();
+			try {
+				Dao<UserEntity, String> userDao = DaoManager.createDao(databaseConnection, UserEntity.class);
+				userDao.deleteById("testNewUser");
+			} catch (SQLException e) {
+				fail("failed to create user dao");
+				e.printStackTrace();
+			}
+		} catch (FileNotFoundException e) {
+			fail("failed to open terminal login file");
 			e.printStackTrace();
 		}
 	}
