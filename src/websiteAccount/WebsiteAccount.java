@@ -61,6 +61,14 @@ public class WebsiteAccount {
 		this.websiteAccountEntity.setNickname(Encryption.encrypt(websitePassword));
 	}
 	
+	public WebsiteAccountEntity getWebsiteAccountEntity() {
+		return this.websiteAccountEntity;
+	}
+	
+	public String toString() {
+		return this.getNickname() + " - Login: " + this.getWebsiteLogin() + ", Password: " + this.getWebsitePassword();
+	}
+	
 	/**
 	 * Adds the WebsiteAccount to the database
 	 * @param databaseConnection - the ConnectionSource object to the database where the 
@@ -124,46 +132,68 @@ public class WebsiteAccount {
 		return websiteAccount.addWebsiteAccount(databaseConnection);
 	}
 	
-	public static String viewWebsiteAccountLogin(ConnectionSource databaseConnection, Scanner keyboard, User safeStoreUser) {
+	/**
+	 * gets the foreign collection of all website account rows for that user
+	 * @param databaseConnection
+	 * @param safeStoreUser of type User
+	 * @return a ForeignCollection<WebsiteAccountEntity> that holds all the db rows of accounts
+	 * 			for the safeStoreUser
+	 */
+	public static ForeignCollection<WebsiteAccountEntity> getAllWebsiteAccounts(ConnectionSource databaseConnection, User safeStoreUser) {
+		Dao<UserEntity, String> userDao;
 		try {
-			// get user object from db to view accounts
-			Dao<UserEntity, String> userDao = DaoManager.createDao(databaseConnection, UserEntity.class);
-			UserEntity returnedFromDb = userDao.queryForSameId(safeStoreUser.getUserEntity());
-			ForeignCollection<WebsiteAccountEntity> websiteAccounts = returnedFromDb.getWebsiteAccounts();
-			
-			// print out all the accounts for the user
-			if (websiteAccounts.isEmpty()) {
-				System.out.println("No accounts");
-				return "No accounts";
-			}
-			for (WebsiteAccountEntity account : websiteAccounts) {
-				System.out.println(Encryption.decrypt(account.getNickname()));
-			}
-			
-			// get the user to type in which one they want to view, and keep asking if the account
-			//	doesn't exist of they type in a blank string
-			String login = "";
-			System.out.println("Type the account that you want to see the username for:");
-			while (login == "") {
-				String nickname = keyboard.nextLine().trim();
-				for (WebsiteAccountEntity account : websiteAccounts) {
-					if (nickname.equals(Encryption.decrypt(account.getNickname()))) {
-						login = Encryption.decrypt(account.getWebsiteLogin());
-						System.out.println("Login: " + Encryption.decrypt(account.getWebsiteLogin()));
-					}
-				}
-				// if the account they typed in doesn't exist, login will never be updated and continue
-				//	to be an empty string, so this writes a little prompt telling the user to enter a 
-				//	re enter the account
-				if (login == "") {
-					System.out.println("Invalid account name. Type the name exactly how it printed above.");
-				}
-			}
-			return login;
+			userDao = DaoManager.createDao(databaseConnection, UserEntity.class);
+			UserEntity userEntity = userDao.queryForSameId(safeStoreUser.getUserEntity());
+			return userEntity.getWebsiteAccounts();
 		} catch (SQLException e) {
 			e.printStackTrace();
-			return "SQL Error Occured";
+			return null;
 		}
+	}
+	
+	/**
+	 * Prints a list of all website accounts for the User
+	 * @param databaseConnection
+	 * @param safeStoreUser of type User
+	 */
+	public static void printAllWebsiteAccounts(ConnectionSource databaseConnection, User safeStoreUser) {
+		ForeignCollection<WebsiteAccountEntity> websiteAccounts = getAllWebsiteAccounts(databaseConnection, safeStoreUser);
+		if (websiteAccounts.isEmpty() || websiteAccounts == null) {
+			System.out.println("No accounts");
+		}
+		for (WebsiteAccountEntity account : websiteAccounts) {
+			System.out.println(Encryption.decrypt(account.getNickname()));
+		}
+	}
+	
+	/**
+	 * Prompts the user to pick the website account they want to view the login and password info for and prints it out
+	 * @param databaseConnection
+	 * @param keyboard
+	 * @param safeStoreUser
+	 * @return - what was printed for that specific website account...mainly used for testing
+	 */
+	public static String viewWebsiteAccountInfo(ConnectionSource databaseConnection, Scanner keyboard, User safeStoreUser) {
+		printAllWebsiteAccounts(databaseConnection, safeStoreUser);
+		ForeignCollection<WebsiteAccountEntity> websiteAccounts = getAllWebsiteAccounts(databaseConnection, safeStoreUser);
+
+		String returnAccountInfo = "No accounts";
+		Boolean accountExists = false;
+		System.out.println("Type the account that you want to see the login info for:");
+		while (!accountExists) {
+			String nickname = keyboard.nextLine().trim();
+			for (WebsiteAccountEntity account : websiteAccounts) {
+				if (nickname.equals(Encryption.decrypt(account.getNickname()))) {
+					accountExists = true;
+					returnAccountInfo = account.toString();
+				}
+			}
+			if (!accountExists) {
+				System.out.println("Invalid account name. Type the name exactly how it is printed above.");
+			}
+		}
+		System.out.println(returnAccountInfo);
+		return returnAccountInfo;
 	}
 	
 }

@@ -3,11 +3,8 @@ package websiteAccountTests;
 import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.OutputStream;
-import java.io.PrintStream;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Scanner;
@@ -17,6 +14,7 @@ import org.junit.jupiter.api.Test;
 
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
+import com.j256.ormlite.dao.ForeignCollection;
 import com.j256.ormlite.jdbc.JdbcConnectionSource;
 import com.j256.ormlite.stmt.PreparedQuery;
 import com.j256.ormlite.stmt.QueryBuilder;
@@ -128,19 +126,56 @@ class WebsiteAccountTests {
 	}
 	
 	@Test
-	void testViewWebsiteAccountLogin() {
-		File file = new File("test/websiteAccountTests/viewLoginForWebAccount.txt");
+	void testGetAllWebsiteAccountsForUser() {
 		try {
 			// add user and account to db
 			User testUser = new User(testUserUsername, testUserPassword);
-			testUser.createSafeStoreAccount(databaseConnection);
+			testUser.createSafeStoreAccountThroughDatabase(databaseConnection);
+			WebsiteAccount account = new WebsiteAccount(testUser, testAccountNickname, testAccountLogin, testAccountPassword);
+			account.addWebsiteAccount(databaseConnection);
+			WebsiteAccount account2 = new WebsiteAccount(testUser, "anothaOne", "thisIsALogin", "screw_camel_case");
+			account2.addWebsiteAccount(databaseConnection);
+			
+			ForeignCollection<WebsiteAccountEntity> accounts = WebsiteAccount.getAllWebsiteAccounts(databaseConnection, testUser);
+			assertEquals(2, accounts.size(), "Size of accounts returned was not correct");
+
+			// delete rows from database
+			websiteAccountDao.deleteById(account.getId());
+			websiteAccountDao.deleteById(account2.getId());
+			userDao.delete(testUser.getUserEntity());
+			
+			// this looks ugly but its just becuase ForeignCollections don't have a .get(index) method
+			int i = 1;
+			for (WebsiteAccountEntity acct : accounts) {
+				if (i == 1) {
+					assertTrue(acct.toString().equals(account.toString()), "One of the accounts returned wasn't correct");
+				}
+				if (i == 2) {
+					assertTrue(acct.toString().equals(account2.toString()), "One of the accounts returned wasn't correct");
+				}
+				++i;
+			}
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} 
+	}
+	
+	@Test
+	void testViewWebsiteAccountInfo() {
+		try {
+			File file = new File("test/websiteAccountTests/viewLoginForWebAccount.txt");
+			
+			// add user and account to db
+			User testUser = new User(testUserUsername, testUserPassword);
+			testUser.createSafeStoreAccountThroughDatabase(databaseConnection);
 			WebsiteAccount account = new WebsiteAccount(testUser, testAccountNickname, testAccountLogin, testAccountPassword);
 			account.addWebsiteAccount(databaseConnection);
 			
 			// try to view the website account login
 			Scanner keyboard = new Scanner(file);
-			String loginPrinted = WebsiteAccount.viewWebsiteAccountLogin(databaseConnection, keyboard, testUser);
-			assertEquals(testAccountLogin, loginPrinted);
+			String accountInfoPrinted = WebsiteAccount.viewWebsiteAccountInfo(databaseConnection, keyboard, testUser);
+			assertEquals(account.toString(), accountInfoPrinted);
 			
 			// delete rows from database once completed test
 			websiteAccountDao.deleteById(account.getId()); 
