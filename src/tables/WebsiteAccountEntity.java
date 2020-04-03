@@ -34,6 +34,10 @@ public class WebsiteAccountEntity extends BaseDaoEnabled<WebsiteAccountEntity, I
 		this.websitePassword = websitePassword;
 	}
 	
+	public String toString() {
+		return this.nickname + " " + this.websiteLogin + " " + this.websitePassword;
+	}
+	
 	public int getId() {
 		return id;
 	}
