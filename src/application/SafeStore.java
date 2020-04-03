@@ -32,22 +32,11 @@ public class SafeStore {
 		        System.out.println("Enter 'create' or 'login' ");
 		        userInput = keyboard.nextLine();
 		    }
+			Scanner scanner = new Scanner(System.in);
+			//creating new account
 			if(userInput.equals("create")) {
-				System.out.println("Type your usernmae:");
-				String username = keyboard.nextLine();
-				while(username.trim() == "" || !User.isUniqueUsername(databaseConnection, username)) {
-					System.out.println("Your username cannot be empty and it must be unique. Try another.");
-					username = keyboard.nextLine();
-				}
-				System.out.println("Type your password:");
-				String password = keyboard.nextLine();
-				while(password.trim() == "") {
-					System.out.println("Your password cannot be empty.");
-					password = keyboard.nextLine();
-				}
-				User newUser = new User(username, password);
-				boolean createdNewUser = newUser.createSafeStoreAccount(databaseConnection);
-				if(createdNewUser) {
+				String username = User.createSafeStoreAccountTerminal(databaseConnection, scanner);
+				if(username != null) {
 					System.out.println("Successfully created account. Welcome, " + username);
 				}
 				else {
@@ -56,7 +45,13 @@ public class SafeStore {
 			}
 			//logging in 
 			else {
-				
+				String username = User.terminalLogin(databaseConnection, scanner);
+				if(username != null) {
+					System.out.println("Welcome, " + username);
+				}
+				else {
+					System.out.println("Username and password don't match our records.");
+				}
 			}
 		}
 		catch (SQLException e) {

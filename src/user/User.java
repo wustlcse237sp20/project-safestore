@@ -6,8 +6,11 @@ import com.j256.ormlite.support.ConnectionSource;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
 import java.sql.SQLException;
+import java.util.Base64;
+import java.util.Scanner;
 
 import tables.UserEntity;
 
@@ -44,13 +47,15 @@ public class User {
 	
 	/**
 	 * 
-	 * @param databaseSource to connect to UserEntity table 
+	 * @param databaseConnection to connect to UserEntity table 
 	 * @param username to check against usernames in UserEntity table
 	 * @return true if unique username is UserEntity table
 	 */
-	public static boolean isUniqueUsername(ConnectionSource databaseSource, String username) {
+	public static boolean isUniqueUsername(ConnectionSource databaseConnection, 
+			String username) {
 		try {
-			Dao<UserEntity, String> userEntityDao = DaoManager.createDao(databaseSource, UserEntity.class);
+			Dao<UserEntity, String> userEntityDao = 
+					DaoManager.createDao(databaseConnection, UserEntity.class);
 			UserEntity matchedUser = userEntityDao.queryForId(username);
 			if(matchedUser == null) {
 				return true;
@@ -62,12 +67,62 @@ public class User {
 	}
 	
 	/**
+	 * login backend work (through database)
+	 * @param databaseConnection to connect to UserEntity table
+	 * @param username from user interaction 
+	 * @param password plaintext from user interaction
+	 * @return true if username and password match a registered user 
+	 */
+	public static boolean loginThroughDatabase(ConnectionSource databaseConnection, 
+			String username, 
+			String password) {
+		try {
+			Dao<UserEntity, String> userEntityDao = 
+					DaoManager.createDao(databaseConnection, UserEntity.class);
+			UserEntity loginUser = userEntityDao.queryForId(username);
+			if(loginUser != null) {
+				String storedHashPassword = loginUser.getPassordHashed();
+				byte[] salt = loginUser.getSalt();
+				String hashedTypedPassword = getSecurePassword(password, salt);
+				if(storedHashPassword.equals(hashedTypedPassword)) {
+					return true;
+				}
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+	
+	/**
+	 * user login via terminal 
+	 * @param databaseConnection to connect to UserEntity table
+	 * @param scanner to get input from user in terminal 
+	 * @return username if successful login. null if unsucessful login. 
+	 * unsuccessful login may be due to username and password not matching or 
+	 * unable to connect to database. 
+	 */
+	public static String terminalLogin(ConnectionSource databaseConnection, Scanner scanner) {
+		System.out.println("Type your usernmae:");
+		String username = scanner.nextLine();
+		System.out.println("Type your password:");
+		String password = scanner.nextLine();
+		boolean login = User.loginThroughDatabase(databaseConnection, username, password);
+		if(login) {
+			return username;
+		}
+		else {
+			return null;
+		}
+	}
+	
+	/**
 	 *  method from: 
 	 *  https://howtodoinjava.com/security/how-to-generate-secure-password-hash-md5-sha-pbkdf2-bcrypt-examples/
 	 * @return random md5 salt
 	 * @throws NoSuchAlgorithmException
 	 */
-	private static byte[] getSalt()
+	public static byte[] getSalt()
 	{
 	    //Always use a SecureRandom generator
 	    SecureRandom sr;
@@ -90,7 +145,7 @@ public class User {
 	 * @param salt randomly generated from getSalt()
 	 * @return
 	 */
-	private static String getSecurePassword(String passwordToHash, byte[] salt)
+	public static String getSecurePassword(String passwordToHash, byte[] salt)
     {
         String generatedPassword = null;
         try {
@@ -116,12 +171,14 @@ public class User {
 	
 	/**
 	 * Tries to input new SafeStore user account info into database
-	 * @param databaseSource to connect to UserEntity table 
+	 * @param databaseConnection to connect to UserEntity table 
 	 * @return true if safe store account successfully created 
+	 * false if unable to connect to connect to database.
 	 */
-	public boolean createSafeStoreAccount(ConnectionSource databaseSource) {
+	public boolean createSafeStoreAccountThroughDatabase(ConnectionSource databaseConnection) {
 		try {
-			Dao<UserEntity, String> userEntityDao = DaoManager.createDao(databaseSource, UserEntity.class);
+			Dao<UserEntity, String> userEntityDao = 
+					DaoManager.createDao(databaseConnection, UserEntity.class);
 			//returns number of records user entity DAO created
 			//Can only be 1 or 0 here as username is id
 			int numRecordsCreated = userEntityDao.create(userEntity);
@@ -134,6 +191,38 @@ public class User {
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return false;
+		}
+	}
+	
+	/**
+	 * user account creation via terminal 
+	 * @param databaseConnection to connect to UserEntity table 
+	 * @param scanner to get input from user in terminal 
+	 * @return username if successful account creation. null if unable to 
+	 * create account due to duplicated username or unable to connect to database.
+	 */
+	public static String createSafeStoreAccountTerminal(ConnectionSource databaseConnection, Scanner scanner) {
+		System.out.println("Type your username:");
+		String username = scanner.nextLine();
+		while(username.trim().isEmpty() || 
+				!User.isUniqueUsername(databaseConnection, username)) {
+			System.out.println("Your username cannot be empty and it must "
+					+ "be unique. Try another.");
+			username = scanner.nextLine();
+		}
+		System.out.println("Type your password:");
+		String password = scanner.nextLine();
+		while(password.trim().isEmpty()) {
+			System.out.println("Your password cannot be empty.");
+			password = scanner.nextLine();
+		}
+		User newUser = new User(username, password);
+		boolean createdNewUser = newUser.createSafeStoreAccountThroughDatabase(databaseConnection);
+		if(createdNewUser) {
+			return username;
+		}
+		else {
+			return null;
 		}
 	}
 
