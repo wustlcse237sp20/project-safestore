@@ -176,8 +176,12 @@ public class WebsiteAccount {
 	public static String viewWebsiteAccountInfo(ConnectionSource databaseConnection, Scanner keyboard, User safeStoreUser) {
 		printAllWebsiteAccounts(databaseConnection, safeStoreUser);
 		ForeignCollection<WebsiteAccountEntity> websiteAccounts = getAllWebsiteAccounts(databaseConnection, safeStoreUser);
-
+		
 		String returnAccountInfo = "No accounts";
+		if (websiteAccounts.isEmpty()) {
+			return returnAccountInfo;
+		}
+		
 		Boolean accountExists = false;
 		System.out.println("Type the account that you want to see the login info for:");
 		while (!accountExists) {
@@ -186,6 +190,7 @@ public class WebsiteAccount {
 				if (nickname.equals(Encryption.decrypt(account.getNickname()))) {
 					accountExists = true;
 					returnAccountInfo = account.toString();
+					break;
 				}
 			}
 			if (!accountExists) {
