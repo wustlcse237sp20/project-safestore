@@ -1,6 +1,7 @@
 package card;
 
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,7 +13,6 @@ import com.j256.ormlite.jdbc.JdbcConnectionSource;
 import com.j256.ormlite.support.ConnectionSource;
 
 import encryption.Encryption;
-import tables.AddressEntity;
 import tables.CreditCardEntity;
 import tables.UserEntity;
 import user.User;
@@ -35,10 +35,11 @@ public class CreditCard implements Card{
 	
 	public CreditCard(User safeStoreUser, String nickname, String creditCardNumber, String expirationDate, String cvv, Address billingAddress) {
 		UserEntity safeStoreUserEntity = safeStoreUser.getUserEntity();
+		String encryptedNickname = Encryption.encrypt(nickname);
 		String encryptedCCNumber = Encryption.encrypt(creditCardNumber);
 		String encryptedExpDate = Encryption.encrypt(expirationDate);
 		String encryptedCvv = Encryption.encrypt(cvv);
-		this.creditCardEntity = new CreditCardEntity(safeStoreUserEntity, nickname, encryptedCCNumber, encryptedExpDate, encryptedCvv, billingAddress.getAddressEntity());
+		this.creditCardEntity = new CreditCardEntity(safeStoreUserEntity, encryptedNickname, encryptedCCNumber, encryptedExpDate, encryptedCvv, billingAddress.getAddressEntity());
 		this.billingAddress = billingAddress;
 	}
 	
@@ -52,10 +53,10 @@ public class CreditCard implements Card{
 	}
 	
 	public String getNickname() {
-		return this.creditCardEntity.getNickname();
+		return Encryption.decrypt(this.creditCardEntity.getNickname());
 	}
 	
-	public String getCreditCardNumber() {
+	public String getCardNumber() {
 		return Encryption.decrypt(this.creditCardEntity.getCreditCardNumber());
 	}
 	
@@ -65,6 +66,19 @@ public class CreditCard implements Card{
 	
 	public String getCvv() {
 		return Encryption.decrypt(this.creditCardEntity.getCvv());
+	}
+	
+	public String getZipCode() {
+		return this.billingAddress.getZipCode();
+	}
+	
+	public String getBillingAddress() {
+		return this.billingAddress.getFullAddress();
+	}
+	
+	public String toString() {
+		return "Card Number: " + this.getCardNumber() + "\n Expiration Date: " + this.getExpirationDate() + 
+				"\n CVV: " + this.getCvv() + "\n Billing Address: " + this.getBillingAddress();
 	}
 	
 	/**
@@ -97,7 +111,7 @@ public class CreditCard implements Card{
 		try {
 			Dao<CreditCardEntity, String> creditCardDao = DaoManager.createDao(databaseConnection, CreditCardEntity.class);
 			Map<String, Object> queryParams = new HashMap<String, Object>();
-			queryParams.put("nickname", this.getNickname());
+			queryParams.put("nickname", Encryption.encrypt(this.getNickname()));
 			queryParams.put("safe_store_username", this.creditCardEntity.getSafeStoreUser());
 			List<CreditCardEntity> returnedCreditCards = creditCardDao.queryForFieldValues(queryParams);
 			if (returnedCreditCards.size() > 0) {
@@ -186,6 +200,73 @@ public class CreditCard implements Card{
 			}
 	}
 	
+	public static CreditCard getCreditCardFromNickname(String nickname, User safeStoreUser, ConnectionSource databaseConnection) throws Exception{
+		nickname = Encryption.encrypt(nickname);
+		try {
+			Dao<CreditCardEntity, String> creditCardDao = DaoManager.createDao(databaseConnection, CreditCardEntity.class);
+			Map<String, Object> queryParams = new HashMap<String, Object>();
+			queryParams.put("nickname", nickname);
+			queryParams.put("safe_store_username", safeStoreUser.getUserEntity());
+			List<CreditCardEntity> returnedCreditCards = creditCardDao.queryForFieldValues(queryParams);
+			if (returnedCreditCards.size() == 0) {
+				throw new Exception("No Credit Card Found");
+			}
+			CreditCardEntity returnedCard = returnedCreditCards.get(0);
+			return new CreditCard(returnedCard);
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw(e);
+		}
+		
+	}
+	
+	public static String getCreditCardInformation(ConnectionSource databaseConnection, Scanner keyboard, User safeStoreUser) {
+		String userPrompt = "What is the card nickname you'd like to retrieve info for (default is the last four digits of the card number)";
+		System.out.println(userPrompt);
+		String nickname = keyboard.nextLine();
+		
+		try {
+			CreditCard requestedCreditCard = CreditCard.getCreditCardFromNickname(nickname, safeStoreUser, databaseConnection);
+			
+			userPrompt = "What information would you like to view? Type: 'Card Number', 'Expiration Date', 'CVV', 'Zip Code', 'Billing Address', or 'All'";
+			System.out.println(userPrompt);
+			
+			String userInput = keyboard.nextLine();
+			String[] acceptableInput = {"Card Number", "Expiration Date", "CVV", "Zip Code", "Billing Address", "All"};
+			while(!Arrays.asList(acceptableInput).contains(userInput)) {
+				userPrompt = "Enter: 'Card Number', 'Expiration Date', 'CVV', 'Zip Code', 'Billing Address', or 'All'";
+				System.out.println(userPrompt);
+				userInput = keyboard.nextLine();
+			}
+			
+			String requestedInformation = "An Error Occurred";
+			if(userInput.equals("Card Number")) {
+				requestedInformation = requestedCreditCard.getCardNumber();
+			}
+			if(userInput.equals("Expiration Date")) {
+				requestedInformation = requestedCreditCard.getExpirationDate();
+			}
+			if(userInput.equals("CVV")) {
+				requestedInformation = requestedCreditCard.getCvv();
+			}
+			if(userInput.equals("Zip Code")) {
+				requestedInformation = requestedCreditCard.getZipCode();
+			}
+			if(userInput.equals("Billing Address")) {
+				requestedInformation = requestedCreditCard.getBillingAddress();
+			}
+			if(userInput.equals("All")) {
+				requestedInformation = requestedCreditCard.toString();
+			}
+			System.out.println(requestedInformation);
+			return requestedInformation;
+		} catch (Exception e) {
+			System.out.println(e);
+			return(e.toString());
+		}
+	}
+	
 	/**
 	 * Main here is just to test out adding a card through the console, would be deleted when functionality
 	 * added to SafeStore.java
@@ -197,16 +278,19 @@ public class CreditCard implements Card{
 			databaseConnection = new JdbcConnectionSource(databaseUrl);
 			@SuppressWarnings("resource")
 			Scanner keyboard = new Scanner(System.in);
-			System.out.println("Would you like to add a Website Account, Credit Card, or Debit Card?");
-			String userInput = keyboard.nextLine();
-			while (!userInput.trim().equals("WebsiteAccount") && !userInput.trim().equals("Credit Card") && !userInput.trim().equals("Debit Card")) {
-				System.out.println("Enter 'Website Account', 'Credit Card', or 'Debit Card'");
-		        userInput = keyboard.nextLine();
-		    }
-			if(userInput.equals("Credit Card")) {
-				User safeStoreUser = new User("testUser", "testPassword");
-				CreditCard.addCreditCard(databaseConnection, keyboard, safeStoreUser);
-			}
+//			System.out.println("Would you like to add a Website Account, Credit Card, or Debit Card?");
+//			String userInput = keyboard.nextLine();
+//			while (!userInput.trim().equals("WebsiteAccount") && !userInput.trim().equals("Credit Card") && !userInput.trim().equals("Debit Card")) {
+//				System.out.println("Enter 'Website Account', 'Credit Card', or 'Debit Card'");
+//		        userInput = keyboard.nextLine();
+//		    }
+//			if(userInput.equals("Credit Card")) {
+//				User safeStoreUser = new User("testUser", "testPassword");
+//				CreditCard.addCreditCard(databaseConnection, keyboard, safeStoreUser);
+//			}
+			User safeStoreUser = new User("testUser", "testPassword");
+			CreditCard.addCreditCard(databaseConnection, keyboard, safeStoreUser);
+			CreditCard.getCreditCardInformation(databaseConnection, keyboard, safeStoreUser);
 		}
 		catch (SQLException e) {
 			e.printStackTrace();

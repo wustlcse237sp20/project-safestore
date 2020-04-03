@@ -31,11 +31,14 @@ import user.User;
 class creditCardTests {
 	
 	ConnectionSource databaseConnection;
+	
 	Address testAddress;
+	
 	UserEntity testUserEntity;
 	User testUser;
 	User testUserTwo;
 	UserEntity testUserEntityTwo;
+	
 	Dao<AddressEntity, String> addressDao;
 	Dao<UserEntity, String> userDao;
 	
@@ -73,7 +76,6 @@ class creditCardTests {
 	@AfterEach
 	public void tearDown() {
 		testAddress.deleteAddress(databaseConnection);
-		
 		try {
 			userDao.delete(testUserEntity);
 			userDao.delete(testUserEntityTwo);
@@ -81,12 +83,24 @@ class creditCardTests {
 			e.printStackTrace();
 		}
 	}
+	
+	@Test
+	void testDefaultNickname() {
+		System.out.println("RUNNING TEST: testDefaultNickname");
+		CreditCard testCreditCard = new CreditCard(testUser, "4323 3249 2013 3232", "04/34", "123", testAddress);
+		assertTrue(testCreditCard.getNickname().equals("3232"), "Default nickname was not the last four digits");
+	}
 
 	@Test
 	void testAddCreditCardExistingAddressDefaultNickname() {
+		System.out.println("RUNNING TEST: testAddCreditCardExistingAddressDefaultNickname");
 		String encryptedCreditCardNumber = Encryption.encrypt("1234567890");
 		CreditCard testCreditCard = new CreditCard(testUser, "1234567890", "04/23", "123", testAddress);
 		try {
+			UserEntity returnedUser = userDao.queryForSameId(testUserEntity);
+			ForeignCollection<CreditCardEntity> usersAssociatedCreditCards = returnedUser.getCreditCards();
+			int initialNumCards = usersAssociatedCreditCards.size();
+			
 			boolean result = testCreditCard.addCard(databaseConnection);
 			assertTrue(result, "Should return true if adding was successful");
 			CreditCardEntity testCreditCardEntity = testCreditCard.getCreditCardEntity();
@@ -106,14 +120,16 @@ class creditCardTests {
 				ForeignCollection<CreditCardEntity> associatedCreditCards = returnedAddressEntity.getCreditCards();
 				assertTrue(associatedCreditCards.size() == 1, "Address should only have one card associated with it");
 				
-				UserEntity returnedUser = userDao.queryForSameId(testUserEntity);
-				ForeignCollection<CreditCardEntity> usersAssociatedCreditCards = returnedUser.getCreditCards();
-				assertTrue(usersAssociatedCreditCards.size() == 1, "User should only have one card associated with it");
+				returnedUser = userDao.queryForSameId(testUserEntity);
+				usersAssociatedCreditCards = returnedUser.getCreditCards();
+				int newNumCards = usersAssociatedCreditCards.size();
+				assertTrue(initialNumCards + 1 == newNumCards, "User should have a credit card added to their collection");
 				
 				Dao<CreditCardEntity, String> creditCardDao = DaoManager.createDao(databaseConnection, CreditCardEntity.class);
 				CreditCardEntity queriedCard = creditCardDao.queryForId(encryptedCreditCardNumber);
 				CreditCard queriedCreditCard = new CreditCard(queriedCard);
-				assertTrue(queriedCreditCard.getCreditCardNumber().equals("1234567890"), "Credit card number doesn't match");
+				assertTrue(queriedCreditCard.getNickname().equals("7890"), "Nickname doesn't match");
+				assertTrue(queriedCreditCard.getCardNumber().equals("1234567890"), "Credit card number doesn't match");
 				assertTrue(queriedCreditCard.getExpirationDate().equals("04/23"), "Expiration date doesn't match");
 				assertTrue(queriedCreditCard.getCvv().equals("123"), "CVV doesn't match");
 				
@@ -131,10 +147,16 @@ class creditCardTests {
 	
 	@Test
 	void testAddCreditCardNewAddress() {
-		String encryptedCreditCardNumber = Encryption.encrypt("1234567890");
+		System.out.println("RUNNING TEST: testAddCreditCardNewAddress");
+		
+		String encryptedCreditCardNumber = Encryption.encrypt("0000000000");
 		Address newAddress = new Address("123 oak st", "STL", "MO", "63130");
-		CreditCard testCreditCard = new CreditCard(testUser, "1234567890", "04/23", "123", newAddress);
+		CreditCard testCreditCard = new CreditCard(testUser, "0000000000", "04/23", "123", newAddress);
 		try {
+			UserEntity returnedUser = userDao.queryForSameId(testUserEntity);
+			ForeignCollection<CreditCardEntity> usersAssociatedCreditCards = returnedUser.getCreditCards();
+			int initialNumCards = usersAssociatedCreditCards.size();
+			
 			boolean result = testCreditCard.addCard(databaseConnection);
 			assertTrue(result, "Should return true if add was successful");
 			CreditCardEntity testCreditCardEntity = testCreditCard.getCreditCardEntity();
@@ -153,14 +175,16 @@ class creditCardTests {
 				ForeignCollection<CreditCardEntity> associatedCreditCards = returnedAddressEntity.getCreditCards();
 				assertTrue(associatedCreditCards.size() == 1, "Address should only have one card associated with it");
 				
-				UserEntity returnedUser = userDao.queryForSameId(testUserEntity);
-				ForeignCollection<CreditCardEntity> usersAssociatedCreditCards = returnedUser.getCreditCards();
-				assertTrue(usersAssociatedCreditCards.size() == 1, "User should only have one card associated with it");
+				returnedUser = userDao.queryForSameId(testUserEntity);
+				usersAssociatedCreditCards = returnedUser.getCreditCards();
+				int newNumCards = usersAssociatedCreditCards.size();
+				assertTrue(initialNumCards + 1 == newNumCards, "User should have an added credit card to their collection");
 				
 				Dao<CreditCardEntity, String> creditCardDao = DaoManager.createDao(databaseConnection, CreditCardEntity.class);
 				CreditCardEntity queriedCard = creditCardDao.queryForId(encryptedCreditCardNumber);
 				CreditCard queriedCreditCard = new CreditCard(queriedCard);
-				assertTrue(queriedCreditCard.getCreditCardNumber().equals("1234567890"), "Credit card number doesn't match");
+				assertTrue(queriedCreditCard.getNickname().equals("0000"), "Nickname doesn't match");
+				assertTrue(queriedCreditCard.getCardNumber().equals("0000000000"), "Credit card number doesn't match");
 				assertTrue(queriedCreditCard.getExpirationDate().equals("04/23"), "Expiration date doesn't match");
 				assertTrue(queriedCreditCard.getCvv().equals("123"), "CVV doesn't match");
 				
@@ -179,8 +203,9 @@ class creditCardTests {
 	
 	@Test
 	void testAddCreditCardExistingNickname() {
-		String encryptedCreditCardNumber = Encryption.encrypt("1234567890");
-		CreditCard testCreditCard = new CreditCard(testUser, "testNickname", "1234567890", "04/23", "123", testAddress);
+		System.out.println("RUNNING TEST: testAddCreditCardExistingNickname");
+		
+		CreditCard testCreditCard = new CreditCard(testUser, "testNickname", "3333333333", "04/23", "123", testAddress);
 		try {
 			boolean firstAddResult = testCreditCard.addCard(databaseConnection);
 			assertTrue(firstAddResult, "first time adding should be successful");
@@ -188,7 +213,7 @@ class creditCardTests {
 			
 			String encryptedCreditCardNumberTwo = Encryption.encrypt("0987654321");
 			CreditCard testCreditCardTwo = new CreditCard(testUser, "testNickname", "0987654321", "04/23", "123", testAddress);
-			boolean secondAddResult = testCreditCard.addCard(databaseConnection);
+			boolean secondAddResult = testCreditCardTwo.addCard(databaseConnection);
 			assertFalse(secondAddResult, "Second add should return false due to same nickname");
 			
 			Dao<CreditCardEntity, String> creditCardDao = DaoManager.createDao(databaseConnection, CreditCardEntity.class);
@@ -207,14 +232,15 @@ class creditCardTests {
 	
 	@Test
 	void testAddCreditCardExistingNicknameDifferentUser() {
-		CreditCard testCreditCard = new CreditCard(testUser, "testNickname", "1234567890", "04/23", "123", testAddress);
+		System.out.println("RUNNING TEST: testAddCreditCardExistingNicknameDifferentUser");
+		CreditCard testCreditCard = new CreditCard(testUser, "testNickname", "5555555555", "04/23", "123", testAddress);
 		try {
 			boolean firstAddResult = testCreditCard.addCard(databaseConnection);
 			assertTrue(firstAddResult, "first time adding should be successful");
 			CreditCardEntity firstCreditCard = testCreditCard.getCreditCardEntity();
 			
-			String encryptedCreditCardNumberTwo = Encryption.encrypt("0987654321");
-			CreditCard testCreditCardTwo = new CreditCard(testUserTwo, "testNickname", "0987654321", "04/23", "123", testAddress);
+			String encryptedCreditCardNumberTwo = Encryption.encrypt("8888888888");
+			CreditCard testCreditCardTwo = new CreditCard(testUserTwo, "testNickname", "8888888888", "04/23", "123", testAddress);
 			boolean secondAddResult = testCreditCardTwo.addCard(databaseConnection);
 			assertTrue(secondAddResult, "Second add should return true due to different user");
 			
@@ -231,7 +257,10 @@ class creditCardTests {
 	
 	@Test
 	void testStaticAddCreditCardDefaultNickname() {
+		System.out.println("RUNNING TEST: testStaticAddCreditCardDefaultNickname");
+
 		String encryptedCreditCardNumber = Encryption.encrypt("1234567890");
+		String expectedNickname = "7890";
 		String expectedExpDate = "04/23";
 		String expectedCvv = "321";
 		String expectedStreetAddress = "456 lazy rd";
@@ -240,6 +269,10 @@ class creditCardTests {
 		String expectedZipCode = "54321";
 		File file = new File("test/cardTests/addCardDefaultNicknameInput.txt");
 		try {
+			UserEntity returnedUser = userDao.queryForSameId(testUserEntity);
+			ForeignCollection<CreditCardEntity> usersAssociatedCreditCards = returnedUser.getCreditCards();
+			int initialNumCards = usersAssociatedCreditCards.size();
+			
 			Scanner keyboard = new Scanner(file);
 			boolean result = CreditCard.addCreditCard(databaseConnection, keyboard, testUser);
 			
@@ -260,14 +293,16 @@ class creditCardTests {
 				ForeignCollection<CreditCardEntity> associatedCreditCards = returnedAddressEntity.getCreditCards();
 				assertTrue(associatedCreditCards.size() == 1, "Address should only have one card associated with it");
 				
-				UserEntity returnedUser = userDao.queryForSameId(testUserEntity);
-				ForeignCollection<CreditCardEntity> usersAssociatedCreditCards = returnedUser.getCreditCards();
-				assertTrue(usersAssociatedCreditCards.size() == 1, "User should only have one card associated with it");
+				returnedUser = userDao.queryForSameId(testUserEntity);
+				usersAssociatedCreditCards = returnedUser.getCreditCards();
+				int newNumCards = usersAssociatedCreditCards.size();
+				assertTrue(initialNumCards + 1 == newNumCards, "User should have a credit card added to their collection");
 				
 				Dao<CreditCardEntity, String> creditCardDao = DaoManager.createDao(databaseConnection, CreditCardEntity.class);
 				CreditCardEntity queriedCard = creditCardDao.queryForId(encryptedCreditCardNumber);
 				CreditCard queriedCreditCard = new CreditCard(queriedCard);
-				assertTrue(queriedCreditCard.getCreditCardNumber().equals("1234567890"), "Credit card number doesn't match");
+				assertTrue(queriedCreditCard.getNickname().equals(expectedNickname), "Nickname doesn't match");
+				assertTrue(queriedCreditCard.getCardNumber().equals("1234567890"), "Credit card number doesn't match");
 				assertTrue(queriedCreditCard.getExpirationDate().equals(expectedExpDate), "Expiration date doesn't match");
 				assertTrue(queriedCreditCard.getCvv().equals(expectedCvv), "CVV doesn't match");
 				
@@ -277,14 +312,15 @@ class creditCardTests {
 				e.printStackTrace();
 			}	
 			
-		} catch (FileNotFoundException e) {
-			System.out.println("Fiel not found");
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 	
 	@Test
 	void testStaticAddCreditCardWithNickname() {
+		System.out.println("RUNNING TEST: testStaticAddCreditCardWithNickname");
+
 		String encryptedCreditCardNumber = Encryption.encrypt("1234567890");
 		String expectedExpDate = "03/24";
 		String expectedCvv = "123";
@@ -295,6 +331,10 @@ class creditCardTests {
 		String expectedZipCode = "12345";
 		File file = new File("test/cardTests/addCardWithNicknameInput.txt");
 		try {
+			UserEntity returnedUser = userDao.queryForSameId(testUserEntity);
+			ForeignCollection<CreditCardEntity> usersAssociatedCreditCards = returnedUser.getCreditCards();
+			int initialNumCards = usersAssociatedCreditCards.size();
+			
 			Scanner keyboard = new Scanner(file);
 			boolean result = CreditCard.addCreditCard(databaseConnection, keyboard, testUser);
 			
@@ -315,14 +355,17 @@ class creditCardTests {
 				ForeignCollection<CreditCardEntity> associatedCreditCards = returnedAddressEntity.getCreditCards();
 				assertTrue(associatedCreditCards.size() == 1, "Address should only have one card associated with it");
 				
-				UserEntity returnedUser = userDao.queryForSameId(testUserEntity);
-				ForeignCollection<CreditCardEntity> usersAssociatedCreditCards = returnedUser.getCreditCards();
-				assertTrue(usersAssociatedCreditCards.size() == 1, "User should only have one card associated with it");
+				
+				returnedUser = userDao.queryForSameId(testUserEntity);
+				usersAssociatedCreditCards = returnedUser.getCreditCards();
+				int newNumCards = usersAssociatedCreditCards.size();
+				assertTrue(initialNumCards + 1 == newNumCards, "User should have a credit card added to their collection");
 				
 				Dao<CreditCardEntity, String> creditCardDao = DaoManager.createDao(databaseConnection, CreditCardEntity.class);
 				CreditCardEntity queriedCard = creditCardDao.queryForId(encryptedCreditCardNumber);
 				CreditCard queriedCreditCard = new CreditCard(queriedCard);
-				assertTrue(queriedCreditCard.getCreditCardNumber().equals("1234567890"), "Credit card number doesn't match");
+				assertTrue(queriedCreditCard.getNickname().equals(expectedNickname), "Nickname doesn't match");
+				assertTrue(queriedCreditCard.getCardNumber().equals("1234567890"), "Credit card number doesn't match");
 				assertTrue(queriedCreditCard.getExpirationDate().equals(expectedExpDate), "Expiration date doesn't match");
 				assertTrue(queriedCreditCard.getCvv().equals(expectedCvv), "CVV doesn't match");
 				
@@ -332,12 +375,190 @@ class creditCardTests {
 				e.printStackTrace();
 			}
 			
-		} catch (FileNotFoundException e) {
-			System.out.println("FIle not found");
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
-		
+	}
+	
+	
+	@Test
+	void testGetCreditCardInformationAll() {
+		String nickname = "testNickname";
+		String cardNumber = "99998888877776666";
+		String expirationDate = "04/23";
+		String cvv = "987";
+		try {
+			CreditCard testCreditCard = new CreditCard(testUser, nickname, cardNumber, expirationDate, cvv, testAddress);
+			CreditCardEntity testCreditCardEntity = testCreditCard.getCreditCardEntity();
+			Dao<CreditCardEntity, String> creditCardDao = DaoManager.createDao(databaseConnection, CreditCardEntity.class);
+			creditCardDao.create(testCreditCardEntity);
+			String expectedOutput = testCreditCard.toString();
+			try {
+				File userInput = new File("test/cardTests/getAllInput.txt");
+				Scanner keyboard = new Scanner(userInput);
+				String output = CreditCard.getCreditCardInformation(databaseConnection, keyboard, testUser);
+				assertTrue(output.equals(expectedOutput), "Expected: " + expectedOutput + " but got: " + output);
+				
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+				fail("Error with user input text file");
+			}
+			
+			creditCardDao.delete(testCreditCardEntity);			
+		} catch (SQLException e) {			
+			e.printStackTrace();
+			fail("Error inserting test card (Database failure)");
+		}
+	}
+	
+	@Test 
+	void testGetCreditCardInformaitonBillingAddress() {
+		String nickname = "testNickname";
+		String cardNumber = "99998888877776666";
+		String expirationDate = "04/23";
+		String cvv = "987";
+		try {
+			CreditCard testCreditCard = new CreditCard(testUser, nickname, cardNumber, expirationDate, cvv, testAddress);
+			CreditCardEntity testCreditCardEntity = testCreditCard.getCreditCardEntity();
+			Dao<CreditCardEntity, String> creditCardDao = DaoManager.createDao(databaseConnection, CreditCardEntity.class);
+			creditCardDao.create(testCreditCardEntity);
+			String expectedOutput = testCreditCard.getBillingAddress();
+			try {
+				File userInput = new File("test/cardTests/getBillingAddressInput.txt");
+				Scanner keyboard = new Scanner(userInput);
+				String output = CreditCard.getCreditCardInformation(databaseConnection, keyboard, testUser);
+				assertTrue(output.equals(expectedOutput), "Expected: " + expectedOutput + " but got: " + output);
+				
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+				fail("Error with user input text file");
+			}
+			
+			creditCardDao.delete(testCreditCardEntity);			
+		} catch (SQLException e) {			
+			e.printStackTrace();
+			fail("Error inserting test card (Database failure)");
+		}
+	}
+	
+	@Test
+	void testGetCreditCardInformationCardNumber() {
+		String nickname = "testNickname";
+		String cardNumber = "99998888877776666";
+		String expirationDate = "04/23";
+		String cvv = "987";
+		try {
+			CreditCard testCreditCard = new CreditCard(testUser, nickname, cardNumber, expirationDate, cvv, testAddress);
+			CreditCardEntity testCreditCardEntity = testCreditCard.getCreditCardEntity();
+			Dao<CreditCardEntity, String> creditCardDao = DaoManager.createDao(databaseConnection, CreditCardEntity.class);
+			creditCardDao.create(testCreditCardEntity);
+			String expectedOutput = testCreditCard.getCardNumber();
+			try {
+				File userInput = new File("test/cardTests/getCardNumberInput.txt");
+				Scanner keyboard = new Scanner(userInput);
+				String output = CreditCard.getCreditCardInformation(databaseConnection, keyboard, testUser);
+				assertTrue(output.equals(expectedOutput), "Expected: " + expectedOutput + " but got: " + output);
+				
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+				fail("Error with user input text file");
+			}
+			
+			creditCardDao.delete(testCreditCardEntity);			
+		} catch (SQLException e) {			
+			e.printStackTrace();
+			fail("Error inserting test card (Database failure)");
+		}
+	}
+	
+	@Test 
+	void testGetCreditCardInformationCvv() {
+		String nickname = "testNickname";
+		String cardNumber = "99998888877776666";
+		String expirationDate = "04/23";
+		String cvv = "987";
+		try {
+			CreditCard testCreditCard = new CreditCard(testUser, nickname, cardNumber, expirationDate, cvv, testAddress);
+			CreditCardEntity testCreditCardEntity = testCreditCard.getCreditCardEntity();
+			Dao<CreditCardEntity, String> creditCardDao = DaoManager.createDao(databaseConnection, CreditCardEntity.class);
+			creditCardDao.create(testCreditCardEntity);
+			String expectedOutput = testCreditCard.getCvv();
+			try {
+				File userInput = new File("test/cardTests/getCvvInput.txt");
+				Scanner keyboard = new Scanner(userInput);
+				String output = CreditCard.getCreditCardInformation(databaseConnection, keyboard, testUser);
+				assertTrue(output.equals(expectedOutput), "Expected: " + expectedOutput + " but got: " + output);
+				
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+				fail("Error with user input text file");
+			}
+			
+			creditCardDao.delete(testCreditCardEntity);			
+		} catch (SQLException e) {			
+			e.printStackTrace();
+			fail("Error inserting test card (Database failure)");
+		}
+	}
+	
+	@Test
+	void testGetCreditCardInformationExpDate() {
+		String nickname = "testNickname";
+		String cardNumber = "99998888877776666";
+		String expirationDate = "04/23";
+		String cvv = "987";
+		try {
+			CreditCard testCreditCard = new CreditCard(testUser, nickname, cardNumber, expirationDate, cvv, testAddress);
+			CreditCardEntity testCreditCardEntity = testCreditCard.getCreditCardEntity();
+			Dao<CreditCardEntity, String> creditCardDao = DaoManager.createDao(databaseConnection, CreditCardEntity.class);
+			creditCardDao.create(testCreditCardEntity);
+			String expectedOutput = testCreditCard.getExpirationDate();
+			try {
+				File userInput = new File("test/cardTests/getExpDateInput.txt");
+				Scanner keyboard = new Scanner(userInput);
+				String output = CreditCard.getCreditCardInformation(databaseConnection, keyboard, testUser);
+				assertTrue(output.equals(expectedOutput), "Expected: " + expectedOutput + " but got: " + output);
+				
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+				fail("Error with user input text file");
+			}
+			
+			creditCardDao.delete(testCreditCardEntity);			
+		} catch (SQLException e) {			
+			e.printStackTrace();
+			fail("Error inserting test card (Database failure)");
+		}
+	}
+	
+	@Test
+	void testGetCreditCardInformationZipCode() {
+		String nickname = "testNickname";
+		String cardNumber = "99998888877776666";
+		String expirationDate = "04/23";
+		String cvv = "987";
+		try {
+			CreditCard testCreditCard = new CreditCard(testUser, nickname, cardNumber, expirationDate, cvv, testAddress);
+			CreditCardEntity testCreditCardEntity = testCreditCard.getCreditCardEntity();
+			Dao<CreditCardEntity, String> creditCardDao = DaoManager.createDao(databaseConnection, CreditCardEntity.class);
+			creditCardDao.create(testCreditCardEntity);
+			String expectedOutput = testCreditCard.getZipCode();
+			try {
+				File userInput = new File("test/cardTests/getZipCodeInput.txt");
+				Scanner keyboard = new Scanner(userInput);
+				String output = CreditCard.getCreditCardInformation(databaseConnection, keyboard, testUser);
+				assertTrue(output.equals(expectedOutput), "Expected: " + expectedOutput + " but got: " + output);
+				
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+				fail("Error with user input text file");
+			}
+			
+			creditCardDao.delete(testCreditCardEntity);			
+		} catch (SQLException e) {			
+			e.printStackTrace();
+			fail("Error inserting test card (Database failure)");
+		}
 	}
 
 }
