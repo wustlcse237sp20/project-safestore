@@ -1,6 +1,7 @@
 package websiteAccount;
 
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
@@ -41,24 +42,45 @@ public class WebsiteAccount {
 		return Encryption.decrypt(this.websiteAccountEntity.getNickname());
 	}
 	
-	public void setNickname(String nickname) {
+	public boolean setNickname(String nickname) {
 		this.websiteAccountEntity.setNickname(Encryption.encrypt(nickname));
+		try {
+			int successfulUpdate = this.websiteAccountEntity.update();
+			return successfulUpdate > 0;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
 	}
 	
 	public String getWebsiteLogin() {
 		return Encryption.decrypt(this.websiteAccountEntity.getWebsiteLogin());
 	}
 	
-	public void setWebsiteLogin(String websiteLogin) {
+	public boolean setWebsiteLogin(String websiteLogin) {
 		this.websiteAccountEntity.setNickname(Encryption.encrypt(websiteLogin));
+		try {
+			int successfulUpdate = this.websiteAccountEntity.update();
+			return successfulUpdate > 0;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
 	}
 	
 	public String getWebsitePassword() {
 		return Encryption.decrypt(this.websiteAccountEntity.getWebsitePassword());
 	}
 	
-	public void setWebsitePassword(String websitePassword) {
+	public boolean setWebsitePassword(String websitePassword) {
 		this.websiteAccountEntity.setNickname(Encryption.encrypt(websitePassword));
+		try {
+			int successfulUpdate = this.websiteAccountEntity.update();
+			return successfulUpdate > 0;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
 	}
 	
 	public WebsiteAccountEntity getWebsiteAccountEntity() {
@@ -200,5 +222,81 @@ public class WebsiteAccount {
 		System.out.println(returnAccountInfo);
 		return returnAccountInfo;
 	}
+	
+	/**
+	 * Gets a WebsiteAccount based on a User and a nickname. If it doesn't exist, returns an 
+	 * exception
+	 * @param databaseConnection
+	 * @param nickname
+	 * @param safeStoreUser
+	 * @return - the WebsiteAccount associated with the nickname and user inputted
+	 * @throws Exception
+	 */
+	public static WebsiteAccount getWebsiteAccountFromNickname(ConnectionSource databaseConnection, String nickname, User safeStoreUser) throws Exception {
+		try {
+			Dao<WebsiteAccountEntity, Integer> websiteAccountDao = DaoManager.createDao(databaseConnection, WebsiteAccountEntity.class);
+			QueryBuilder<WebsiteAccountEntity, Integer> queryBuilder = websiteAccountDao.queryBuilder();
+			queryBuilder.where()
+					.eq("nickname", Encryption.encrypt(nickname))
+					.and()
+					.eq("safe_store_username", safeStoreUser.getUserEntity().getUsername());
+			List<WebsiteAccountEntity> accountsWithMatchingNicknames = websiteAccountDao.query(queryBuilder.prepare());
+			if (accountsWithMatchingNicknames.size() == 0) {
+				throw new Exception("No accounts exist with that nickname");
+			}
+			return new WebsiteAccount(accountsWithMatchingNicknames.get(0));
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw(e);
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw(e);
+		}
+	}
+	
+	/**
+	 * Prompts the user to update information for their website account and updates it in database
+	 * @param databaseConnection
+	 * @param keyboard
+	 * @param safeStoreUser
+	 * @return - true if update was successful, false otherwise
+	 */
+	public static boolean updateWebsiteAccount(ConnectionSource databaseConnection, Scanner keyboard, User safeStoreUser) {
+		System.out.println("Enter the nickname of the account you want to modify: ");
+		String nickname = keyboard.nextLine().trim();
+		try {
+			WebsiteAccount accountToModify = WebsiteAccount.getWebsiteAccountFromNickname(databaseConnection, nickname, safeStoreUser);
+			System.out.println(accountToModify.toString());
+			System.out.println("Which part of account do you want to modify?");
+			String[] acceptableInput = {"Nickname", "Login", "Password"};
+			String whichFieldToModify = keyboard.nextLine().trim();
+			while (!Arrays.asList(acceptableInput).contains(whichFieldToModify)) {
+				System.out.println("Invalid input. Please type: Nickname, Login, or Password for which you want to change: ");
+				whichFieldToModify = keyboard.nextLine().trim();
+			}
+			if (whichFieldToModify.equals("Nickname")) {
+				System.out.println("Please enter the new nickname for the account: ");
+				String newNickname = keyboard.nextLine().trim();
+				return accountToModify.setNickname(newNickname);
+			}
+			if (whichFieldToModify.equals("Login")) {
+				System.out.println("Please enter the new login for the account: ");
+				String newLogin = keyboard.nextLine().trim();
+				return accountToModify.setWebsiteLogin(newLogin);
+			}
+			if (whichFieldToModify.equals("Password")) {
+				System.out.println("Please enter the new password for the account: ");
+				String newPassword = keyboard.nextLine().trim();
+				return accountToModify.setWebsitePassword(newPassword);
+			}
+			return false;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+	
 	
 }
