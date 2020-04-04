@@ -4,6 +4,8 @@ import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.misc.BaseDaoEnabled;
 import com.j256.ormlite.table.DatabaseTable;
 
+import encryption.Encryption;
+
 @DatabaseTable(tableName = "WebsiteAccounts")
 public class WebsiteAccountEntity extends BaseDaoEnabled<WebsiteAccountEntity, Integer> {
 
@@ -35,7 +37,10 @@ public class WebsiteAccountEntity extends BaseDaoEnabled<WebsiteAccountEntity, I
 	}
 	
 	public String toString() {
-		return this.nickname + " " + this.websiteLogin + " " + this.websitePassword;
+		String decryptedNickname = Encryption.decrypt(this.nickname);
+		String decryptedLogin = Encryption.decrypt(this.websiteLogin);
+		String decryptedPassword = Encryption.decrypt(this.websitePassword);
+		return decryptedNickname + " - Login: " + decryptedLogin + ", Password: " + decryptedPassword;
 	}
 	
 	public int getId() {
