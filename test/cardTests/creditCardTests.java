@@ -54,8 +54,9 @@ class creditCardTests {
 			testAddress = new Address("6843 kingsbury blvd", "STL", "MO", "63130");
 			testAddress.addAddress(databaseConnection);
 			
-			testUserEntity = new UserEntity("username", "password", "salt");
-			testUserEntityTwo = new UserEntity("usernametwo", "password", "salt");
+			byte[] salt = new byte[5];
+			testUserEntity = new UserEntity("username", "password", salt);
+			testUserEntityTwo = new UserEntity("usernametwo", "password", salt);
 			
 			userDao = DaoManager.createDao(databaseConnection, UserEntity.class);
 			userDao.create(testUserEntity);
@@ -233,7 +234,7 @@ class creditCardTests {
 	@Test
 	void testAddCreditCardExistingNicknameDifferentUser() {
 		System.out.println("RUNNING TEST: testAddCreditCardExistingNicknameDifferentUser");
-		CreditCard testCreditCard = new CreditCard(testUser, "testNickname", "5555555555", "04/23", "123", testAddress);
+		CreditCard testCreditCard = new CreditCard(testUser, "blah", "5555555555", "04/23", "123", testAddress);
 		try {
 			boolean firstAddResult = testCreditCard.addCard(databaseConnection);
 			assertTrue(firstAddResult, "first time adding should be successful");
@@ -382,7 +383,7 @@ class creditCardTests {
 	
 	@Test
 	void testGetCreditCardFromNickname() {
-		String nickname = "testNickname";
+		String nickname = "nickyname";
 		String cardNumber = "99998888877776666";
 		String expirationDate = "04/23";
 		String cvv = "987";
@@ -598,5 +599,492 @@ class creditCardTests {
 			fail("Error inserting test card (Database failure)");
 		}
 	}
+	
+	@Test
+	void testSetNickname() {
+		String nickname = "oldNickname";
+		String cardNumber = "20394203923482";
+		String expirationDate = "02/24";
+		String cvv = "666";
+		CreditCard testCreditCard = new CreditCard(testUser, nickname, cardNumber, expirationDate, cvv, testAddress);
+		CreditCardEntity testCreditCardEntity = testCreditCard.getCreditCardEntity();
+		
+		try {
+			Dao<CreditCardEntity, String> creditCardDao = DaoManager.createDao(databaseConnection, CreditCardEntity.class);
+			creditCardDao.create(testCreditCardEntity);
+			
+			String newNickname = "newNickname";
+			boolean result = testCreditCard.setNickname(newNickname, databaseConnection);
+			assertTrue(result, "setting nickname should have returned true if successful");
+		
+			CreditCardEntity queriedCardEntity = creditCardDao.queryForId(Encryption.encrypt(cardNumber));
+			assertFalse(queriedCardEntity == null, "card should be found in database");
+			
+			CreditCard queriedCard = new CreditCard(queriedCardEntity);
+			String queriedCardNickname = queriedCard.getNickname();
+			assertTrue(queriedCardNickname.equals(newNickname), "Nickname was not updated. Expected: " + newNickname + " but got: " + queriedCardNickname);
+			
+			creditCardDao.delete(testCreditCardEntity);
+		} catch (SQLException e) {
+			e.printStackTrace();
+			fail(e);
+		}
 
+	}
+	
+	@Test
+	void testSetCardNumber() {
+		String nickname = "name";
+		String cardNumber = "20394203923482";
+		String expirationDate = "02/24";
+		String cvv = "666";
+		CreditCard testCreditCard = new CreditCard(testUser, nickname, cardNumber, expirationDate, cvv, testAddress);
+		CreditCardEntity testCreditCardEntity = testCreditCard.getCreditCardEntity();
+		
+		try {
+			Dao<CreditCardEntity, String> creditCardDao = DaoManager.createDao(databaseConnection, CreditCardEntity.class);
+			creditCardDao.create(testCreditCardEntity);
+			
+			String newCardNumber = "666666666666";
+			boolean result = testCreditCard.setCardNumber(newCardNumber, databaseConnection);
+			assertTrue(result, "setting card number should have returned true if successful");
+		
+			CreditCardEntity queriedCardEntity = creditCardDao.queryForId(Encryption.encrypt(newCardNumber));
+			assertFalse(queriedCardEntity == null, "card should be found in database, number not updated");
+			
+			CreditCard queriedCard = new CreditCard(queriedCardEntity);
+			String queriedCardNumber = queriedCard.getCardNumber();
+			assertTrue(queriedCardNumber.equals(newCardNumber), "Card Number was not updated. Expected: " + newCardNumber + " but got: " + queriedCardNumber);
+			
+			CreditCardEntity queriedOldNum = creditCardDao.queryForId(Encryption.encrypt(cardNumber));
+			assertTrue(queriedOldNum==null, "No card should exist with old number");
+			
+			creditCardDao.delete(queriedCardEntity);
+		} catch (SQLException e) {
+			e.printStackTrace();
+			fail(e);
+		}
+	}
+	
+	@Test
+	void testSetExpirationDate() {
+		String nickname = "testNickname";
+		String cardNumber = "23948029384029";
+		String expirationDate = "02/24";
+		String cvv = "666";
+		CreditCard testCreditCard = new CreditCard(testUser, nickname, cardNumber, expirationDate, cvv, testAddress);
+		CreditCardEntity testCreditCardEntity = testCreditCard.getCreditCardEntity();
+		
+		try {
+			Dao<CreditCardEntity, String> creditCardDao = DaoManager.createDao(databaseConnection, CreditCardEntity.class);
+			creditCardDao.create(testCreditCardEntity);
+			
+			String newExpirationDate = "02/30";
+			boolean result = testCreditCard.setExpirationDate(newExpirationDate, databaseConnection);
+			assertTrue(result, "setting expiration date should have returned true if successful");
+		
+			CreditCardEntity queriedCardEntity = creditCardDao.queryForId(Encryption.encrypt(cardNumber));
+			assertFalse(queriedCardEntity == null, "card should be found in database");
+			
+			CreditCard queriedCard = new CreditCard(queriedCardEntity);
+			String queriedExpirationDate = queriedCard.getExpirationDate();
+			assertTrue(queriedExpirationDate.equals(newExpirationDate), "Expiration was not updated. Expected: " + newExpirationDate + " but got: " + queriedExpirationDate);
+			
+			creditCardDao.delete(testCreditCardEntity);
+		} catch (SQLException e) {
+			e.printStackTrace();
+			fail(e);
+		}
+	}
+
+	@Test
+	void testSetCvv() {
+		String nickname = "testNickname";
+		String cardNumber = "4350203980239857";
+		String expirationDate = "02/24";
+		String cvv = "666";
+		CreditCard testCreditCard = new CreditCard(testUser, nickname, cardNumber, expirationDate, cvv, testAddress);
+		CreditCardEntity testCreditCardEntity = testCreditCard.getCreditCardEntity();
+		
+		try {
+			Dao<CreditCardEntity, String> creditCardDao = DaoManager.createDao(databaseConnection, CreditCardEntity.class);
+			creditCardDao.create(testCreditCardEntity);
+			
+			String newCvv = "888";
+			boolean result = testCreditCard.setCvv(newCvv, databaseConnection);
+			assertTrue(result, "setting CVV should have returned true if successful");
+		
+			CreditCardEntity queriedCardEntity = creditCardDao.queryForId(Encryption.encrypt(cardNumber));
+			assertFalse(queriedCardEntity == null, "card should be found in database");
+			
+			CreditCard queriedCard = new CreditCard(queriedCardEntity);
+			String queriedCvv = queriedCard.getCvv();
+			assertTrue(queriedCvv.equals(newCvv), "CVV was not updated. Expected: " + newCvv + " but got: " + queriedCvv);
+			
+			creditCardDao.delete(testCreditCardEntity);
+		} catch (SQLException e) {
+			e.printStackTrace();
+			fail(e);
+		}
+	}
+
+	@Test
+	void testSetBillingAddressOneCardAssociatedNewAddress() {
+		String nickname = "ocana";
+		String cardNumber = "679283928342085";
+		String expirationDate = "02/24";
+		String cvv = "666";
+		Address oldBillingAddress = new Address("216 W 92nd st", "NYC", "NY", "10025");
+		CreditCard testCreditCard = new CreditCard(testUser, nickname, cardNumber, expirationDate, cvv, oldBillingAddress);
+		CreditCardEntity testCreditCardEntity = testCreditCard.getCreditCardEntity();
+		
+		try {
+			Dao<CreditCardEntity, String> creditCardDao = DaoManager.createDao(databaseConnection, CreditCardEntity.class);
+			creditCardDao.create(testCreditCardEntity);
+			
+			Address newBillingAddress = new Address("6666 wash ave", "STL", "MO", "63130");
+			String newBillingAddressString = newBillingAddress.getFullAddress();
+			boolean result = testCreditCard.setBillingAddress(newBillingAddress, databaseConnection);
+			assertTrue(result, "setting billing address should have returned true if successful");
+		
+			CreditCardEntity queriedCardEntity = creditCardDao.queryForId(Encryption.encrypt(cardNumber));
+			assertFalse(queriedCardEntity == null, "card should be found in database");
+			
+			CreditCard queriedCard = new CreditCard(queriedCardEntity);
+			String queriedBillingAddress = queriedCard.getBillingAddress();
+			assertTrue(queriedBillingAddress.equals(newBillingAddressString), "Billing Address was not updated. Expected: " + newBillingAddressString + " but got: " + queriedBillingAddress);
+			
+			Map<String, Object> addressQueryParams = new HashMap<String, Object>();
+			addressQueryParams.put("street_address", Encryption.encrypt("216 W 92nd st"));
+			addressQueryParams.put("city", Encryption.encrypt("NYC"));
+			addressQueryParams.put("state", Encryption.encrypt("NY"));
+			addressQueryParams.put("zip_code", Encryption.encrypt("10025"));
+			
+			List<AddressEntity> returnedAddresses = addressDao.queryForFieldValues(addressQueryParams);
+			assertTrue(returnedAddresses.size() == 0, "Should have deleted the old address");
+			
+			Map<String, Object> addressQueryParamsTwo = new HashMap<String, Object>();
+			addressQueryParamsTwo.put("street_address", Encryption.encrypt("6666 wash ave"));
+			addressQueryParamsTwo.put("city", Encryption.encrypt("STL"));
+			addressQueryParamsTwo.put("state", Encryption.encrypt("MO"));
+			addressQueryParamsTwo.put("zip_code", Encryption.encrypt("63130"));
+			
+			List<AddressEntity> returnedAddressesTwo = addressDao.queryForFieldValues(addressQueryParamsTwo);
+			assertTrue(returnedAddressesTwo.size() == 1, "Should have added another row for new address");
+			
+			creditCardDao.delete(testCreditCardEntity);
+			newBillingAddress.deleteAddress(databaseConnection);
+		} catch (SQLException e) {
+			e.printStackTrace();
+			fail(e);
+		}
+	}
+	
+	@Test
+	void testSetBillingAddressOneCardAssociatedExistingAddress() {
+		String nickname = "ocaea";
+		String cardNumber = "84357934857220";
+		String expirationDate = "02/24";
+		String cvv = "666";
+		Address oldBillingAddress = new Address("246 W 99nd st", "NYC", "NY", "10025");
+		CreditCard testCreditCard = new CreditCard(testUser, nickname, cardNumber, expirationDate, cvv, oldBillingAddress);
+		CreditCardEntity testCreditCardEntity = testCreditCard.getCreditCardEntity();
+		
+		try {
+			Dao<CreditCardEntity, String> creditCardDao = DaoManager.createDao(databaseConnection, CreditCardEntity.class);
+			creditCardDao.create(testCreditCardEntity);
+			
+			String newBillingAddressString = testAddress.getFullAddress();
+			boolean result = testCreditCard.setBillingAddress(testAddress, databaseConnection);
+			assertTrue(result, "setting billing address should have returned true if successful");
+		
+			CreditCardEntity queriedCardEntity = creditCardDao.queryForId(Encryption.encrypt(cardNumber));
+			assertFalse(queriedCardEntity == null, "card should be found in database");
+			
+			CreditCard queriedCard = new CreditCard(queriedCardEntity);
+			String queriedBillingAddress = queriedCard.getBillingAddress();
+			assertTrue(queriedBillingAddress.equals(newBillingAddressString), "Billing was not updated. Expected: " + newBillingAddressString + " but got: " + queriedBillingAddress);
+			
+			Map<String, Object> addressQueryParams = new HashMap<String, Object>();
+			addressQueryParams.put("street_address", Encryption.encrypt("246 W 99nd st"));
+			addressQueryParams.put("city", Encryption.encrypt("NYC"));
+			addressQueryParams.put("state", Encryption.encrypt("NY"));
+			addressQueryParams.put("zip_code", Encryption.encrypt("10025"));
+			
+			List<AddressEntity> returnedAddresses = addressDao.queryForFieldValues(addressQueryParams);
+			assertTrue(returnedAddresses.size() == 0, "Should have deleted the old address");
+			
+			Map<String, Object> addressQueryParamsTwo = new HashMap<String, Object>();
+			addressQueryParamsTwo.put("street_address", Encryption.encrypt(testAddress.getStreetAddress()));
+			addressQueryParamsTwo.put("city", Encryption.encrypt(testAddress.getCity()));
+			addressQueryParamsTwo.put("state", Encryption.encrypt(testAddress.getState()));
+			addressQueryParamsTwo.put("zip_code", Encryption.encrypt(testAddress.getZipCode()));
+			
+			List<AddressEntity> returnedAddressesTwo = addressDao.queryForFieldValues(addressQueryParamsTwo);
+			assertTrue(returnedAddressesTwo.size() == 1, "Should not have added another row for existing address");
+			
+			creditCardDao.delete(testCreditCardEntity);
+		} catch (SQLException e) {
+			e.printStackTrace();
+			fail(e);
+		}
+	}
+	
+	@Test
+	void testSetBillingAddressMultipleCardsAssociated() {
+		String nickname = "mca";
+		String cardNumber = "4238420394855993";
+		String expirationDate = "02/24";
+		String cvv = "666";
+		Address oldBillingAddress = new Address("444 E 82nd st", "NYC", "NY", "10025");
+		CreditCard testCreditCard = new CreditCard(testUser, nickname, cardNumber, expirationDate, cvv, oldBillingAddress);
+		CreditCardEntity testCreditCardEntity = testCreditCard.getCreditCardEntity();
+		
+		CreditCard testCreditCardTwo = new CreditCard(testUser, "nick", "8888777733331111", "04/32", "349", oldBillingAddress);
+		CreditCardEntity testCreditCardEntityTwo = testCreditCardTwo.getCreditCardEntity();
+		
+		try {
+			Dao<CreditCardEntity, String> creditCardDao = DaoManager.createDao(databaseConnection, CreditCardEntity.class);
+			creditCardDao.create(testCreditCardEntity);
+			creditCardDao.create(testCreditCardEntityTwo);
+			
+			Address newBillingAddress = new Address("6645 wash ave", "STL", "MO", "63130");
+			String newBillingAddressString = newBillingAddress.getFullAddress();
+			boolean result = testCreditCard.setBillingAddress(newBillingAddress, databaseConnection);
+			assertTrue(result, "setting billing address should have returned true if successful");
+		
+			CreditCardEntity queriedCardEntity = creditCardDao.queryForId(Encryption.encrypt(cardNumber));
+			assertFalse(queriedCardEntity == null, "card should be found in database");
+			
+			CreditCard queriedCard = new CreditCard(queriedCardEntity);
+			String queriedBillingAddress = queriedCard.getBillingAddress();
+			assertTrue(queriedBillingAddress.equals(newBillingAddressString), "Building Address was not updated. Expected: " + newBillingAddressString + " but got: " + queriedBillingAddress);
+			
+			Map<String, Object> addressQueryParams = new HashMap<String, Object>();
+			addressQueryParams.put("street_address", Encryption.encrypt("444 E 82nd st"));
+			addressQueryParams.put("city", Encryption.encrypt("NYC"));
+			addressQueryParams.put("state", Encryption.encrypt("NY"));
+			addressQueryParams.put("zip_code", Encryption.encrypt("10025"));
+			
+			List<AddressEntity> returnedAddresses = addressDao.queryForFieldValues(addressQueryParams);
+			assertTrue(returnedAddresses.size() == 1, "Should not have deleted the old address since it is associated with another card");
+			
+			Map<String, Object> addressQueryParamsTwo = new HashMap<String, Object>();
+			addressQueryParamsTwo.put("street_address", Encryption.encrypt("6645 wash ave"));
+			addressQueryParamsTwo.put("city", Encryption.encrypt("STL"));
+			addressQueryParamsTwo.put("state", Encryption.encrypt("MO"));
+			addressQueryParamsTwo.put("zip_code", Encryption.encrypt("63130"));
+			
+			List<AddressEntity> returnedAddressesTwo = addressDao.queryForFieldValues(addressQueryParamsTwo);
+			assertTrue(returnedAddressesTwo.size() == 1, "Should have added another row for new address");
+			
+			creditCardDao.delete(testCreditCardEntity);
+			creditCardDao.delete(testCreditCardEntityTwo);
+			newBillingAddress.deleteAddress(databaseConnection);
+			oldBillingAddress.deleteAddress(databaseConnection);
+		} catch (SQLException e) {
+			e.printStackTrace();
+			fail(e);
+		}
+	}
+	
+	@Test
+	void testUpdateCreditCardInformationUpdateNickname() {
+		String nickname = "nick";
+		String cardNumber = "92347109485193857";
+		String expirationDate = "04/23";
+		String cvv = "988";
+		try {
+			CreditCard testCreditCard = new CreditCard(testUser, nickname, cardNumber, expirationDate, cvv, testAddress);
+			CreditCardEntity testCreditCardEntity = testCreditCard.getCreditCardEntity();
+			Dao<CreditCardEntity, String> creditCardDao = DaoManager.createDao(databaseConnection, CreditCardEntity.class);
+			creditCardDao.create(testCreditCardEntity);
+
+			try {
+				File userInput = new File("test/cardTests/updateCreditCardNicknameInput.txt");
+				Scanner keyboard = new Scanner(userInput);
+				boolean result = CreditCard.updateCreditCardInformation(databaseConnection, keyboard, testUser);
+				assertTrue(result, "Should have returned true if updated credit card");
+				
+				CreditCardEntity queriedEntity = creditCardDao.queryForId(Encryption.encrypt(cardNumber));
+				assertFalse(queriedEntity==null, "Should have found credit card in the database still");
+				
+				CreditCard queriedCreditCard = new CreditCard(queriedEntity);
+				String gottenNickname = queriedCreditCard.getNickname();
+				assertTrue(gottenNickname.equals("name"), "Nickname was not updated. Expected 'name' but got: " + gottenNickname);
+				
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+				creditCardDao.delete(testCreditCardEntity);			
+				fail("Error with user input text file");
+			}
+			
+			creditCardDao.delete(testCreditCardEntity);			
+		} catch (SQLException e) {			
+			e.printStackTrace();
+			fail("Error inserting test card (Database failure)");
+		}
+	}
+
+	@Test
+	void testUpdateCreditCardInformationUpdateCardNum() {
+		String nickname = "card";
+		String cardNumber = "1111111111111111";
+		String expirationDate = "04/23";
+		String cvv = "988";
+		try {
+			CreditCard testCreditCard = new CreditCard(testUser, nickname, cardNumber, expirationDate, cvv, testAddress);
+			CreditCardEntity testCreditCardEntity = testCreditCard.getCreditCardEntity();
+			Dao<CreditCardEntity, String> creditCardDao = DaoManager.createDao(databaseConnection, CreditCardEntity.class);
+			creditCardDao.create(testCreditCardEntity);
+
+			try {
+				File userInput = new File("test/cardTests/updateCreditCardCardNumInput.txt");
+				Scanner keyboard = new Scanner(userInput);
+				boolean result = CreditCard.updateCreditCardInformation(databaseConnection, keyboard, testUser);
+				assertTrue(result, "Should have returned true if updated credit card");
+				
+				CreditCardEntity queriedEntity = creditCardDao.queryForId(Encryption.encrypt("8888888888888888"));
+				assertFalse(queriedEntity==null, "card number not updated");
+				
+				CreditCard queriedCard = new CreditCard(queriedEntity);
+				String queriedCardNumber = queriedCard.getCardNumber();
+				assertTrue(queriedCardNumber.equals("8888888888888888"), "Card Number was not updated. Expected: 8888888888888888 but got: " + queriedCardNumber);
+				
+				CreditCardEntity queriedOldNum = creditCardDao.queryForId(Encryption.encrypt(cardNumber));
+				assertTrue(queriedOldNum==null, "No card should exist with old number");
+				
+				creditCardDao.delete(queriedEntity);
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+				creditCardDao.delete(testCreditCardEntity);			
+				fail("Error with user input text file");
+			}
+			
+		} catch (SQLException e) {			
+			e.printStackTrace();
+			fail("Error inserting test card (Database failure)");
+		}
+	}
+	
+	@Test
+	void testUpdateCreditCardInformationUpdateExpDate() {
+		String nickname = "C1";
+		String cardNumber = "48537459283001394";
+		String expirationDate = "04/23";
+		String cvv = "908";
+		try {
+			CreditCard testCreditCard = new CreditCard(testUser, nickname, cardNumber, expirationDate, cvv, testAddress);
+			CreditCardEntity testCreditCardEntity = testCreditCard.getCreditCardEntity();
+			Dao<CreditCardEntity, String> creditCardDao = DaoManager.createDao(databaseConnection, CreditCardEntity.class);
+			creditCardDao.create(testCreditCardEntity);
+
+			try {
+				File userInput = new File("test/cardTests/updateCreditCardExpDateInput.txt");
+				Scanner keyboard = new Scanner(userInput);
+				boolean result = CreditCard.updateCreditCardInformation(databaseConnection, keyboard, testUser);
+				assertTrue(result, "Should have returned true if updated credit card");
+				
+				CreditCardEntity queriedEntity = creditCardDao.queryForId(Encryption.encrypt(cardNumber));
+				assertFalse(queriedEntity==null, "card not found in database");
+				
+				CreditCard queriedCard = new CreditCard(queriedEntity);
+				String queriedExpDate= queriedCard.getExpirationDate();
+				assertTrue(queriedExpDate.equals("04/30"), "Card Number was not updated. Expected: 04/30 but got: " + queriedExpDate);
+
+				
+				creditCardDao.delete(queriedEntity);
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+				creditCardDao.delete(testCreditCardEntity);			
+				fail("Error with user input text file");
+			}
+			
+		} catch (SQLException e) {			
+			e.printStackTrace();
+			fail("Error inserting test card (Database failure)");
+		}
+	}
+	
+	@Test
+	void testUpdateCreditCardInformationUpdateCvv() {
+		String nickname = "7up";
+		String cardNumber = "48537459283001394";
+		String expirationDate = "04/23";
+		String cvv = "908";
+		try {
+			CreditCard testCreditCard = new CreditCard(testUser, nickname, cardNumber, expirationDate, cvv, testAddress);
+			CreditCardEntity testCreditCardEntity = testCreditCard.getCreditCardEntity();
+			Dao<CreditCardEntity, String> creditCardDao = DaoManager.createDao(databaseConnection, CreditCardEntity.class);
+			creditCardDao.create(testCreditCardEntity);
+
+			try {
+				File userInput = new File("test/cardTests/updateCreditCardCvvInput.txt");
+				Scanner keyboard = new Scanner(userInput);
+				boolean result = CreditCard.updateCreditCardInformation(databaseConnection, keyboard, testUser);
+				assertTrue(result, "Should have returned true if updated credit card");
+				
+				CreditCardEntity queriedEntity = creditCardDao.queryForId(Encryption.encrypt(cardNumber));
+				assertFalse(queriedEntity==null, "card not found in database");
+				
+				CreditCard queriedCard = new CreditCard(queriedEntity);
+				String queriedCvv= queriedCard.getCvv();
+				assertTrue(queriedCvv.equals("669"), "Card Number was not updated. Expected: 669 but got: " + queriedCvv);
+
+				
+				creditCardDao.delete(queriedEntity);
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+				creditCardDao.delete(testCreditCardEntity);			
+				fail("Error with user input text file");
+			}
+			
+		} catch (SQLException e) {			
+			e.printStackTrace();
+			fail("Error inserting test card (Database failure)");
+		}
+	}
+	
+	@Test
+	void testUpdateCreditCardInformationUpdateBillingAddress() {
+		String nickname = "ba";
+		String cardNumber = "90230293875549203";
+		String expirationDate = "04/23";
+		String cvv = "908";
+		try {
+			CreditCard testCreditCard = new CreditCard(testUser, nickname, cardNumber, expirationDate, cvv, testAddress);
+			CreditCardEntity testCreditCardEntity = testCreditCard.getCreditCardEntity();
+			Dao<CreditCardEntity, String> creditCardDao = DaoManager.createDao(databaseConnection, CreditCardEntity.class);
+			creditCardDao.create(testCreditCardEntity);
+
+			try {
+				File userInput = new File("test/cardTests/updateCreditCardBillingAddressInput.txt");
+				Scanner keyboard = new Scanner(userInput);
+				boolean result = CreditCard.updateCreditCardInformation(databaseConnection, keyboard, testUser);
+				assertTrue(result, "Should have returned true if updated credit card");
+				
+				CreditCardEntity queriedEntity = creditCardDao.queryForId(Encryption.encrypt(cardNumber));
+				assertFalse(queriedEntity==null, "card not found in database");
+				
+				CreditCard queriedCard = new CreditCard(queriedEntity);
+				String queriedBillingAddress = queriedCard.getBillingAddress();
+				Address expectedAddress = new Address("999 9th st", "Miami", "FL", "23423");
+				String expectedAddressString = expectedAddress.getFullAddress();
+				assertTrue(queriedBillingAddress.equals(expectedAddressString), "Card Number was not updated. Expected: " + expectedAddressString + "but got: " + queriedBillingAddress);
+
+				expectedAddress.updateToExistingAddress(databaseConnection);
+				expectedAddress.deleteAddress(databaseConnection);
+				
+				creditCardDao.delete(queriedEntity);
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+				creditCardDao.delete(testCreditCardEntity);			
+				fail("Error with user input text file");
+			}
+			
+		} catch (SQLException e) {			
+			e.printStackTrace();
+			fail("Error inserting test card (Database failure)");
+		}
+	}
 }

@@ -72,6 +72,10 @@ public class Address {
 		return this.addressEntity;
 	}
 	
+	protected int getNumAssociatedCards() {
+		return this.addressEntity.getCreditCards().size() + this.addressEntity.getDebitCards().size();
+	}
+	
 	/**
 	 * Checks if an address with the same street address, city, state, and zip code
 	 * already exists in the database 
@@ -163,7 +167,7 @@ public class Address {
 	}
 	
 	/**
-	 * Method only used for cleaning up after tests
+	 * Deletes an address from the database
 	 * @param databaseConnection
 	 */
 	public void deleteAddress(ConnectionSource databaseConnection) {
