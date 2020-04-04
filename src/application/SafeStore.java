@@ -21,7 +21,7 @@ public class SafeStore {
 
 	public static void main(String[] args) {
 		ConnectionSource databaseConnection;
-		String databaseUrl = "jdbc:sqlite:src/database/app.db";
+		String databaseUrl = "jdbc:sqlite:database/app.db";
 		try {
 			databaseConnection = new JdbcConnectionSource(databaseUrl);
 			@SuppressWarnings("resource")
