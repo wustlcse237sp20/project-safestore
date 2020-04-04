@@ -81,6 +81,10 @@ public class CreditCard implements Card{
 				"\n CVV: " + this.getCvv() + "\n Billing Address: " + this.getBillingAddress();
 	}
 
+	/**
+	 * sets the credit cards nickname in the database 
+	 * @return true if successful, false if not
+	 */
 	public boolean setNickname(String nickname, ConnectionSource databaseConnection) {
 		this.creditCardEntity.setNickname(Encryption.encrypt(nickname));
 		try {
@@ -91,7 +95,11 @@ public class CreditCard implements Card{
 			return false;
 		}
 	}
-
+	
+	/**
+	 * sets the credit card number in the database 
+	 * @return true if successful, false if not
+	 */
 	public boolean setCardNumber(String cardNumber, ConnectionSource databaseConnection) {
 		try {
 			int result = this.creditCardEntity.updateId(Encryption.encrypt(cardNumber));
@@ -102,6 +110,10 @@ public class CreditCard implements Card{
 		}
 	}
 
+	/**
+	 * sets the credit cards expiration date in the database 
+	 * @return true if successful, false if not
+	 */
 	public boolean setExpirationDate(String expirationDate, ConnectionSource databaseConnection) {
 		this.creditCardEntity.setExpirationDate(Encryption.encrypt(expirationDate));
 		try {
@@ -113,6 +125,10 @@ public class CreditCard implements Card{
 		}
 	}
 
+	/**
+	 * sets the credit cards CVV in the database 
+	 * @return true if successful, false if not
+	 */
 	public boolean setCvv(String cvv, ConnectionSource databaseConnection) {
 		this.creditCardEntity.setCvv(Encryption.encrypt(cvv));
 		try {
@@ -124,6 +140,11 @@ public class CreditCard implements Card{
 		}
 	}
 
+	/**
+	 * Sets the billing address to be a new address 
+	 * If old address only had one card associated with it, then it deletes the old address
+	 * @return true if successful, false if not
+	 */
 	public boolean setBillingAddress(Address newBillingAddress, ConnectionSource databaseConnection) {		
 		Address oldAddress = this.billingAddress;
 		
@@ -278,6 +299,15 @@ public class CreditCard implements Card{
 		}
 	}
 
+	/**
+	 * Gets a Credit card from the database based off the nickname and SafeStore user
+	 * 
+	 * @param nickname
+	 * @param safeStoreUser
+	 * @param databaseConnection
+	 * @return the Credit Card with that nickname and user
+	 * @throws Exception if no credit card is found, or if there is a database error
+	 */
 	public static CreditCard getCreditCardFromNickname(String nickname, User safeStoreUser, ConnectionSource databaseConnection) throws Exception{
 		nickname = Encryption.encrypt(nickname);
 		try {
@@ -299,6 +329,13 @@ public class CreditCard implements Card{
 
 	}
 
+	/**
+	 * Returns and prints the requested information about a credit card
+	 * @param databaseConnection
+	 * @param keyboard
+	 * @param safeStoreUser
+	 * @return
+	 */
 	public static String getCreditCardInformation(ConnectionSource databaseConnection, Scanner keyboard, User safeStoreUser) {
 		String userPrompt = "What is the card nickname you'd like to retrieve info for (default is the last four digits of the card number)";
 		System.out.println(userPrompt);
@@ -345,8 +382,15 @@ public class CreditCard implements Card{
 		}
 	}
 	
+	/**
+	 * Updates the credit card in the database based off user input 
+	 * @param databaseConnection
+	 * @param keyboard
+	 * @param safeStoreUser
+	 * @return
+	 */
 	public static boolean updateCreditCardInformation(ConnectionSource databaseConnection, Scanner keyboard, User safeStoreUser) {
-		String userPrompt = "What is the card nickname you'd like to retrieve info for (default is the last four digits of the card number)";
+		String userPrompt = "What is the card nickname you'd like to update info for (default is the last four digits of the card number)";
 		System.out.println(userPrompt);
 		String nickname = keyboard.nextLine();
 		
@@ -429,7 +473,9 @@ public class CreditCard implements Card{
 			//				CreditCard.addCreditCard(databaseConnection, keyboard, safeStoreUser);
 			//			}
 			User safeStoreUser = new User("testUser", "testPassword");
+			safeStoreUser.createSafeStoreAccountThroughDatabase(databaseConnection);
 			CreditCard.addCreditCard(databaseConnection, keyboard, safeStoreUser);
+			CreditCard.updateCreditCardInformation(databaseConnection, keyboard, safeStoreUser);
 			CreditCard.getCreditCardInformation(databaseConnection, keyboard, safeStoreUser);
 		}
 		catch (SQLException e) {
