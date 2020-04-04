@@ -58,7 +58,7 @@ public class WebsiteAccount {
 	}
 	
 	public boolean setWebsiteLogin(String websiteLogin) {
-		this.websiteAccountEntity.setNickname(Encryption.encrypt(websiteLogin));
+		this.websiteAccountEntity.setWebsiteLogin(Encryption.encrypt(websiteLogin));
 		try {
 			int successfulUpdate = this.websiteAccountEntity.update();
 			return successfulUpdate > 0;
@@ -73,7 +73,7 @@ public class WebsiteAccount {
 	}
 	
 	public boolean setWebsitePassword(String websitePassword) {
-		this.websiteAccountEntity.setNickname(Encryption.encrypt(websitePassword));
+		this.websiteAccountEntity.setWebsitePassword(Encryption.encrypt(websitePassword));
 		try {
 			int successfulUpdate = this.websiteAccountEntity.update();
 			return successfulUpdate > 0;

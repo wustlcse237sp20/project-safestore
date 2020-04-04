@@ -259,13 +259,13 @@ class WebsiteAccountTests {
 			WebsiteAccount account = new WebsiteAccount(testUser, testAccountNickname, testAccountLogin, testAccountPassword);
 			account.addWebsiteAccount(databaseConnection); 
 			
-			// update the account nickname to this string
+			// update the account login to this string
 			String updatedLogin = "new_login";
 			WebsiteAccount.updateWebsiteAccount(databaseConnection, keyboard, testUser);
 			
 			// get the updated account and see if nickname was updated correctly
 			WebsiteAccountEntity updatedAccount = websiteAccountDao.queryForId(account.getId());
-			assertEquals("Logins didn't match", updatedLogin, Encryption.decrypt(updatedAccount.getNickname()));
+			assertEquals("Logins didn't match", updatedLogin, Encryption.decrypt(updatedAccount.getWebsiteLogin()));
 			
 			websiteAccountDao.deleteById(account.getId()); 
 			userDao.delete(testUser.getUserEntity());
@@ -290,13 +290,13 @@ class WebsiteAccountTests {
 			WebsiteAccount account = new WebsiteAccount(testUser, testAccountNickname, testAccountLogin, testAccountPassword);
 			account.addWebsiteAccount(databaseConnection); 
 			
-			// update the account nickname to this string
+			// update the account password to this string
 			String updatedPassword = "anotha_one";
 			WebsiteAccount.updateWebsiteAccount(databaseConnection, keyboard, testUser);
 			
 			// get the updated account and see if nickname was updated correctly
 			WebsiteAccountEntity updatedAccount = websiteAccountDao.queryForId(account.getId());
-			assertEquals("Passwords didn't match", updatedPassword, Encryption.decrypt(updatedAccount.getNickname()));
+			assertEquals("Passwords didn't match", updatedPassword, Encryption.decrypt(updatedAccount.getWebsitePassword()));
 			
 			websiteAccountDao.deleteById(account.getId()); 
 			userDao.delete(testUser.getUserEntity());
