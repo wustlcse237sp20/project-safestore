@@ -19,6 +19,16 @@ public interface Card {
 	
 	public String toString();
 	
+	public boolean setNickname(String nickname, ConnectionSource databaseConnection);
+	
+	public boolean setCardNumber(String cardNumber, ConnectionSource databaseConnection);
+	
+	public boolean setExpirationDate(String expirationDate, ConnectionSource databaseConnection);
+	
+	public boolean setCvv(String cvv, ConnectionSource databaseConnection);
+	
+	public boolean setBillingAddress(Address billingAddress, ConnectionSource databaseConnection);
+	
 	public boolean addCard(ConnectionSource databaseConnection) throws Exception;
 	
 }
