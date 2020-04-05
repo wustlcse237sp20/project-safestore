@@ -32,5 +32,7 @@
 - Modifying account information (credit card, debit card, website account, etc.) exists as a functionality on the backend (and there are tests for these functionalities) but we do not have user input incorporated into these stories. This will be done in iteration 2 when we implement the UI. 
 ## Commands to Compile and Run Code:
 ```sh
-$ git clone 
+$ git clone https://github.com/wustlcse237sp20/project-safestore.git
+$ cd project-safestore/
+$ ./runSafeStore.sh 
 ```
