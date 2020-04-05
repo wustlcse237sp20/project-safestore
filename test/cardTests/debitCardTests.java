@@ -20,11 +20,9 @@ import com.j256.ormlite.jdbc.JdbcConnectionSource;
 import com.j256.ormlite.support.ConnectionSource;
 
 import card.Address;
-import card.CreditCard;
 import card.DebitCard;
 import encryption.Encryption;
 import tables.AddressEntity;
-import tables.CreditCardEntity;
 import tables.DebitCardEntity;
 import tables.UserEntity;
 import user.User;
@@ -93,7 +91,7 @@ class debitCardTests {
 		assertTrue(testDebitCard.getNickname().equals("3232"), "Default nickname was not the last four digits");
 	}
 	@Test
-	void testAddCreditCardExistingAddressDefaultNickname() {
+	void testAddDebitCardExistingAddressDefaultNickname() {
 		System.out.println("RUNNING TEST: testAddDebitCardExistingAddressDefaultNickname");
 		String encryptedDebitCardNumber = Encryption.encrypt("1234567890");
 		DebitCard testDebitCard = new DebitCard(testUser, "1234567890", "04/23", "123", "1234", testAddress);
@@ -118,8 +116,8 @@ class debitCardTests {
 				assertTrue(returnedAddresses.size() == 1, errMsg);
 				
 				AddressEntity returnedAddressEntity = returnedAddresses.get(0);
-				ForeignCollection<CreditCardEntity> associatedCreditCards = returnedAddressEntity.getCreditCards();
-				assertTrue(associatedCreditCards.size() == 1, "Address should only have one card associated with it");
+				ForeignCollection<DebitCardEntity> associatedDebitCards = returnedAddressEntity.getDebitCards();
+				assertTrue(associatedDebitCards.size() == 1, "Address should only have one card associated with it");
 				
 				returnedUser = userDao.queryForSameId(testUserEntity);
 				usersAssociatedDebitCards = returnedUser.getDebitCards();
@@ -130,7 +128,7 @@ class debitCardTests {
 				DebitCardEntity queriedCard = debitCardDao.queryForId(encryptedDebitCardNumber);
 				DebitCard queriedDebitCard = new DebitCard(queriedCard);
 				assertTrue(queriedDebitCard.getNickname().equals("7890"), "Nickname doesn't match");
-				assertTrue(queriedDebitCard.getCardNumber().equals("1234567890"), "Credit card number doesn't match");
+				assertTrue(queriedDebitCard.getCardNumber().equals("1234567890"), "Debit card number doesn't match");
 				assertTrue(queriedDebitCard.getExpirationDate().equals("04/23"), "Expiration date doesn't match");
 				assertTrue(queriedDebitCard.getCvv().equals("123"), "CVV doesn't match");
 				assertTrue(queriedDebitCard.getPin().equals("1234"), "Pin doesn't match");
@@ -153,11 +151,12 @@ class debitCardTests {
 		String expectedNickname = "7890";
 		String expectedExpDate = "04/23";
 		String expectedCvv = "321";
+		String expectedPin = "4321";
 		String expectedStreetAddress = "456 lazy rd";
 		String expectedCity = "STL";
 		String expectedState = "MO";
 		String expectedZipCode = "54321";
-		String expectedPin = "4321";
+		
 		
 		File file = new File("test/cardTests/addDebitCardDefaultNicknameInput.txt");
 		try {
@@ -194,7 +193,7 @@ class debitCardTests {
 				DebitCardEntity queriedCard = debitCardDao.queryForId(encryptedDebitCardNumber);
 				DebitCard queriedDebitCard = new DebitCard(queriedCard);
 				assertTrue(queriedDebitCard.getNickname().equals(expectedNickname), "Nickname doesn't match");
-				assertTrue(queriedDebitCard.getCardNumber().equals("1234567890"), "Credit card number doesn't match");
+				assertTrue(queriedDebitCard.getCardNumber().equals("1234567890"), "Debit card number doesn't match");
 				assertTrue(queriedDebitCard.getExpirationDate().equals(expectedExpDate), "Expiration date doesn't match");
 				assertTrue(queriedDebitCard.getCvv().equals(expectedCvv), "CVV doesn't match");
 				assertTrue(queriedDebitCard.getPin().equals(expectedPin), "Pin doesn't match");
@@ -211,8 +210,8 @@ class debitCardTests {
 	}
 	
 	@Test
-	void testStaticAddCreditCardWithNickname() {
-		System.out.println("RUNNING TEST: testStaticAddCreditCardWithNickname");
+	void testStaticAddDebitCardWithNickname() {
+		System.out.println("RUNNING TEST: testStaticAddDebitCardWithNickname");
 
 		String encryptedDebitCardNumber = Encryption.encrypt("1234567890");
 		String expectedExpDate = "03/24";
@@ -260,7 +259,7 @@ class debitCardTests {
 				DebitCardEntity queriedCard = debitCardDao.queryForId(encryptedDebitCardNumber);
 				DebitCard queriedDebitCard = new DebitCard(queriedCard);
 				assertTrue(queriedDebitCard.getNickname().equals(expectedNickname), "Nickname doesn't match");
-				assertTrue(queriedDebitCard.getCardNumber().equals("1234567890"), "Credit card number doesn't match");
+				assertTrue(queriedDebitCard.getCardNumber().equals("1234567890"), "Debit card number doesn't match");
 				assertTrue(queriedDebitCard.getExpirationDate().equals(expectedExpDate), "Expiration date doesn't match");
 				assertTrue(queriedDebitCard.getCvv().equals(expectedCvv), "CVV doesn't match");
 				assertTrue(queriedDebitCard.getPin().equals(expectedPin), "Pin doesn't match");
