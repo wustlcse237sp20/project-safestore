@@ -1,0 +1,5 @@
+nickname
+badInput
+
+Login
+new_login

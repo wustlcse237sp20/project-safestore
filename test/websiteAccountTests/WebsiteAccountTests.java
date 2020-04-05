@@ -188,5 +188,124 @@ class WebsiteAccountTests {
 		}
 		
 	}
+	
+	@Test
+	void testGetWebsiteAccountFromNickname() {
+		try {
+			// add user and account to db
+			User testUser = new User(testUserUsername, testUserPassword);
+			testUser.createSafeStoreAccountThroughDatabase(databaseConnection);
+			WebsiteAccount account = new WebsiteAccount(testUser, testAccountNickname, testAccountLogin, testAccountPassword);
+			account.addWebsiteAccount(databaseConnection); 
+			
+			WebsiteAccount returnedAccount = 
+					WebsiteAccount.getWebsiteAccountFromNickname(databaseConnection, testAccountNickname, testUser);
+			
+			// delete rows from database once completed test
+			websiteAccountDao.deleteById(account.getId()); 
+			userDao.delete(testUser.getUserEntity());
+			
+			assertEquals("Nickname's not equal", account.getNickname(), returnedAccount.getNickname());
+			assertEquals("Login's not equal", account.getWebsiteLogin(), returnedAccount.getWebsiteLogin());
+			assertEquals("Password's not equal", account.getWebsitePassword(), returnedAccount.getWebsitePassword());
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Test
+	void testUpdateWebsiteAccountNickname() {
+		try {
+			// set up test user input
+			File file = new File("test/websiteAccountTests/testUpdateAccountNickname.txt");
+			Scanner keyboard = new Scanner(file);
+			
+			// add user and account to db
+			User testUser = new User(testUserUsername, testUserPassword);
+			testUser.createSafeStoreAccountThroughDatabase(databaseConnection);
+			WebsiteAccount account = new WebsiteAccount(testUser, testAccountNickname, testAccountLogin, testAccountPassword);
+			account.addWebsiteAccount(databaseConnection); 
+			
+			// update the account nickname to this string
+			String updatedNickname = "n$c*na$emdalke";
+			WebsiteAccount.updateWebsiteAccount(databaseConnection, keyboard, testUser);
+			
+			// get the updated account and see if nickname was updated correctly
+			WebsiteAccountEntity updatedAccount = websiteAccountDao.queryForId(account.getId());
+			assertEquals("Nicknames didn't match", updatedNickname, Encryption.decrypt(updatedAccount.getNickname()));
+			
+			websiteAccountDao.deleteById(account.getId()); 
+			userDao.delete(testUser.getUserEntity());
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Test
+	void testUpdateWebsiteAccountLogin() {
+		try {
+			// set up test user input
+			File file = new File("test/websiteAccountTests/testUpdateAccountLogin.txt");
+			Scanner keyboard = new Scanner(file);
+			
+			// add user and account to db
+			User testUser = new User(testUserUsername, testUserPassword);
+			testUser.createSafeStoreAccountThroughDatabase(databaseConnection);
+			WebsiteAccount account = new WebsiteAccount(testUser, testAccountNickname, testAccountLogin, testAccountPassword);
+			account.addWebsiteAccount(databaseConnection); 
+			
+			// update the account login to this string
+			String updatedLogin = "new_login";
+			WebsiteAccount.updateWebsiteAccount(databaseConnection, keyboard, testUser);
+			
+			// get the updated account and see if nickname was updated correctly
+			WebsiteAccountEntity updatedAccount = websiteAccountDao.queryForId(account.getId());
+			assertEquals("Logins didn't match", updatedLogin, Encryption.decrypt(updatedAccount.getWebsiteLogin()));
+			
+			websiteAccountDao.deleteById(account.getId()); 
+			userDao.delete(testUser.getUserEntity());
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Test
+	void testUpdateWebsiteAccountPassword() {
+		try {
+			// set up test user input
+			File file = new File("test/websiteAccountTests/testUpdateAccountPassword.txt");
+			Scanner keyboard = new Scanner(file);
+			
+			// add user and account to db
+			User testUser = new User(testUserUsername, testUserPassword);
+			testUser.createSafeStoreAccountThroughDatabase(databaseConnection);
+			WebsiteAccount account = new WebsiteAccount(testUser, testAccountNickname, testAccountLogin, testAccountPassword);
+			account.addWebsiteAccount(databaseConnection); 
+			
+			// update the account password to this string
+			String updatedPassword = "anotha_one";
+			WebsiteAccount.updateWebsiteAccount(databaseConnection, keyboard, testUser);
+			
+			// get the updated account and see if nickname was updated correctly
+			WebsiteAccountEntity updatedAccount = websiteAccountDao.queryForId(account.getId());
+			assertEquals("Passwords didn't match", updatedPassword, Encryption.decrypt(updatedAccount.getWebsitePassword()));
+			
+			websiteAccountDao.deleteById(account.getId()); 
+			userDao.delete(testUser.getUserEntity());
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
 
 }
