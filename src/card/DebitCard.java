@@ -311,6 +311,22 @@ public class DebitCard implements Card {
 			return false;
 		}
 	}
+	
+	public static boolean updateDebitCardInformation(ConnectionSource databaseConnection, Scanner keyboard,
+			User testUser) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	public static DebitCard getDebitCardFromNickname(String nickname, User testUser,
+			ConnectionSource databaseConnection) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	public static String getDebitCardInformation(ConnectionSource databaseConnection, Scanner keyboard, User testUser) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 
 	
 
