@@ -282,7 +282,7 @@ public class DebitCard implements Card {
 		expirationDate = keyboard.nextLine();
 		System.out.println("What is the CVV?");
 		cvv = keyboard.nextLine();
-		System.out.print("What is the pin?");
+		System.out.println("What is the pin?");
 		pin = keyboard.nextLine();
 		System.out.println("Do you want a nickname for this debit card? Y/N (default is the last 4 digits)");
 		userInput = keyboard.nextLine();
