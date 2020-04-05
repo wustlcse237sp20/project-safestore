@@ -64,6 +64,7 @@ class UserTest {
 	void testCreateAccountThroughTerminal() throws IOException {
 		File createAccountUserInput = new File("test/userTest/terminalCreateAccount");
 		
+		// output stream code from https://limzhenghong.wordpress.com/2015/03/18/junit-with-system-out-println/“
 		//Prepare to redirect output
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
 		PrintStream ps = new PrintStream(os);
