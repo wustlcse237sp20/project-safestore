@@ -14,7 +14,7 @@ public class DebitCardEntity extends BaseDaoEnabled<DebitCardEntity, String> {
 	@DatabaseField(columnName = "nickname")
 	private String nickname;
 	
-	// reason for String is that a card number is usally in the form:
+	// reason for String is that a card number is usually in the form:
 	//	#### #### #### #### which is easiest to store as a string in 
 	// 	a database for our uses
 	@DatabaseField(columnName = "debit_card_number", id = true, canBeNull = false)
