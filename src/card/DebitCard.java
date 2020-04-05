@@ -1,6 +1,7 @@
 package card;
 
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +12,7 @@ import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.support.ConnectionSource;
 
 import encryption.Encryption;
+import tables.CreditCardEntity;
 import tables.DebitCardEntity;
 import tables.UserEntity;
 import user.User;
@@ -144,6 +146,17 @@ public class DebitCard implements Card {
 			e.printStackTrace();
 			return false;
 		}
+	}
+	public boolean setPin(String pin, ConnectionSource databaseConnection) {
+		this.debitCardEntity.setPin(Encryption.encrypt(pin));
+		try {
+			int result = this.debitCardEntity.update();
+			return result > 0;
+		} catch(SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+
 	}
 	/**
 	 * Sets the billing address to be a new address 
@@ -311,20 +324,157 @@ public class DebitCard implements Card {
 			return false;
 		}
 	}
+	/**
+	 * Updates the debit card in the database based off user input 
+	 * @param databaseConnection
+	 * @param keyboard
+	 * @param safeStoreUser
+	 * @return
+	 */
+	public static boolean updateDebitCardInformation(ConnectionSource databaseConnection, Scanner keyboard, User safeStoreUser) {
+		String userPrompt = "What is the card nickname you'd like to update info for (default is the last four digits of the card number)";
+		System.out.println(userPrompt);
+		String nickname = keyboard.nextLine();
+		
+		try {
+			DebitCard requestedDebitCard = DebitCard.getDebitCardFromNickname(nickname, safeStoreUser, databaseConnection);
+			userPrompt = "What information would you like to update? Type: 'Nickname', 'Card Number', 'Expiration Date', 'CVV', or 'Billing Address'";
+			System.out.println(userPrompt);
+			String userInput = keyboard.nextLine();
+			
+			String[] acceptableInput = {"Nickname", "Card Number", "Expiration Date", "CVV", "Pin", "Billing Address"};
+			while(!Arrays.asList(acceptableInput).contains(userInput)) {
+				userPrompt = "Enter: 'Nickname', 'Card Number', 'Expiration Date', 'CVV', 'Pin' or 'Billing Address'";
+				System.out.println(userPrompt);
+				userInput = keyboard.nextLine();
+			}
+			
+			if(userInput.equals("Nickname")) {
+				userPrompt = "What is the new nickname you'd like to use?";
+				System.out.println(userPrompt);
+				String newNickname = keyboard.nextLine();
+				return requestedDebitCard.setNickname(newNickname, databaseConnection);
+			}
+			if(userInput.equals("Card Number")) {
+				userPrompt = "What is the new card number?";
+				System.out.println(userPrompt);
+				String newCardNum = keyboard.nextLine();
+				return requestedDebitCard.setCardNumber(newCardNum, databaseConnection);
+			}
+			if(userInput.equals("Expiration Date")) {
+				userPrompt = "What is the new expiration date?";
+				System.out.println(userPrompt);
+				String newExpDate = keyboard.nextLine();
+				return requestedDebitCard.setExpirationDate(newExpDate, databaseConnection);
+			}
+			if(userInput.equals("CVV")) {
+				userPrompt = "What is the new CVV?";
+				System.out.println(userPrompt);
+				String newCvv = keyboard.nextLine();
+				return requestedDebitCard.setCvv(newCvv, databaseConnection);
+			}
+			if(userInput.equals("Pin")) {
+				userPrompt = "What is the new Pin?";
+				System.out.println(userPrompt);
+				String newPin = keyboard.nextLine();
+				return requestedDebitCard.setPin(newPin, databaseConnection);
+			}
+			if(userInput.equals("Billing Address")) {
+				System.out.println("What is the street address?");
+				String streetAddress = keyboard.nextLine();
+				System.out.println("What is the city?");
+				String city = keyboard.nextLine();
+				System.out.println("What is the state?");
+				String state = keyboard.nextLine();
+				System.out.println("What is the zip code?");
+				String zipCode = keyboard.nextLine();
+
+				Address newBillingAddress = new Address(streetAddress, city, state, zipCode);	
+				return requestedDebitCard.setBillingAddress(newBillingAddress, databaseConnection);
+			}
+			return false;
+		} catch (Exception e) {
+			System.out.println(e);
+			return false;
+		}
+	}
 	
-	public static boolean updateDebitCardInformation(ConnectionSource databaseConnection, Scanner keyboard,
-			User testUser) {
-		// TODO Auto-generated method stub
-		return false;
+	/**
+	 * Gets a Debit card from the database based off the nickname and SafeStore user
+	 * 
+	 * @param nickname
+	 * @param safeStoreUser
+	 * @param databaseConnection
+	 * @return the Debit Card with that nickname and user
+	 * @throws Exception if no credit card is found, or if there is a database error
+	 */
+	public static DebitCard getDebitCardFromNickname(String nickname, User safeStoreUser,ConnectionSource databaseConnection) throws Exception {
+		nickname = Encryption.encrypt(nickname);
+		try {
+			Dao<DebitCardEntity, String> debitCardDao = DaoManager.createDao(databaseConnection, DebitCardEntity.class);
+			Map<String, Object> queryParams = new HashMap<String, Object>();
+			queryParams.put("nickname", nickname);
+			queryParams.put("safe_store_username", safeStoreUser.getUserEntity());
+			List<DebitCardEntity> returnedDebitCards = debitCardDao.queryForFieldValues(queryParams);
+			if (returnedDebitCards.size() == 0) {
+				throw new Exception("No Debit Card Found");
+			}
+			DebitCardEntity returnedCard = returnedDebitCards.get(0);
+			return new DebitCard(returnedCard);
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw(e);
+		}
+		
 	}
-	public static DebitCard getDebitCardFromNickname(String nickname, User testUser,
-			ConnectionSource databaseConnection) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	public static String getDebitCardInformation(ConnectionSource databaseConnection, Scanner keyboard, User testUser) {
-		// TODO Auto-generated method stub
-		return null;
+	public static String getDebitCardInformation(ConnectionSource databaseConnection, Scanner keyboard, User safeStoreUser) {
+		String userPrompt = "What is the card nickname you'd like to retrieve info for (default is the last four digits of the card number)";
+		System.out.println(userPrompt);
+		String nickname = keyboard.nextLine();
+
+		try {
+			DebitCard requestedDebitCard = DebitCard.getDebitCardFromNickname(nickname, safeStoreUser, databaseConnection);
+
+			userPrompt = "What information would you like to view? Type: 'Card Number', 'Expiration Date', 'CVV', 'Zip Code', 'Billing Address', or 'All'";
+			System.out.println(userPrompt);
+
+			String userInput = keyboard.nextLine();
+			String[] acceptableInput = {"Card Number", "Expiration Date", "CVV", "Pin", "Zip Code", "Billing Address", "All"};
+			while(!Arrays.asList(acceptableInput).contains(userInput)) {
+				userPrompt = "Enter: 'Card Number', 'Expiration Date', 'CVV', 'Pin', 'Zip Code', 'Billing Address', or 'All'";
+				System.out.println(userPrompt);
+				userInput = keyboard.nextLine();
+			}
+
+			String requestedInformation = "An Error Occurred";
+			if(userInput.equals("Card Number")) {
+				requestedInformation = requestedDebitCard.getCardNumber();
+			}
+			if(userInput.equals("Expiration Date")) {
+				requestedInformation = requestedDebitCard.getExpirationDate();
+			}
+			if(userInput.equals("CVV")) {
+				requestedInformation = requestedDebitCard.getCvv();
+			}
+			if(userInput.equals("Pin")) {
+				requestedInformation = requestedDebitCard.getPin();
+			}
+			if(userInput.equals("Zip Code")) {
+				requestedInformation = requestedDebitCard.getZipCode();
+			}
+			if(userInput.equals("Billing Address")) {
+				requestedInformation = requestedDebitCard.getBillingAddress();
+			}
+			if(userInput.equals("All")) {
+				requestedInformation = requestedDebitCard.toString();
+			}
+			System.out.println(requestedInformation);
+			return requestedInformation;
+		} catch (Exception e) {
+			System.out.println(e);
+			return(e.toString());
+		}
 	}
 
 

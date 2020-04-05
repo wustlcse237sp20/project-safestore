@@ -283,8 +283,9 @@ class debitCardTests {
 		String cardNumber = "99998888877776666";
 		String expirationDate = "04/23";
 		String cvv = "987";
+		String pin = "6789";
 		try {
-			DebitCard testDebitCard = new DebitCard(testUser, nickname, cardNumber, expirationDate, cvv, testAddress);
+			DebitCard testDebitCard = new DebitCard(testUser, nickname, cardNumber, expirationDate, cvv, pin, testAddress);
 			DebitCardEntity testDebitCardEntity = testDebitCard.getDebitCardEntity();
 			Dao<DebitCardEntity, String> debitCardDao = DaoManager.createDao(databaseConnection, DebitCardEntity.class);
 			debitCardDao.create(testDebitCardEntity);
@@ -302,7 +303,7 @@ class debitCardTests {
 				fail(e);
 			}
 
-			debitCardDao.delete(testDebitCardEntity);			
+			debitCardDao.delete(testDebitCardEntity);
 		} catch (SQLException e) {			
 			e.printStackTrace();
 			fail("Error inserting test card (Database failure)");
@@ -345,7 +346,7 @@ class debitCardTests {
 	@Test 
 	void testGetDebitCardInformaitonBillingAddress() {
 		String nickname = "testNickname";
-		String cardNumber = "99998888877776666";
+		String cardNumber = "9999888886666";
 		String expirationDate = "04/23";
 		String cvv = "987";
 		String pin = "6789";
@@ -635,13 +636,48 @@ class debitCardTests {
 	}
 
 	@Test
+	void testSetPin() {
+		String nickname = "testNickname";
+		String cardNumber = "4350203980239857";
+		String expirationDate = "02/24";
+		String cvv = "666";
+		String pin = "6789";
+		
+		DebitCard testDebitCard = new DebitCard(testUser, nickname, cardNumber, expirationDate, cvv, pin, testAddress);
+		DebitCardEntity testDebitCardEntity = testDebitCard.getDebitCardEntity();
+
+		try {
+			Dao<DebitCardEntity, String> debitCardDao = DaoManager.createDao(databaseConnection, DebitCardEntity.class);
+			debitCardDao.create(testDebitCardEntity);
+
+			String newPin = "8888";
+			boolean result = testDebitCard.setPin(newPin, databaseConnection);
+			assertTrue(result, "setting Pin should have returned true if successful");
+
+			DebitCardEntity queriedCardEntity = debitCardDao.queryForId(Encryption.encrypt(cardNumber));
+			assertFalse(queriedCardEntity == null, "card should be found in database");
+
+			DebitCard queriedCard = new DebitCard(queriedCardEntity);
+			String queriedPin = queriedCard.getPin();
+			assertTrue(queriedPin.equals(newPin), "Pin was not updated. Expected: " + newPin + " but got: " + queriedPin);
+
+			debitCardDao.delete(testDebitCardEntity);
+		} catch (SQLException e) {
+			e.printStackTrace();
+			fail(e);
+		}
+	}
+	
+	@Test
 	void testSetBillingAddressOneCardAssociatedNewAddress() {
 		String nickname = "ocana";
 		String cardNumber = "679283928342085";
 		String expirationDate = "02/24";
 		String cvv = "666";
+		String pin = "6789";
+		
 		Address oldBillingAddress = new Address("216 W 92nd st", "NYC", "NY", "10025");
-		DebitCard testDebitCard = new DebitCard(testUser, nickname, cardNumber, expirationDate, cvv, oldBillingAddress);
+		DebitCard testDebitCard = new DebitCard(testUser, nickname, cardNumber, expirationDate, cvv, pin, oldBillingAddress);
 		DebitCardEntity testDebitCardEntity = testDebitCard.getDebitCardEntity();
 
 		try {
@@ -797,7 +833,7 @@ class debitCardTests {
 	}
 
 	@Test
-	void testUpdatedebitCardInformationUpdateNickname() {
+	void testUpdateDebitCardInformationUpdateNickname() {
 		String nickname = "nick";
 		String cardNumber = "92347109485193857";
 		String expirationDate = "04/23";
@@ -810,7 +846,7 @@ class debitCardTests {
 			debitCardDao.create(testDebitCardEntity);
 
 			try {
-				File userInput = new File("test/cardTests/updatedebitCardNicknameInput.txt");
+				File userInput = new File("test/cardTests/updateCreditCardNicknameInput.txt");
 				Scanner keyboard = new Scanner(userInput);
 				boolean result = DebitCard.updateDebitCardInformation(databaseConnection, keyboard, testUser);
 				assertTrue(result, "Should have returned true if updated debit card");
@@ -836,7 +872,7 @@ class debitCardTests {
 	}
 
 	@Test
-	void testUpdatedebitCardInformationUpdateCardNum() {
+	void testUpdateDebitCardInformationUpdateCardNum() {
 		String nickname = "card";
 		String cardNumber = "1111111111111111";
 		String expirationDate = "04/23";
@@ -850,7 +886,7 @@ class debitCardTests {
 			debitCardDao.create(testDebitCardEntity);
 
 			try {
-				File userInput = new File("test/cardTests/updatedebitCardCardNumInput.txt");
+				File userInput = new File("test/cardTests/updateCreditCardCardNumInput.txt");
 				Scanner keyboard = new Scanner(userInput);
 				boolean result = DebitCard.updateDebitCardInformation(databaseConnection, keyboard, testUser);
 				assertTrue(result, "Should have returned true if updated debit card");
@@ -879,7 +915,7 @@ class debitCardTests {
 	}
 
 	@Test
-	void testUpdatedebitCardInformationUpdateExpDate() {
+	void testUpdateDebitCardInformationUpdateExpDate() {
 		String nickname = "C1";
 		String cardNumber = "48537459283001394";
 		String expirationDate = "04/23";
@@ -892,7 +928,7 @@ class debitCardTests {
 			debitCardDao.create(testDebitCardEntity);
 
 			try {
-				File userInput = new File("test/cardTests/updatedebitCardExpDateInput.txt");
+				File userInput = new File("test/cardTests/updateCreditCardExpDateInput.txt");
 				Scanner keyboard = new Scanner(userInput);
 				boolean result = DebitCard.updateDebitCardInformation(databaseConnection, keyboard, testUser);
 				assertTrue(result, "Should have returned true if updated debit card");
@@ -919,7 +955,7 @@ class debitCardTests {
 	}
 
 	@Test
-	void testUpdatedebitCardInformationUpdateCvv() {
+	void testUpdateDebitCardInformationUpdateCvv() {
 		String nickname = "7up";
 		String cardNumber = "48537459283001394";
 		String expirationDate = "04/23";
@@ -933,7 +969,7 @@ class debitCardTests {
 			debitCardDao.create(testDebitCardEntity);
 
 			try {
-				File userInput = new File("test/cardTests/updatedebitCardCvvInput.txt");
+				File userInput = new File("test/cardTests/updateCreditCardCvvInput.txt");
 				Scanner keyboard = new Scanner(userInput);
 				boolean result = DebitCard.updateDebitCardInformation(databaseConnection, keyboard, testUser);
 				assertTrue(result, "Should have returned true if updated debit card");
@@ -960,7 +996,47 @@ class debitCardTests {
 	}
 
 	@Test
-	void testUpdatedebitCardInformationUpdateBillingAddress() {
+	void testUpdateDebitCardInformationUpdatePin() {
+		String nickname = "8up";
+		String cardNumber = "48537459283001394";
+		String expirationDate = "04/23";
+		String cvv = "908";
+		String pin = "6789";
+		try {
+
+			DebitCard testDebitCard = new DebitCard(testUser, nickname, cardNumber, expirationDate, cvv, pin, testAddress);
+			DebitCardEntity testDebitCardEntity = testDebitCard.getDebitCardEntity();
+			Dao<DebitCardEntity, String> debitCardDao = DaoManager.createDao(databaseConnection, DebitCardEntity.class);
+			debitCardDao.create(testDebitCardEntity);
+
+			try {
+				File userInput = new File("test/cardTests/updateDebitCardPinInput.txt");
+				Scanner keyboard = new Scanner(userInput);
+				boolean result = DebitCard.updateDebitCardInformation(databaseConnection, keyboard, testUser);
+				assertTrue(result, "Should have returned true if updated debit card");
+
+				DebitCardEntity queriedEntity = debitCardDao.queryForId(Encryption.encrypt(cardNumber));
+				assertFalse(queriedEntity==null, "card not found in database");
+
+				DebitCard queriedCard = new DebitCard(queriedEntity);
+				String queriedPin= queriedCard.getPin();
+				assertTrue(queriedPin.equals("6699"), "Pin was not updated. Expected: 6699 but got: " + queriedPin);
+
+
+				debitCardDao.delete(queriedEntity);
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+				debitCardDao.delete(testDebitCardEntity);			
+				fail("Error with user input text file");
+			}
+
+		} catch (SQLException e) {			
+			e.printStackTrace();
+			fail("Error inserting test card (Database failure)");
+		}
+	}
+	@Test
+	void testUpdateDebitCardInformationUpdateBillingAddress() {
 		String nickname = "ba";
 		String cardNumber = "90230293875549203";
 		String expirationDate = "04/23";
@@ -974,7 +1050,7 @@ class debitCardTests {
 			debitCardDao.create(testDebitCardEntity);
 
 			try {
-				File userInput = new File("test/cardTests/updatedebitCardBillingAddressInput.txt");
+				File userInput = new File("test/cardTests/updateCreditCardBillingAddressInput.txt");
 				Scanner keyboard = new Scanner(userInput);
 				boolean result = DebitCard.updateDebitCardInformation(databaseConnection, keyboard, testUser);
 				assertTrue(result, "Should have returned true if updated debit card");
