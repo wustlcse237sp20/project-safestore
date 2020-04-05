@@ -334,7 +334,7 @@ public class CreditCard implements Card{
 	 * @param databaseConnection
 	 * @param keyboard
 	 * @param safeStoreUser
-	 * @return
+	 * @return requested credit card info
 	 */
 	public static String getCreditCardInformation(ConnectionSource databaseConnection, Scanner keyboard, User safeStoreUser) {
 		String userPrompt = "What is the card nickname you'd like to retrieve info for (default is the last four digits of the card number)";
@@ -387,7 +387,7 @@ public class CreditCard implements Card{
 	 * @param databaseConnection
 	 * @param keyboard
 	 * @param safeStoreUser
-	 * @return
+	 * @return true if the information is updated, false if not
 	 */
 	public static boolean updateCreditCardInformation(ConnectionSource databaseConnection, Scanner keyboard, User safeStoreUser) {
 		String userPrompt = "What is the card nickname you'd like to update info for (default is the last four digits of the card number)";

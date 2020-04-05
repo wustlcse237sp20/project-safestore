@@ -901,7 +901,7 @@ class creditCardTests {
 			creditCardDao.create(testCreditCardEntity);
 
 			try {
-				File userInput = new File("test/cardTests/updateCreditCardNicknameInput.txt");
+				File userInput = new File("test/cardTests/updateCardNicknameInput.txt");
 				Scanner keyboard = new Scanner(userInput);
 				boolean result = CreditCard.updateCreditCardInformation(databaseConnection, keyboard, testUser);
 				assertTrue(result, "Should have returned true if updated credit card");
@@ -939,7 +939,7 @@ class creditCardTests {
 			creditCardDao.create(testCreditCardEntity);
 
 			try {
-				File userInput = new File("test/cardTests/updateCreditCardCardNumInput.txt");
+				File userInput = new File("test/cardTests/updateCardNumInput.txt");
 				Scanner keyboard = new Scanner(userInput);
 				boolean result = CreditCard.updateCreditCardInformation(databaseConnection, keyboard, testUser);
 				assertTrue(result, "Should have returned true if updated credit card");
@@ -980,7 +980,7 @@ class creditCardTests {
 			creditCardDao.create(testCreditCardEntity);
 
 			try {
-				File userInput = new File("test/cardTests/updateCreditCardExpDateInput.txt");
+				File userInput = new File("test/cardTests/updateCardExpDateInput.txt");
 				Scanner keyboard = new Scanner(userInput);
 				boolean result = CreditCard.updateCreditCardInformation(databaseConnection, keyboard, testUser);
 				assertTrue(result, "Should have returned true if updated credit card");
@@ -1019,7 +1019,7 @@ class creditCardTests {
 			creditCardDao.create(testCreditCardEntity);
 
 			try {
-				File userInput = new File("test/cardTests/updateCreditCardCvvInput.txt");
+				File userInput = new File("test/cardTests/updateCardCvvInput.txt");
 				Scanner keyboard = new Scanner(userInput);
 				boolean result = CreditCard.updateCreditCardInformation(databaseConnection, keyboard, testUser);
 				assertTrue(result, "Should have returned true if updated credit card");
@@ -1058,7 +1058,7 @@ class creditCardTests {
 			creditCardDao.create(testCreditCardEntity);
 
 			try {
-				File userInput = new File("test/cardTests/updateCreditCardBillingAddressInput.txt");
+				File userInput = new File("test/cardTests/updateCardBillingAddressInput.txt");
 				Scanner keyboard = new Scanner(userInput);
 				boolean result = CreditCard.updateCreditCardInformation(databaseConnection, keyboard, testUser);
 				assertTrue(result, "Should have returned true if updated credit card");

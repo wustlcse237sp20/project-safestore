@@ -438,7 +438,37 @@ class debitCardTests {
 			fail("Error inserting test card (Database failure)");
 		}
 	}
+	@Test 
+	void testGetDebitCardInformationPin() {
+		String nickname = "testNickname";
+		String cardNumber = "99998888877776666";
+		String expirationDate = "04/23";
+		String cvv = "987";
+		String pin = "6789";
+		try {
+			DebitCard testDebitCard = new DebitCard(testUser, nickname, cardNumber, expirationDate, cvv, pin, testAddress);
+			DebitCardEntity testDebitCardEntity = testDebitCard.getDebitCardEntity();
+			Dao<DebitCardEntity, String> debitCardDao = DaoManager.createDao(databaseConnection, DebitCardEntity.class);
+			debitCardDao.create(testDebitCardEntity);
+			String expectedOutput = testDebitCard.getPin();
+			try {
+				File userInput = new File("test/cardTests/getPinInput.txt");
+				Scanner keyboard = new Scanner(userInput);
+				String output = DebitCard.getDebitCardInformation(databaseConnection, keyboard, testUser);
+				assertTrue(output.equals(expectedOutput), "Expected: " + expectedOutput + " but got: " + output);
 
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+				debitCardDao.delete(testDebitCardEntity);			
+				fail("Error with user input text file");
+			}
+
+			debitCardDao.delete(testDebitCardEntity);			
+		} catch (SQLException e) {			
+			e.printStackTrace();
+			fail("Error inserting test card (Database failure)");
+		}
+	}
 	@Test
 	void testGetDebitCardInformationExpDate() {
 		String nickname = "testNickname";
@@ -846,7 +876,7 @@ class debitCardTests {
 			debitCardDao.create(testDebitCardEntity);
 
 			try {
-				File userInput = new File("test/cardTests/updateCreditCardNicknameInput.txt");
+				File userInput = new File("test/cardTests/updateCardNicknameInput.txt");
 				Scanner keyboard = new Scanner(userInput);
 				boolean result = DebitCard.updateDebitCardInformation(databaseConnection, keyboard, testUser);
 				assertTrue(result, "Should have returned true if updated debit card");
@@ -886,7 +916,7 @@ class debitCardTests {
 			debitCardDao.create(testDebitCardEntity);
 
 			try {
-				File userInput = new File("test/cardTests/updateCreditCardCardNumInput.txt");
+				File userInput = new File("test/cardTests/updateCardNumInput.txt");
 				Scanner keyboard = new Scanner(userInput);
 				boolean result = DebitCard.updateDebitCardInformation(databaseConnection, keyboard, testUser);
 				assertTrue(result, "Should have returned true if updated debit card");
@@ -928,7 +958,7 @@ class debitCardTests {
 			debitCardDao.create(testDebitCardEntity);
 
 			try {
-				File userInput = new File("test/cardTests/updateCreditCardExpDateInput.txt");
+				File userInput = new File("test/cardTests/updateCardExpDateInput.txt");
 				Scanner keyboard = new Scanner(userInput);
 				boolean result = DebitCard.updateDebitCardInformation(databaseConnection, keyboard, testUser);
 				assertTrue(result, "Should have returned true if updated debit card");
@@ -969,7 +999,7 @@ class debitCardTests {
 			debitCardDao.create(testDebitCardEntity);
 
 			try {
-				File userInput = new File("test/cardTests/updateCreditCardCvvInput.txt");
+				File userInput = new File("test/cardTests/updateCardCvvInput.txt");
 				Scanner keyboard = new Scanner(userInput);
 				boolean result = DebitCard.updateDebitCardInformation(databaseConnection, keyboard, testUser);
 				assertTrue(result, "Should have returned true if updated debit card");
@@ -1050,7 +1080,7 @@ class debitCardTests {
 			debitCardDao.create(testDebitCardEntity);
 
 			try {
-				File userInput = new File("test/cardTests/updateCreditCardBillingAddressInput.txt");
+				File userInput = new File("test/cardTests/updateCardBillingAddressInput.txt");
 				Scanner keyboard = new Scanner(userInput);
 				boolean result = DebitCard.updateDebitCardInformation(databaseConnection, keyboard, testUser);
 				assertTrue(result, "Should have returned true if updated debit card");

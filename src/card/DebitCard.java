@@ -12,7 +12,6 @@ import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.support.ConnectionSource;
 
 import encryption.Encryption;
-import tables.CreditCardEntity;
 import tables.DebitCardEntity;
 import tables.UserEntity;
 import user.User;
@@ -26,11 +25,11 @@ public class DebitCard implements Card {
 		String defaultNickname = debitCardNumber.substring(debitCardNumber.length() - 4, debitCardNumber.length());
 		defaultNickname = Encryption.encrypt(defaultNickname);
 		UserEntity safeStoreUserEntity = safeStoreUser.getUserEntity();
-		String encryptedCCNumber = Encryption.encrypt(debitCardNumber);
+		String encryptedDCNumber = Encryption.encrypt(debitCardNumber);
 		String encryptedExpDate = Encryption.encrypt(expirationDate);
 		String encryptedCvv = Encryption.encrypt(cvv);
 		String encryptedPin = Encryption.encrypt(pin);
-		this.debitCardEntity = new DebitCardEntity(safeStoreUserEntity, defaultNickname, encryptedCCNumber, encryptedExpDate, encryptedCvv, encryptedPin, billingAddress.getAddressEntity());
+		this.debitCardEntity = new DebitCardEntity(safeStoreUserEntity, defaultNickname, encryptedDCNumber, encryptedExpDate, encryptedCvv, encryptedPin, billingAddress.getAddressEntity());
 		this.billingAddress = billingAddress;
 		
 	}
@@ -38,11 +37,11 @@ public class DebitCard implements Card {
 		
 		String encryptedNickname = Encryption.encrypt(nickname);
 		UserEntity safeStoreUserEntity = safeStoreUser.getUserEntity();
-		String encryptedCCNumber = Encryption.encrypt(debitCardNumber);
+		String encryptedDCNumber = Encryption.encrypt(debitCardNumber);
 		String encryptedExpDate = Encryption.encrypt(expirationDate);
 		String encryptedCvv = Encryption.encrypt(cvv);
 		String encryptedPin = Encryption.encrypt(pin);
-		this.debitCardEntity = new DebitCardEntity(safeStoreUserEntity, encryptedNickname, encryptedCCNumber, encryptedExpDate, encryptedCvv, encryptedPin, billingAddress.getAddressEntity());
+		this.debitCardEntity = new DebitCardEntity(safeStoreUserEntity, encryptedNickname, encryptedDCNumber, encryptedExpDate, encryptedCvv, encryptedPin, billingAddress.getAddressEntity());
 		this.billingAddress = billingAddress;
 		
 	}
@@ -87,7 +86,7 @@ public class DebitCard implements Card {
 		return "Card Number: " + this.getCardNumber() + "\n Expiration Date: " + this.getExpirationDate() + 
 				"\n CVV: " + this.getCvv() + "\n pin: " + this.getPin() + "\n Billing Address: " + this.getBillingAddress();
 	}
-	@Override
+	
 	/**
 	 * sets the debit cards nickname in the database 
 	 * @return true if successful, false if not
@@ -147,6 +146,12 @@ public class DebitCard implements Card {
 			return false;
 		}
 	}
+	/**
+	 * Sets the debit cards Pin in the database
+	 * @param pin
+	 * @param databaseConnection
+	 * @return true if successful, false if not
+	 */
 	public boolean setPin(String pin, ConnectionSource databaseConnection) {
 		this.debitCardEntity.setPin(Encryption.encrypt(pin));
 		try {
@@ -207,7 +212,7 @@ public class DebitCard implements Card {
 	 * 
 	 * @param databaseConnection
 	 * @return true if the debit card was successfully added, false if nickname already in use
-	 * @throws Exception if the 
+	 * @throws Exception if the database fails to connect or if the address is not added 
 	 */
 	public boolean addCard(ConnectionSource databaseConnection) throws Exception {
 		if (this.billingAddress.addressExists(databaseConnection)) {
@@ -244,10 +249,6 @@ public class DebitCard implements Card {
 
 	}
 
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-
-	}
 	
 	/**
 	 * A static method to prompt user for necessary information to make a debit card 
@@ -329,7 +330,7 @@ public class DebitCard implements Card {
 	 * @param databaseConnection
 	 * @param keyboard
 	 * @param safeStoreUser
-	 * @return
+	 * @return true if the information is updated, false if not
 	 */
 	public static boolean updateDebitCardInformation(ConnectionSource databaseConnection, Scanner keyboard, User safeStoreUser) {
 		String userPrompt = "What is the card nickname you'd like to update info for (default is the last four digits of the card number)";
@@ -338,7 +339,7 @@ public class DebitCard implements Card {
 		
 		try {
 			DebitCard requestedDebitCard = DebitCard.getDebitCardFromNickname(nickname, safeStoreUser, databaseConnection);
-			userPrompt = "What information would you like to update? Type: 'Nickname', 'Card Number', 'Expiration Date', 'CVV', or 'Billing Address'";
+			userPrompt = "What information would you like to update? Type: 'Nickname', 'Card Number', 'Expiration Date', 'CVV', 'Pin', or 'Billing Address'";
 			System.out.println(userPrompt);
 			String userInput = keyboard.nextLine();
 			
@@ -428,6 +429,13 @@ public class DebitCard implements Card {
 		}
 		
 	}
+	/**
+	 * Returns and prints the requested information about a debit card
+	 * @param databaseConnection
+	 * @param keyboard
+	 * @param safeStoreUser
+	 * @return requested debit card info 
+	 */
 	public static String getDebitCardInformation(ConnectionSource databaseConnection, Scanner keyboard, User safeStoreUser) {
 		String userPrompt = "What is the card nickname you'd like to retrieve info for (default is the last four digits of the card number)";
 		System.out.println(userPrompt);
@@ -436,7 +444,7 @@ public class DebitCard implements Card {
 		try {
 			DebitCard requestedDebitCard = DebitCard.getDebitCardFromNickname(nickname, safeStoreUser, databaseConnection);
 
-			userPrompt = "What information would you like to view? Type: 'Card Number', 'Expiration Date', 'CVV', 'Zip Code', 'Billing Address', or 'All'";
+			userPrompt = "What information would you like to view? Type: 'Card Number', 'Expiration Date', 'CVV', 'Pin, 'Zip Code', 'Billing Address', or 'All'";
 			System.out.println(userPrompt);
 
 			String userInput = keyboard.nextLine();
