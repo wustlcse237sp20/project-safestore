@@ -39,23 +39,15 @@ public class UserSignInWindow {
 	private JFrame frame;
 	private JTextField usernameField;
 	private JPasswordField passwordField;
-	static ConnectionSource databaseConnection;
-	static String databaseUrl;
+	
 	JTextField newUsername = new JTextField(10);
 	JPasswordField newPassword = new JPasswordField(10);
 	/**
 	 * Launch the application.
 	 */
-	public static void main(String[] args) {
-		System.setProperty(LocalLog.LOCAL_LOG_LEVEL_PROPERTY, "ERROR");
+	public static void launchWindow() {
 
-		databaseUrl = "jdbc:sqlite:src/database/app.db";
-		try {
-			databaseConnection = new JdbcConnectionSource(databaseUrl);
-		}
-		catch (SQLException e) {
-			e.printStackTrace();
-		}
+	
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
@@ -136,9 +128,9 @@ public class UserSignInWindow {
 				String username = usernameField.getText();
 				char[] password = passwordField.getPassword();
 				String passwordString = String.valueOf(password);
-				System.out.println("X" + passwordString +"X");
+				
 				if(!passwordString.isEmpty() && !username.isEmpty()) {
-					boolean login = User.loginThroughDatabase(databaseConnection, username, passwordString);
+					boolean login = UIController.loginUser(username, passwordString); 
 					if(login) {
 						// NEXT WINDOW
 						System.out.println("success");
@@ -160,9 +152,10 @@ public class UserSignInWindow {
 		JButton btnCreateAccount = new JButton("Create Account");
 		btnCreateAccount.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-
+				// popup window stuff: https://stackoverflow.com/questions/12810460/joptionpane-input-dialog-box-program
+				
 				JPanel basePanel = new JPanel();
-				//basePanel.setLayout(new BorderLayout(5, 5));
+				
 				basePanel.setOpaque(true);
 				basePanel.setBackground(Color.RED);
 
@@ -191,8 +184,8 @@ public class UserSignInWindow {
 							JOptionPane.showMessageDialog(frame, "Username and password must contain values");
 						}else {
 							
-							User newUser = new User(newUsername.getText(), String.valueOf(newPassword.getPassword()));
-							boolean createdNewUser = newUser.createSafeStoreAccountThroughDatabase(databaseConnection);
+							
+							boolean createdNewUser = UIController.createUser(newUsername.getText(),String.valueOf(newPassword.getPassword())); 
 							if(createdNewUser) {
 								creatingUser = false;
 								//Go to next window
