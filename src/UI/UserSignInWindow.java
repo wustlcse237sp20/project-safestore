@@ -197,7 +197,7 @@ public class UserSignInWindow {
 								creatingUser = false;
 								//Go to next window
 							}else {
-								JOptionPane.showMessageDialog(frame, "Username taken");
+								JOptionPane.showMessageDialog(frame, "Username taken, choose another");
 							}
 						}
 						
