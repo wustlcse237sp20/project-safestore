@@ -38,10 +38,10 @@ public class UserSignInWindow {
 
 	private JFrame frame;
 	private JTextField usernameField;
-	private JPasswordField passwordField;
-	
+	private JPasswordField passwordField;	
 	JTextField newUsername = new JTextField(10);
 	JPasswordField newPassword = new JPasswordField(10);
+	
 	/**
 	 * Launch the application.
 	 */
@@ -165,9 +165,6 @@ public class UserSignInWindow {
 						BorderFactory.createEmptyBorder(5, 5, 5, 5));
 				centerPanel.setOpaque(true);
 				centerPanel.setBackground(Color.WHITE);
-
-
-
 				centerPanel.add(new JLabel("Username "));
 				centerPanel.add(newUsername);
 				centerPanel.add(new JLabel("Password "));
@@ -183,8 +180,7 @@ public class UserSignInWindow {
 						if(newUsername.getText().isEmpty() || String.valueOf(newPassword.getPassword()).isEmpty()) {
 							JOptionPane.showMessageDialog(frame, "Username and password must contain values");
 						}else {
-							
-							
+						
 							boolean createdNewUser = UIController.createUser(newUsername.getText(),String.valueOf(newPassword.getPassword())); 
 							if(createdNewUser) {
 								creatingUser = false;
