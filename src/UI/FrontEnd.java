@@ -72,7 +72,7 @@ public class FrontEnd {
 	/**
 	 * Launch the application.
 	 */
-	public static void main(String[] args) {
+	public static void launchWindow() {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
