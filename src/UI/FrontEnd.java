@@ -67,7 +67,7 @@ public class FrontEnd {
 	private JTextField debitCardModifyCityInput;
 	private JTextField debitCardModifyStateInput;
 	private JTextField debitCardModifyZipInput;
-	private JTextField textField_9;
+	private JTextField debitCardModifyCurrNicknameInput;
 
 	/**
 	 * Launch the application.
@@ -91,43 +91,15 @@ public class FrontEnd {
 	public FrontEnd() {
 		initialize();
 	}
-
+	
 	/**
-	 * Initialize the contents of the frame.
+	 * 
+	 * Initializes the view section of the website account tab.
 	 */
-	private void initialize() {
-		frame = new JFrame();
-		frame.setBounds(100, 100, 800, 500);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setResizable(false);
-		
-		JTabbedPane safeStore = new JTabbedPane(JTabbedPane.TOP);
-		frame.getContentPane().add(safeStore, BorderLayout.CENTER);
-		
-		JPanel websiteAccounts = new JPanel();
-		safeStore.addTab("Website Accounts", null, websiteAccounts, null);
-		websiteAccounts.setLayout(null);
-		
-		JLabel websiteAccountsLabel = new JLabel("Website Accounts");
-		websiteAccountsLabel.setFont(new Font("Lucida Grande", Font.BOLD, 20));
-		websiteAccountsLabel.setBounds(315, 6, 189, 25);
-		websiteAccounts.add(websiteAccountsLabel);
-		
-		JLabel logoWebsiteAccountPane = new JLabel("SAFESTORE");
-		logoWebsiteAccountPane.setHorizontalAlignment(SwingConstants.CENTER);
-		logoWebsiteAccountPane.setForeground(Color.RED);
-		logoWebsiteAccountPane.setFont(new Font("Marker Felt", Font.PLAIN, 16));
-		logoWebsiteAccountPane.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
-		logoWebsiteAccountPane.setBounds(0, 399, 114, 33);
-		websiteAccounts.add(logoWebsiteAccountPane);
-		
+	private void initializeWebAccountViewSection(JPanel websiteAccounts) {
 		JLabel websiteAccountSearchHeader = new JLabel("Search Account Information");
 		websiteAccountSearchHeader.setBounds(89, 43, 175, 16);
 		websiteAccounts.add(websiteAccountSearchHeader);
-		
-		JLabel websiteAccountAddHeader = new JLabel("Add Account Information");
-		websiteAccountAddHeader.setBounds(493, 43, 209, 16);
-		websiteAccounts.add(websiteAccountAddHeader);
 		
 		websiteAccountSearchNicknameInput = new JTextField();
 		websiteAccountSearchNicknameInput.setBounds(112, 71, 130, 26);
@@ -167,6 +139,18 @@ public class FrontEnd {
 		JLabel websiteAccountViewPasswordResult = new JLabel("");
 		websiteAccountViewPasswordResult.setBounds(260, 209, 61, 16);
 		websiteAccounts.add(websiteAccountViewPasswordResult);
+	}
+	
+	/**
+	 * 
+	 * Initializes the add section of the website account tab.
+	 */
+	private void intializeWebAccountAddSection(JPanel websiteAccounts) {
+		JLabel websiteAccountAddHeader = new JLabel("Add Account Information");
+		websiteAccountAddHeader.setBounds(493, 43, 209, 16);
+		websiteAccounts.add(websiteAccountAddHeader);
+		
+		
 		
 		JLabel websiteAccountAddNicknameLabel = new JLabel("Nickname*:");
 		websiteAccountAddNicknameLabel.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
@@ -202,6 +186,18 @@ public class FrontEnd {
 		websiteAccountAddButton.setBounds(541, 176, 73, 29);
 		websiteAccounts.add(websiteAccountAddButton);
 		
+		JLabel wesbiteAccountrequiredFieldLabelAdd = new JLabel("* required field");
+		wesbiteAccountrequiredFieldLabelAdd.setForeground(Color.RED);
+		wesbiteAccountrequiredFieldLabelAdd.setFont(new Font("Lucida Grande", Font.PLAIN, 8));
+		wesbiteAccountrequiredFieldLabelAdd.setBounds(553, 59, 61, 16);
+		websiteAccounts.add(wesbiteAccountrequiredFieldLabelAdd);
+	}
+	
+	/**
+	 * 
+	 * initializes the modify section of the website account tab.
+	 */
+	private void initializeWebAccountModifySection(JPanel websiteAccounts) {
 		JLabel websiteAccountModifyLabel = new JLabel("Modify Account Information");
 		websiteAccountModifyLabel.setBounds(493, 220, 209, 16);
 		websiteAccounts.add(websiteAccountModifyLabel);
@@ -255,36 +251,41 @@ public class FrontEnd {
 		wesbiteAccountrequiredFieldLabel.setFont(new Font("Lucida Grande", Font.PLAIN, 8));
 		wesbiteAccountrequiredFieldLabel.setBounds(553, 236, 61, 16);
 		websiteAccounts.add(wesbiteAccountrequiredFieldLabel);
+	}
+
+	/**
+	 * Initialize the contents of the website account tab.
+	 */
+	private void initializeWebAccountTab(JTabbedPane safeStore) {
+		JPanel websiteAccounts = new JPanel();
+		safeStore.addTab("Website Accounts", null, websiteAccounts, null);
+		websiteAccounts.setLayout(null);
 		
-		JLabel wesbiteAccountrequiredFieldLabelAdd = new JLabel("* required field");
-		wesbiteAccountrequiredFieldLabelAdd.setForeground(Color.RED);
-		wesbiteAccountrequiredFieldLabelAdd.setFont(new Font("Lucida Grande", Font.PLAIN, 8));
-		wesbiteAccountrequiredFieldLabelAdd.setBounds(553, 59, 61, 16);
-		websiteAccounts.add(wesbiteAccountrequiredFieldLabelAdd);
+		JLabel websiteAccountsLabel = new JLabel("Website Accounts");
+		websiteAccountsLabel.setFont(new Font("Lucida Grande", Font.BOLD, 20));
+		websiteAccountsLabel.setBounds(315, 6, 189, 25);
+		websiteAccounts.add(websiteAccountsLabel);
 		
-		JPanel creditCards = new JPanel();
-		safeStore.addTab("Credit Cards", null, creditCards, null);
-		creditCards.setLayout(null);
+		JLabel logoWebsiteAccountPane = new JLabel("SAFESTORE");
+		logoWebsiteAccountPane.setHorizontalAlignment(SwingConstants.CENTER);
+		logoWebsiteAccountPane.setForeground(Color.RED);
+		logoWebsiteAccountPane.setFont(new Font("Marker Felt", Font.PLAIN, 16));
+		logoWebsiteAccountPane.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+		logoWebsiteAccountPane.setBounds(0, 399, 114, 33);
+		websiteAccounts.add(logoWebsiteAccountPane);
 		
-		JLabel creditCardLabel = new JLabel("Credit Cards");
-		creditCardLabel.setFont(new Font("Lucida Grande", Font.BOLD, 20));
-		creditCardLabel.setBounds(323, 6, 139, 16);
-		creditCards.add(creditCardLabel);
-		
-		JLabel logoCreditCardPane = new JLabel("SAFESTORE");
-		logoCreditCardPane.setHorizontalAlignment(SwingConstants.CENTER);
-		logoCreditCardPane.setForeground(Color.RED);
-		logoCreditCardPane.setFont(new Font("Marker Felt", Font.PLAIN, 16));
-		logoCreditCardPane.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
-		logoCreditCardPane.setBounds(0, 399, 114, 33);
-		creditCards.add(logoCreditCardPane);
-		
-		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
-		tabbedPane.setBounds(6, 29, 773, 383);
-		creditCards.add(tabbedPane);
-		
+		initializeWebAccountViewSection(websiteAccounts);
+		intializeWebAccountAddSection(websiteAccounts);
+		initializeWebAccountModifySection(websiteAccounts);	
+	}
+	
+	/**
+	 * 
+	 * Initializes the credit card view tab for the credit card tab.
+	 */
+	private void initializeCreditCardViewTab(JTabbedPane creditCardTabbedPane) {
 		JPanel creditCardViewTab = new JPanel();
-		tabbedPane.addTab("View", null, creditCardViewTab, null);
+		creditCardTabbedPane.addTab("View", null, creditCardViewTab, null);
 		creditCardViewTab.setLayout(null);
 		
 		JLabel creditCardSearchLabel = new JLabel("Nickname*:");
@@ -315,9 +316,15 @@ public class FrontEnd {
 		creditCardViewDisplay.setText("call the toString method on \nCreditCard to display all \ncard information here");
 		creditCardViewDisplay.setBounds(415, 90, 230, 185);
 		creditCardViewTab.add(creditCardViewDisplay);
-		
+	}
+	
+	/**
+	 * initializes the credit card add tab for the credit card tab.
+	 * 
+	 */
+	private void initializeCreditCardAddTab(JTabbedPane creditCardTabbedPane) {
 		JPanel creditCardAddTab = new JPanel();
-		tabbedPane.addTab("Add", null, creditCardAddTab, null);
+		creditCardTabbedPane.addTab("Add", null, creditCardAddTab, null);
 		creditCardAddTab.setLayout(null);
 		
 		JLabel creditCardAddNumberLabel = new JLabel("Card Number*:");
@@ -406,9 +413,15 @@ public class FrontEnd {
 		creditCardAddRequiredFieldLabel.setFont(new Font("Lucida Grande", Font.PLAIN, 8));
 		creditCardAddRequiredFieldLabel.setBounds(619, 19, 61, 16);
 		creditCardAddTab.add(creditCardAddRequiredFieldLabel);
-		
+	}
+	
+	/**
+	 * initializes the credit card modify tab for the credit card tab.
+	 * 
+	 */
+	private void initializeCreditCardModifyTab(JTabbedPane creditCardTabbedPane) {
 		JPanel creditCardModifyTab = new JPanel();
-		tabbedPane.addTab("Modify", null, creditCardModifyTab, null);
+		creditCardTabbedPane.addTab("Modify", null, creditCardModifyTab, null);
 		creditCardModifyTab.setLayout(null);
 		
 		JTextArea creditCardDisplayNicknamesAdd_1 = new JTextArea();
@@ -501,35 +514,51 @@ public class FrontEnd {
 		modifyCreditCardCurNicknameInput.setBounds(499, 22, 168, 26);
 		creditCardModifyTab.add(modifyCreditCardCurNicknameInput);
 		
-		JLabel creditCardModifyRequiredFieldLabel_1 = new JLabel("* required field");
-		creditCardModifyRequiredFieldLabel_1.setForeground(Color.RED);
-		creditCardModifyRequiredFieldLabel_1.setFont(new Font("Lucida Grande", Font.PLAIN, 8));
-		creditCardModifyRequiredFieldLabel_1.setBounds(606, 6, 61, 16);
-		creditCardModifyTab.add(creditCardModifyRequiredFieldLabel_1);
+		JLabel creditCardModifyRequiredFieldLabel = new JLabel("* required field");
+		creditCardModifyRequiredFieldLabel.setForeground(Color.RED);
+		creditCardModifyRequiredFieldLabel.setFont(new Font("Lucida Grande", Font.PLAIN, 8));
+		creditCardModifyRequiredFieldLabel.setBounds(606, 6, 61, 16);
+		creditCardModifyTab.add(creditCardModifyRequiredFieldLabel);
+	}
+	
+	/**
+	 * Initialize the contents of the credit card tab.
+	 */
+	private void initializeCreditCardTab(JTabbedPane safeStore) {
+		JPanel creditCards = new JPanel();
+		safeStore.addTab("Credit Cards", null, creditCards, null);
+		creditCards.setLayout(null);
 		
-		JPanel debitCards = new JPanel();
-		safeStore.addTab("Debit Cards", null, debitCards, null);
-		debitCards.setLayout(null);
+		JLabel creditCardLabel = new JLabel("Credit Cards");
+		creditCardLabel.setFont(new Font("Lucida Grande", Font.BOLD, 20));
+		creditCardLabel.setBounds(323, 6, 139, 16);
+		creditCards.add(creditCardLabel);
 		
-		JLabel debitCardLabel = new JLabel("Debit Cards");
-		debitCardLabel.setFont(new Font("Lucida Grande", Font.BOLD, 20));
-		debitCardLabel.setBounds(317, 0, 135, 33);
-		debitCards.add(debitCardLabel);
+		JLabel logoCreditCardPane = new JLabel("SAFESTORE");
+		logoCreditCardPane.setHorizontalAlignment(SwingConstants.CENTER);
+		logoCreditCardPane.setForeground(Color.RED);
+		logoCreditCardPane.setFont(new Font("Marker Felt", Font.PLAIN, 16));
+		logoCreditCardPane.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+		logoCreditCardPane.setBounds(0, 399, 114, 33);
+		creditCards.add(logoCreditCardPane);
 		
-		JLabel logoDebitCardPane = new JLabel("SAFESTORE");
-		logoDebitCardPane.setHorizontalAlignment(SwingConstants.CENTER);
-		logoDebitCardPane.setForeground(Color.RED);
-		logoDebitCardPane.setFont(new Font("Marker Felt", Font.PLAIN, 16));
-		logoDebitCardPane.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
-		logoDebitCardPane.setBounds(0, 399, 114, 33);
-		debitCards.add(logoDebitCardPane);
+		JTabbedPane creditCardTabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		creditCardTabbedPane.setBounds(6, 29, 773, 383);
+		creditCards.add(creditCardTabbedPane);
 		
-		JTabbedPane tabbedPane_1 = new JTabbedPane(JTabbedPane.TOP);
-		tabbedPane_1.setBounds(0, 27, 773, 388);
-		debitCards.add(tabbedPane_1);
-		
+		initializeCreditCardViewTab(creditCardTabbedPane);
+		initializeCreditCardAddTab(creditCardTabbedPane);
+		initializeCreditCardModifyTab(creditCardTabbedPane);
+
+	}
+	
+	/**
+	 * initializes the debit card view tab for the debit card tab.
+	 * 
+	 */
+	private void initializeDebitCardViewTab(JTabbedPane debitCardTabbedPane) {
 		JPanel debitCardViewTab = new JPanel();
-		tabbedPane_1.addTab("View", null, debitCardViewTab, null);
+		debitCardTabbedPane.addTab("View", null, debitCardViewTab, null);
 		debitCardViewTab.setLayout(null);
 		
 		JLabel debitCardSearchLabel = new JLabel("Nickname*:");
@@ -551,123 +580,131 @@ public class FrontEnd {
 		debitCardDisplayNicknamesView.setBounds(171, 64, 113, 248);
 		debitCardViewTab.add(debitCardDisplayNicknamesView);
 		
-		JTextArea debitCardTxtrCallTheToString = new JTextArea();
-		debitCardTxtrCallTheToString.setText("call the toString method on \nDebitCard to display all \ncard information here");
-		debitCardTxtrCallTheToString.setBounds(391, 90, 230, 185);
-		debitCardViewTab.add(debitCardTxtrCallTheToString);
+		JTextArea debitCardViewDisplay = new JTextArea();
+		debitCardViewDisplay.setText("call the toString method on \nDebitCard to display all \ncard information here");
+		debitCardViewDisplay.setBounds(391, 90, 230, 185);
+		debitCardViewTab.add(debitCardViewDisplay);
 		
 		JLabel debitCardDefaultNicknameDisclaimer = new JLabel("*default nickname is last four digits of card number");
 		debitCardDefaultNicknameDisclaimer.setFont(new Font("Lucida Grande", Font.PLAIN, 9));
 		debitCardDefaultNicknameDisclaimer.setBounds(477, 315, 251, 16);
 		debitCardViewTab.add(debitCardDefaultNicknameDisclaimer);
-		
+	}
+	
+	/**
+	 * initializes the debit card add tab for the debit card tab.
+	 * 
+	 */
+	private void initializeDebitCardAddTab(JTabbedPane debitCardTabbedPane) {
 		JPanel debitCardAddTab = new JPanel();
-		tabbedPane_1.addTab("Add", null, debitCardAddTab, null);
+		debitCardTabbedPane.addTab("Add", null, debitCardAddTab, null);
 		debitCardAddTab.setLayout(null);
-		
-		JPanel creditCardAddTab_1 = new JPanel();
-		creditCardAddTab_1.setLayout(null);
-		creditCardAddTab_1.setBounds(0, 0, 752, 337);
-		debitCardAddTab.add(creditCardAddTab_1);
+	
 		
 		JLabel debitCardAddNumberLabel = new JLabel("Card Number*:");
 		debitCardAddNumberLabel.setBounds(384, 45, 98, 16);
-		creditCardAddTab_1.add(debitCardAddNumberLabel);
+		debitCardAddTab.add(debitCardAddNumberLabel);
 		
 		JLabel debitCardAddNicknameLabel = new JLabel("Nickname:");
 		debitCardAddNicknameLabel.setBounds(384, 73, 77, 16);
-		creditCardAddTab_1.add(debitCardAddNicknameLabel);
+		debitCardAddTab.add(debitCardAddNicknameLabel);
 		
 		JLabel debitCardAddExpirationDateLabel = new JLabel("Expiration Date*:");
 		debitCardAddExpirationDateLabel.setBounds(384, 101, 112, 16);
-		creditCardAddTab_1.add(debitCardAddExpirationDateLabel);
+		debitCardAddTab.add(debitCardAddExpirationDateLabel);
 		
 		JLabel debitCardAddCvvLabel = new JLabel("CVV*:");
 		debitCardAddCvvLabel.setBounds(384, 129, 40, 16);
-		creditCardAddTab_1.add(debitCardAddCvvLabel);
+		debitCardAddTab.add(debitCardAddCvvLabel);
 		
 		JLabel debitCardAddStAddressLabel = new JLabel("Street Address*:");
 		debitCardAddStAddressLabel.setBounds(384, 185, 106, 16);
-		creditCardAddTab_1.add(debitCardAddStAddressLabel);
+		debitCardAddTab.add(debitCardAddStAddressLabel);
 		
 		JLabel debitCardAddCityLabel = new JLabel("City*:");
 		debitCardAddCityLabel.setBounds(384, 213, 40, 16);
-		creditCardAddTab_1.add(debitCardAddCityLabel);
+		debitCardAddTab.add(debitCardAddCityLabel);
 		
 		JLabel debitCardAddStateLabel = new JLabel("State*:");
 		debitCardAddStateLabel.setBounds(384, 241, 52, 16);
-		creditCardAddTab_1.add(debitCardAddStateLabel);
+		debitCardAddTab.add(debitCardAddStateLabel);
 		
 		JLabel debitCardAddZipLabel = new JLabel("Zip Code*:");
 		debitCardAddZipLabel.setBounds(384, 269, 77, 16);
-		creditCardAddTab_1.add(debitCardAddZipLabel);
+		debitCardAddTab.add(debitCardAddZipLabel);
 		
 		JTextArea debitCardAddDisplayNickname = new JTextArea();
 		debitCardAddDisplayNickname.setText("will display\nthe list of \nnicknames");
 		debitCardAddDisplayNickname.setBounds(95, 45, 168, 212);
-		creditCardAddTab_1.add(debitCardAddDisplayNickname);
+		debitCardAddTab.add(debitCardAddDisplayNickname);
 		
 		debitCardAddNicknameInput = new JTextField();
 		debitCardAddNicknameInput.setColumns(10);
 		debitCardAddNicknameInput.setBounds(458, 68, 222, 26);
-		creditCardAddTab_1.add(debitCardAddNicknameInput);
+		debitCardAddTab.add(debitCardAddNicknameInput);
 		
 		debitCardAddNumberInput = new JTextField();
 		debitCardAddNumberInput.setColumns(10);
 		debitCardAddNumberInput.setBounds(482, 40, 198, 26);
-		creditCardAddTab_1.add(debitCardAddNumberInput);
+		debitCardAddTab.add(debitCardAddNumberInput);
 		
 		debitCardAddExpDateInput = new JTextField();
 		debitCardAddExpDateInput.setColumns(10);
 		debitCardAddExpDateInput.setBounds(495, 96, 185, 26);
-		creditCardAddTab_1.add(debitCardAddExpDateInput);
+		debitCardAddTab.add(debitCardAddExpDateInput);
 		
 		debitCardAddCvvInput = new JTextField();
 		debitCardAddCvvInput.setColumns(10);
 		debitCardAddCvvInput.setBounds(424, 124, 256, 26);
-		creditCardAddTab_1.add(debitCardAddCvvInput);
+		debitCardAddTab.add(debitCardAddCvvInput);
 		
 		debitCardAddStAdressInput = new JTextField();
 		debitCardAddStAdressInput.setColumns(10);
 		debitCardAddStAdressInput.setBounds(494, 180, 185, 26);
-		creditCardAddTab_1.add(debitCardAddStAdressInput);
+		debitCardAddTab.add(debitCardAddStAdressInput);
 		
 		debitCardAddCityInput = new JTextField();
 		debitCardAddCityInput.setColumns(10);
 		debitCardAddCityInput.setBounds(425, 208, 255, 26);
-		creditCardAddTab_1.add(debitCardAddCityInput);
+		debitCardAddTab.add(debitCardAddCityInput);
 		
 		debitCardAddStateInput = new JTextField();
 		debitCardAddStateInput.setColumns(10);
 		debitCardAddStateInput.setBounds(435, 236, 245, 26);
-		creditCardAddTab_1.add(debitCardAddStateInput);
+		debitCardAddTab.add(debitCardAddStateInput);
 		
 		debitCardAddZipInput = new JTextField();
 		debitCardAddZipInput.setColumns(10);
 		debitCardAddZipInput.setBounds(458, 264, 222, 26);
-		creditCardAddTab_1.add(debitCardAddZipInput);
+		debitCardAddTab.add(debitCardAddZipInput);
 		
 		JButton debitCardAddButton = new JButton("Add");
 		debitCardAddButton.setBounds(495, 302, 117, 29);
-		creditCardAddTab_1.add(debitCardAddButton);
+		debitCardAddTab.add(debitCardAddButton);
 		
 		JLabel debitCardAddRequiredFieldLabel = new JLabel("* required field");
 		debitCardAddRequiredFieldLabel.setForeground(Color.RED);
 		debitCardAddRequiredFieldLabel.setFont(new Font("Lucida Grande", Font.PLAIN, 8));
 		debitCardAddRequiredFieldLabel.setBounds(619, 19, 61, 16);
-		creditCardAddTab_1.add(debitCardAddRequiredFieldLabel);
+		debitCardAddTab.add(debitCardAddRequiredFieldLabel);
 		
 		JLabel debitCardAddPinLabel = new JLabel("Pin*:");
 		debitCardAddPinLabel.setBounds(384, 157, 40, 16);
-		creditCardAddTab_1.add(debitCardAddPinLabel);
+		debitCardAddTab.add(debitCardAddPinLabel);
 		
 		debitCardAddPinInput = new JTextField();
 		debitCardAddPinInput.setColumns(10);
 		debitCardAddPinInput.setBounds(413, 152, 267, 26);
-		creditCardAddTab_1.add(debitCardAddPinInput);
-		
+		debitCardAddTab.add(debitCardAddPinInput);
+	}
+
+	/**
+	 * initializes the debit card modify tab for the debit card tab.
+	 * 
+	 */
+	private void initializeDebitCardModifyTab(JTabbedPane debitCardTabbedPane) {
 		JPanel debitCardModifyTab = new JPanel();
-		tabbedPane_1.addTab("Modify", null, debitCardModifyTab, null);
+		debitCardTabbedPane.addTab("Modify", null, debitCardModifyTab, null);
 		debitCardModifyTab.setLayout(null);
 		
 		JTextArea debitCardModifyDisplayNickname = new JTextArea();
@@ -770,9 +807,57 @@ public class FrontEnd {
 		debitCardModifyCurNicknameLabel.setBounds(398, 25, 124, 16);
 		debitCardModifyTab.add(debitCardModifyCurNicknameLabel);
 		
-		textField_9 = new JTextField();
-		textField_9.setColumns(10);
-		textField_9.setBounds(520, 20, 174, 26);
-		debitCardModifyTab.add(textField_9);
+		debitCardModifyCurrNicknameInput = new JTextField();
+		debitCardModifyCurrNicknameInput.setColumns(10);
+		debitCardModifyCurrNicknameInput.setBounds(520, 20, 174, 26);
+		debitCardModifyTab.add(debitCardModifyCurrNicknameInput);
+	}
+	
+	/**
+	 * Initialize the contents of the debit card tab.
+	 */
+	private void initializeDebitCardTab(JTabbedPane safeStore) {
+		JPanel debitCards = new JPanel();
+		safeStore.addTab("Debit Cards", null, debitCards, null);
+		debitCards.setLayout(null);
+		
+		JLabel debitCardLabel = new JLabel("Debit Cards");
+		debitCardLabel.setFont(new Font("Lucida Grande", Font.BOLD, 20));
+		debitCardLabel.setBounds(317, 0, 135, 33);
+		debitCards.add(debitCardLabel);
+		
+		JLabel logoDebitCardPane = new JLabel("SAFESTORE");
+		logoDebitCardPane.setHorizontalAlignment(SwingConstants.CENTER);
+		logoDebitCardPane.setForeground(Color.RED);
+		logoDebitCardPane.setFont(new Font("Marker Felt", Font.PLAIN, 16));
+		logoDebitCardPane.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+		logoDebitCardPane.setBounds(0, 399, 114, 33);
+		debitCards.add(logoDebitCardPane);
+		
+		JTabbedPane debitCardTabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		debitCardTabbedPane.setBounds(0, 27, 773, 388);
+		debitCards.add(debitCardTabbedPane);
+		
+		initializeDebitCardViewTab(debitCardTabbedPane);
+		initializeDebitCardAddTab(debitCardTabbedPane);
+		initializeDebitCardModifyTab(debitCardTabbedPane);
+	}
+	
+	/**
+	 * Initialize the contents of the frame.
+	 */
+	private void initialize() {
+		frame = new JFrame();
+		frame.setBounds(100, 100, 800, 500);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setResizable(false);
+		
+		JTabbedPane safeStore = new JTabbedPane(JTabbedPane.TOP);
+		frame.getContentPane().add(safeStore, BorderLayout.CENTER);
+		
+		initializeWebAccountTab(safeStore);
+		initializeCreditCardTab(safeStore);
+		initializeDebitCardTab(safeStore);
+
 	}
 }
