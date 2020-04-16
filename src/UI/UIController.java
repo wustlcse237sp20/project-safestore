@@ -63,5 +63,24 @@ public class UIController {
 			}
 			return website;
 	}
+	public static boolean addWebsiteAccount(String nickname, String username, String password) {
+		WebsiteAccount websiteAccount = new WebsiteAccount(safeStoreUser, nickname, username, password);
+		return websiteAccount.addWebsiteAccount(databaseConnection);
+	}
+
+	public static boolean modifyWebsiteAccount(String currentUsername, String newNickname, String newLogin, String newPassword) {
+		String[] fieldsToModify = {"","",""};
+		String[] newInputs = {newNickname,newLogin, newPassword};
+		if(!newNickname.isEmpty()) {
+			fieldsToModify[0] = "Nickname";
+		}
+		if(!newLogin.isEmpty()) {
+			fieldsToModify[1] = "Login";
+		}
+		if(!newPassword.isEmpty()) {
+			fieldsToModify[2] = "Password";
+		}
+		return WebsiteAccount.updateWebsiteAccount(databaseConnection, currentUsername, safeStoreUser, fieldsToModify, newInputs);
+	}
 
 }

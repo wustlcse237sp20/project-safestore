@@ -6,6 +6,7 @@ import javax.swing.JFrame;
 import javax.swing.JTabbedPane;
 import java.awt.BorderLayout;
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
 import javax.swing.JTextPane;
 import javax.swing.SpringLayout;
 import javax.swing.JTextField;
@@ -20,6 +21,7 @@ import websiteAccount.WebsiteAccount;
 import javax.swing.JButton;
 import javax.swing.JScrollBar;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -30,11 +32,11 @@ public class FrontEnd {
 	private JTextField websiteAccountSearchNicknameInput;
 	private JTextField websiteAccountAddNicknameInput;
 	private JTextField websiteAccountAddUsernameInput;
-	private JTextField websiteAccountAddPasswordInput;
+	private JPasswordField websiteAccountAddPasswordInput;
 	private JTextField websiteAccountModifyCurrNicknameInput;
-	private JTextField wesbiteAccountModifyNicknameInput;
+	private JTextField websiteAccountModifyNicknameInput;
 	private JTextField websiteAccountModifyUsernameInput;
-	private JTextField websiteAccountModifyPasswordInput;
+	private JPasswordField websiteAccountModifyPasswordInput;
 	private JTextField creditCardSearchNicknameInput;
 	private JTextField creditCardAddNicknameInput;
 	private JTextField creditCardAddNumberInput;
@@ -73,7 +75,8 @@ public class FrontEnd {
 	private JTextField debitCardModifyStateInput;
 	private JTextField debitCardModifyZipInput;
 	private JTextField debitCardModifyCurrNicknameInput;
-
+	private JLabel websiteAccountViewUsernameResult;
+	private JLabel websiteAccountViewPasswordResult;
 	/**
 	 * Launch the application.
 	 */
@@ -137,12 +140,12 @@ public class FrontEnd {
 		websiteAccounts.add(websiteAccountViewPasswordLabel);
 
 		//Label for displaying the username when it is gotten
-		JLabel websiteAccountViewUsernameResult = new JLabel("");
+		websiteAccountViewUsernameResult = new JLabel("");
 		websiteAccountViewUsernameResult.setBounds(259, 181, 155, 16);
 		websiteAccounts.add(websiteAccountViewUsernameResult);
 
 		//label for displaying the password when it is gotten
-		JLabel websiteAccountViewPasswordResult = new JLabel("");
+		websiteAccountViewPasswordResult = new JLabel("");
 		websiteAccountViewPasswordResult.setBounds(260, 209, 154, 16);
 		websiteAccounts.add(websiteAccountViewPasswordResult);
 
@@ -154,6 +157,7 @@ public class FrontEnd {
 					websiteAccountViewPasswordResult.setText(website.getWebsitePassword());
 				}else {
 					websiteAccountViewUsernameResult.setText("Site doesn't exist");
+					websiteAccountViewPasswordResult.setText(" ");
 				}
 			}
 		});
@@ -195,12 +199,27 @@ public class FrontEnd {
 		websiteAccountAddPasswordLabel.setBounds(468, 144, 75, 16);
 		websiteAccounts.add(websiteAccountAddPasswordLabel);
 
-		websiteAccountAddPasswordInput = new JTextField();
+		websiteAccountAddPasswordInput = new JPasswordField();
 		websiteAccountAddPasswordInput.setColumns(10);
 		websiteAccountAddPasswordInput.setBounds(541, 139, 130, 26);
 		websiteAccounts.add(websiteAccountAddPasswordInput);
 
 		JButton websiteAccountAddButton = new JButton("Add");
+		websiteAccountAddButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(websiteAccountAddNicknameInput.getText().isEmpty() || String.valueOf(websiteAccountAddPasswordInput.getPassword()).isEmpty()|| websiteAccountAddUsernameInput.getText().isEmpty()) {
+					JOptionPane.showMessageDialog(frame, "Username, password, and nickname must contain values");
+				}else {
+					if(UIController.addWebsiteAccount(websiteAccountAddNicknameInput.getText(), websiteAccountAddUsernameInput.getText(),String.valueOf(websiteAccountAddPasswordInput.getPassword()))) {
+						JOptionPane.showMessageDialog(frame, "Website Added Succesfully!");
+						resetAddWebsiteFields();
+					}else {
+						JOptionPane.showMessageDialog(frame, "Could not add website - Website with nickname already exists");
+						resetAddWebsiteFields();
+					}
+				}
+			}
+		});
 		websiteAccountAddButton.setBounds(541, 176, 73, 29);
 		websiteAccounts.add(websiteAccountAddButton);
 
@@ -235,10 +254,10 @@ public class FrontEnd {
 		websiteAccountModifyNicknameLabel.setBounds(445, 288, 98, 16);
 		websiteAccounts.add(websiteAccountModifyNicknameLabel);
 
-		wesbiteAccountModifyNicknameInput = new JTextField();
-		wesbiteAccountModifyNicknameInput.setColumns(10);
-		wesbiteAccountModifyNicknameInput.setBounds(541, 283, 130, 26);
-		websiteAccounts.add(wesbiteAccountModifyNicknameInput);
+		websiteAccountModifyNicknameInput = new JTextField();
+		websiteAccountModifyNicknameInput.setColumns(10);
+		websiteAccountModifyNicknameInput.setBounds(541, 283, 130, 26);
+		websiteAccounts.add(websiteAccountModifyNicknameInput);
 
 		JLabel websiteAccountModifyUsernameLabel = new JLabel("New Username:");
 		websiteAccountModifyUsernameLabel.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
@@ -251,6 +270,23 @@ public class FrontEnd {
 		websiteAccounts.add(websiteAccountModifyUsernameInput);
 
 		JButton websiteAccountModifyButton = new JButton("Modify");
+		websiteAccountModifyButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(websiteAccountModifyCurrNicknameInput.getText().isEmpty()) {
+					JOptionPane.showMessageDialog(frame, "Please enter the nickname of the account you want to modify");
+				}else {
+
+					if(UIController.modifyWebsiteAccount(websiteAccountModifyCurrNicknameInput.getText(),websiteAccountModifyNicknameInput.getText(),websiteAccountModifyUsernameInput.getText(),String.valueOf(websiteAccountModifyPasswordInput.getPassword()))) {
+						JOptionPane.showMessageDialog(frame, "Website modified ");
+						resetModifyWebsiteFields();
+						
+					}else {
+						JOptionPane.showMessageDialog(frame, "Couldn't Modify website");
+						resetModifyWebsiteFields();
+					}
+				}
+			}
+		});
 		websiteAccountModifyButton.setBounds(541, 381, 73, 29);
 		websiteAccounts.add(websiteAccountModifyButton);
 
@@ -259,7 +295,7 @@ public class FrontEnd {
 		websiteAccountModifyPasswordLabel.setBounds(445, 355, 98, 16);
 		websiteAccounts.add(websiteAccountModifyPasswordLabel);
 
-		websiteAccountModifyPasswordInput = new JTextField();
+		websiteAccountModifyPasswordInput = new JPasswordField();
 		websiteAccountModifyPasswordInput.setColumns(10);
 		websiteAccountModifyPasswordInput.setBounds(541, 350, 130, 26);
 		websiteAccounts.add(websiteAccountModifyPasswordInput);
@@ -877,5 +913,22 @@ public class FrontEnd {
 		initializeCreditCardTab(safeStore);
 		initializeDebitCardTab(safeStore);
 
+	}
+	// Display the new website updates automatically - implement better later - also do this for adding a website maybe
+	private void resetSearchWebsiteFieldAfterModifyingSite(String siteName, String username, String password) {
+		websiteAccountSearchNicknameInput.setText(siteName);
+		websiteAccountViewPasswordResult.setText(password);
+		websiteAccountViewUsernameResult.setText(username);
+	}
+	private void resetAddWebsiteFields(){
+		websiteAccountAddNicknameInput.setText("");
+		websiteAccountAddPasswordInput.setText("");
+		websiteAccountAddUsernameInput.setText("");
+	}
+	private void resetModifyWebsiteFields() {
+		websiteAccountModifyCurrNicknameInput.setText("");
+		websiteAccountModifyUsernameInput.setText("");
+		websiteAccountModifyNicknameInput.setText("");
+		websiteAccountModifyPasswordInput.setText("");
 	}
 }
