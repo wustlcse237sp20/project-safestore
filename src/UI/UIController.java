@@ -22,7 +22,9 @@ public class UIController {
 		catch (SQLException e) {
 			e.printStackTrace();
 		}
-		UserSignInWindow.launchWindow();
+		//TODO: Maybe have a method within UserSignInWindow to check if logged in, if logged in then launch the FrontEnd and close the UserSignInWindow? 
+		//UserSignInWindow.launchWindow();
+		FrontEnd.launchWindow();
 	}
 	
 	public static boolean createUser(String username, String password) {
