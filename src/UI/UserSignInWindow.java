@@ -19,6 +19,7 @@ import com.j256.ormlite.jdbc.JdbcDatabaseConnection;
 import com.j256.ormlite.logger.LocalLog;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.support.DatabaseConnection;
+import com.sun.glass.events.WindowEvent;
 
 import user.User;
 
@@ -36,18 +37,18 @@ import java.awt.event.ActionEvent;
 
 public class UserSignInWindow {
 
-	private JFrame frame;
+	private static JFrame frame;
 	private JTextField usernameField;
 	private JPasswordField passwordField;	
-	JTextField newUsername = new JTextField(10);
-	JPasswordField newPassword = new JPasswordField(10);
-	
+	JTextField newUsername = new JTextField(20);
+	JPasswordField newPassword = new JPasswordField(20);
+
 	/**
 	 * Launch the application.
 	 */
 	public static void launchWindow() {
 
-	
+
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
@@ -78,28 +79,28 @@ public class UserSignInWindow {
 		SpringLayout springLayout = new SpringLayout();
 		frame.getContentPane().setLayout(springLayout);
 
-		JLabel lblSafestore = new JLabel("SAFESTORE");
-		springLayout.putConstraint(SpringLayout.WEST, lblSafestore, 120, SpringLayout.WEST, frame.getContentPane());
-		springLayout.putConstraint(SpringLayout.EAST, lblSafestore, -120, SpringLayout.EAST, frame.getContentPane());
-		lblSafestore.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
-		lblSafestore.setFont(new Font("Marker Felt", Font.PLAIN, 35));
-		springLayout.putConstraint(SpringLayout.NORTH, lblSafestore, 39, SpringLayout.NORTH, frame.getContentPane());
-		lblSafestore.setHorizontalAlignment(SwingConstants.CENTER);
-		lblSafestore.setForeground(Color.RED);
-		frame.getContentPane().add(lblSafestore);
+		JLabel safestoreLabel = new JLabel("SAFESTORE");
+		springLayout.putConstraint(SpringLayout.WEST, safestoreLabel, 120, SpringLayout.WEST, frame.getContentPane());
+		springLayout.putConstraint(SpringLayout.EAST, safestoreLabel, -120, SpringLayout.EAST, frame.getContentPane());
+		safestoreLabel.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+		safestoreLabel.setFont(new Font("Marker Felt", Font.PLAIN, 35));
+		springLayout.putConstraint(SpringLayout.NORTH, safestoreLabel, 39, SpringLayout.NORTH, frame.getContentPane());
+		safestoreLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		safestoreLabel.setForeground(Color.RED);
+		frame.getContentPane().add(safestoreLabel);
 
-		JLabel lblLogin = new JLabel("Login");
-		springLayout.putConstraint(SpringLayout.NORTH, lblLogin, 15, SpringLayout.SOUTH, lblSafestore);
-		springLayout.putConstraint(SpringLayout.WEST, lblLogin, 50, SpringLayout.WEST, lblSafestore);
-		springLayout.putConstraint(SpringLayout.EAST, lblLogin, -50, SpringLayout.EAST, lblSafestore);
-		lblLogin.setFont(new Font("Lucida Grande", Font.PLAIN, 15));
-		lblLogin.setHorizontalAlignment(SwingConstants.CENTER);
-		frame.getContentPane().add(lblLogin);
+		JLabel loginLabel = new JLabel("Login");
+		springLayout.putConstraint(SpringLayout.NORTH, loginLabel, 15, SpringLayout.SOUTH, safestoreLabel);
+		springLayout.putConstraint(SpringLayout.WEST, loginLabel, 50, SpringLayout.WEST, safestoreLabel);
+		springLayout.putConstraint(SpringLayout.EAST, loginLabel, -50, SpringLayout.EAST, safestoreLabel);
+		loginLabel.setFont(new Font("Lucida Grande", Font.PLAIN, 15));
+		loginLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		frame.getContentPane().add(loginLabel);
 
 		usernameField = new JTextField();
-		springLayout.putConstraint(SpringLayout.NORTH, usernameField, 5, SpringLayout.SOUTH, lblLogin);
-		springLayout.putConstraint(SpringLayout.WEST, usernameField, 0, SpringLayout.WEST, lblLogin);
-		springLayout.putConstraint(SpringLayout.EAST, usernameField, 0, SpringLayout.EAST, lblLogin);
+		springLayout.putConstraint(SpringLayout.NORTH, usernameField, 5, SpringLayout.SOUTH, loginLabel);
+		springLayout.putConstraint(SpringLayout.WEST, usernameField, 0, SpringLayout.WEST, loginLabel);
+		springLayout.putConstraint(SpringLayout.EAST, usernameField, 0, SpringLayout.EAST, loginLabel);
 		frame.getContentPane().add(usernameField);
 		usernameField.setColumns(10);
 
@@ -110,31 +111,32 @@ public class UserSignInWindow {
 		frame.getContentPane().add(passwordField);
 		passwordField.setColumns(10);
 
-		JLabel lblUsername = new JLabel("Username");
-		springLayout.putConstraint(SpringLayout.NORTH, lblUsername, 0, SpringLayout.NORTH, usernameField);
-		springLayout.putConstraint(SpringLayout.SOUTH, lblUsername, 0, SpringLayout.SOUTH, usernameField);
-		springLayout.putConstraint(SpringLayout.EAST, lblUsername, 0, SpringLayout.WEST, usernameField);
-		frame.getContentPane().add(lblUsername);
+		JLabel usernameLabel = new JLabel("Username");
+		springLayout.putConstraint(SpringLayout.NORTH, usernameLabel, 0, SpringLayout.NORTH, usernameField);
+		springLayout.putConstraint(SpringLayout.SOUTH, usernameLabel, 0, SpringLayout.SOUTH, usernameField);
+		springLayout.putConstraint(SpringLayout.EAST, usernameLabel, 0, SpringLayout.WEST, usernameField);
+		frame.getContentPane().add(usernameLabel);
 
-		JLabel lblPassword = new JLabel("Password");
-		springLayout.putConstraint(SpringLayout.NORTH, lblPassword, 5, SpringLayout.SOUTH, lblUsername);
-		springLayout.putConstraint(SpringLayout.SOUTH, lblPassword, 0, SpringLayout.SOUTH, passwordField);
-		springLayout.putConstraint(SpringLayout.EAST, lblPassword, 0, SpringLayout.WEST, passwordField);
-		frame.getContentPane().add(lblPassword);
+		JLabel passwordLabel = new JLabel("Password");
+		springLayout.putConstraint(SpringLayout.NORTH, passwordLabel, 5, SpringLayout.SOUTH, usernameLabel);
+		springLayout.putConstraint(SpringLayout.SOUTH, passwordLabel, 0, SpringLayout.SOUTH, passwordField);
+		springLayout.putConstraint(SpringLayout.EAST, passwordLabel, 0, SpringLayout.WEST, passwordField);
+		frame.getContentPane().add(passwordLabel);
 
-		JButton btnEnter = new JButton("Enter");
-		btnEnter.addActionListener(new ActionListener() {
+		JButton enterButton = new JButton("Enter");
+		enterButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				String username = usernameField.getText();
 				char[] password = passwordField.getPassword();
 				String passwordString = String.valueOf(password);
-				
+
 				if(!passwordString.isEmpty() && !username.isEmpty()) {
-					boolean login = UIController.loginUser(username, passwordString); 
-					if(login) {
+					boolean isLoggedIn = UIController.loginUser(username, passwordString); 
+					if(isLoggedIn) {
 						// NEXT WINDOW
-						System.out.println("success");
-						
+						UIController.setUserForSession(username);
+
+
 					}
 					else {
 						JOptionPane.showMessageDialog(frame, "Username or password incorrect");
@@ -144,63 +146,78 @@ public class UserSignInWindow {
 
 			}
 		});
-		springLayout.putConstraint(SpringLayout.NORTH, btnEnter, 5, SpringLayout.SOUTH, passwordField);
-		springLayout.putConstraint(SpringLayout.WEST, btnEnter, 20, SpringLayout.WEST, usernameField);
-		springLayout.putConstraint(SpringLayout.EAST, btnEnter, -20, SpringLayout.EAST, usernameField);
-		frame.getContentPane().add(btnEnter);
+		springLayout.putConstraint(SpringLayout.NORTH, enterButton, 5, SpringLayout.SOUTH, passwordField);
+		springLayout.putConstraint(SpringLayout.WEST, enterButton, 20, SpringLayout.WEST, usernameField);
+		springLayout.putConstraint(SpringLayout.EAST, enterButton, -20, SpringLayout.EAST, usernameField);
+		frame.getContentPane().add(enterButton);
 
-		JButton btnCreateAccount = new JButton("Create Account");
-		btnCreateAccount.addActionListener(new ActionListener() {
+		JButton createAccountButton = new JButton("Create Account");
+		createAccountButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				// popup window stuff: https://stackoverflow.com/questions/12810460/joptionpane-input-dialog-box-program
-				
-				JPanel basePanel = new JPanel();
-				
-				basePanel.setOpaque(true);
-				basePanel.setBackground(Color.RED);
 
-				JPanel centerPanel = new JPanel();
-				centerPanel.setLayout(new GridLayout(3, 2, 5, 5));
-				centerPanel.setBorder(
-						BorderFactory.createEmptyBorder(5, 5, 5, 5));
-				centerPanel.setOpaque(true);
-				centerPanel.setBackground(Color.WHITE);
-				centerPanel.add(new JLabel("Username "));
-				centerPanel.add(newUsername);
-				centerPanel.add(new JLabel("Password "));
-				centerPanel.add(newPassword);
 
-				basePanel.add(centerPanel);
 				boolean creatingUser = true;
 				while(creatingUser){
-					int selection = JOptionPane.showConfirmDialog(frame, basePanel, "New Account: ", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+					int userSelection = JOptionPane.showConfirmDialog(frame, createBasePanel(), "New Account: ", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 
-					if(selection == JOptionPane.OK_OPTION) {
+					if(userSelection == JOptionPane.OK_OPTION) {
 
 						if(newUsername.getText().isEmpty() || String.valueOf(newPassword.getPassword()).isEmpty()) {
 							JOptionPane.showMessageDialog(frame, "Username and password must contain values");
 						}else {
-						
+
 							boolean createdNewUser = UIController.createUser(newUsername.getText(),String.valueOf(newPassword.getPassword())); 
 							if(createdNewUser) {
 								creatingUser = false;
-								//Go to next window
+								//NEXT WINDOW
+								UIController.setUserForSession(newUsername.getText());
+
 							}else {
 								JOptionPane.showMessageDialog(frame, "Username taken, choose another");
 							}
 						}
-						
-					}else if(selection == JOptionPane.CANCEL_OPTION){
+
+					}else if(userSelection == JOptionPane.CANCEL_OPTION){
 						creatingUser = false;
 					}
 
 				}
 			}
 		});
-		btnCreateAccount.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
-		springLayout.putConstraint(SpringLayout.SOUTH, btnCreateAccount, -6, SpringLayout.NORTH, lblSafestore);
-		springLayout.putConstraint(SpringLayout.EAST, btnCreateAccount, -10, SpringLayout.EAST, frame.getContentPane());
-		frame.getContentPane().add(btnCreateAccount);
+		createAccountButton.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
+		springLayout.putConstraint(SpringLayout.SOUTH, createAccountButton, -6, SpringLayout.NORTH, safestoreLabel);
+		springLayout.putConstraint(SpringLayout.EAST, createAccountButton, -10, SpringLayout.EAST, frame.getContentPane());
+		frame.getContentPane().add(createAccountButton);
 
 	}
+	private JPanel createBasePanel() {
+		JPanel basePanel = new JPanel();
+
+		basePanel.setOpaque(true);
+		basePanel.setBackground(Color.RED);
+
+		JPanel centerPanel = new JPanel();
+		centerPanel.setLayout(new GridLayout(3, 2, 5, 5));
+		centerPanel.setBorder(
+				BorderFactory.createEmptyBorder(5, 5, 5, 5));
+		centerPanel.setOpaque(true);
+		centerPanel.setBackground(Color.WHITE);
+		centerPanel.add(new JLabel("Username "));
+		centerPanel.add(newUsername);
+		centerPanel.add(new JLabel("Password "));
+		centerPanel.add(newPassword);
+
+		basePanel.add(centerPanel);
+		return basePanel;
+	}
+	public static void closeWindow() {
+
+		frame.setVisible(false);
+		frame.dispose();
+
+
+
+	}
+
 }
