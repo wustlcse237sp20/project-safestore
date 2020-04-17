@@ -306,7 +306,6 @@ public class WebsiteAccount {
 				if (fieldsToModify[i].equals("Nickname")) {
 					String newNickname = newInputs[0].trim();
 					accountToModify.setNickname(newNickname);
-					System.out.println("GETS HERE");
 				}
 				if (fieldsToModify[i].equals("Login")) {
 					String newLogin = newInputs[1].trim();

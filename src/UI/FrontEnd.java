@@ -77,6 +77,7 @@ public class FrontEnd {
 	private JTextField debitCardModifyCurrNicknameInput;
 	private JLabel websiteAccountViewUsernameResult;
 	private JLabel websiteAccountViewPasswordResult;
+	private JButton websiteAccountSearchButton;
 	/**
 	 * Launch the application.
 	 */
@@ -114,7 +115,7 @@ public class FrontEnd {
 		websiteAccounts.add(websiteAccountSearchNicknameInput);
 		websiteAccountSearchNicknameInput.setColumns(10);
 
-		JButton websiteAccountSearchButton = new JButton("Search");
+		websiteAccountSearchButton = new JButton("Search");
 
 		websiteAccountSearchButton.setBounds(248, 71, 73, 29);
 		websiteAccounts.add(websiteAccountSearchButton);
@@ -212,6 +213,7 @@ public class FrontEnd {
 				}else {
 					if(UIController.addWebsiteAccount(websiteAccountAddNicknameInput.getText(), websiteAccountAddUsernameInput.getText(),String.valueOf(websiteAccountAddPasswordInput.getPassword()))) {
 						JOptionPane.showMessageDialog(frame, "Website Added Succesfully!");
+						setSearchWebsiteFieldAfterModifyingOrAddingSite(websiteAccountAddNicknameInput.getText());
 						resetAddWebsiteFields();
 					}else {
 						JOptionPane.showMessageDialog(frame, "Could not add website - Website with nickname already exists");
@@ -278,8 +280,15 @@ public class FrontEnd {
 
 					if(UIController.modifyWebsiteAccount(websiteAccountModifyCurrNicknameInput.getText(),websiteAccountModifyNicknameInput.getText(),websiteAccountModifyUsernameInput.getText(),String.valueOf(websiteAccountModifyPasswordInput.getPassword()))) {
 						JOptionPane.showMessageDialog(frame, "Website modified ");
-						resetModifyWebsiteFields();
 						
+						String siteNickname = "f";
+						if(websiteAccountModifyNicknameInput.getText().isEmpty()) {
+						siteNickname = websiteAccountModifyCurrNicknameInput.getText(); 
+						}else {
+						siteNickname = websiteAccountModifyNicknameInput.getText();
+						}
+						setSearchWebsiteFieldAfterModifyingOrAddingSite(siteNickname);
+						resetModifyWebsiteFields();
 					}else {
 						JOptionPane.showMessageDialog(frame, "Couldn't Modify website");
 						resetModifyWebsiteFields();
@@ -914,11 +923,11 @@ public class FrontEnd {
 		initializeDebitCardTab(safeStore);
 
 	}
+	
 	// Display the new website updates automatically - implement better later - also do this for adding a website maybe
-	private void resetSearchWebsiteFieldAfterModifyingSite(String siteName, String username, String password) {
+	private void setSearchWebsiteFieldAfterModifyingOrAddingSite(String siteName) {
 		websiteAccountSearchNicknameInput.setText(siteName);
-		websiteAccountViewPasswordResult.setText(password);
-		websiteAccountViewUsernameResult.setText(username);
+		websiteAccountSearchButton.doClick();
 	}
 	private void resetAddWebsiteFields(){
 		websiteAccountAddNicknameInput.setText("");
