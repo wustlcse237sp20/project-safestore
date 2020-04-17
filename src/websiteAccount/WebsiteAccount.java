@@ -301,21 +301,19 @@ public class WebsiteAccount {
 		try {
 			WebsiteAccount accountToModify = WebsiteAccount.getWebsiteAccountFromNickname(databaseConnection,currentAccountUsername, safeStoreUser);
 
-			for(int i = 0; i < fieldsToModify.length; i++) {
-
-				if (fieldsToModify[i].equals("Nickname")) {
+				if (fieldsToModify[0].equals("Nickname")) {
 					String newNickname = newInputs[0].trim();
 					accountToModify.setNickname(newNickname);
 				}
-				if (fieldsToModify[i].equals("Login")) {
+				if (fieldsToModify[1].equals("Login")) {
 					String newLogin = newInputs[1].trim();
 					accountToModify.setWebsiteLogin(newLogin);
 				}
-				if (fieldsToModify[i].equals("Password")) {
+				if (fieldsToModify[2].equals("Password")) {
 					String newPassword = newInputs[2].trim();
 					accountToModify.setWebsitePassword(newPassword);
 				}
-			}
+			
 			return true;
 		} catch (SQLException e) {
 			return false;
