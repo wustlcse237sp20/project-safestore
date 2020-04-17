@@ -2,16 +2,20 @@ package UI;
 
 import java.sql.SQLException;
 
+import com.j256.ormlite.dao.Dao;
+import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.jdbc.JdbcConnectionSource;
 import com.j256.ormlite.logger.LocalLog;
 import com.j256.ormlite.support.ConnectionSource;
 
+import tables.UserEntity;
 import user.User;
+import websiteAccount.WebsiteAccount;
 
 public class UIController {
 	static ConnectionSource databaseConnection;
 	static String databaseUrl;
-	
+	static User safeStoreUser;
 	public static void main(String[] args) {
 		// TODO Auto-generated constructor stub
 		System.setProperty(LocalLog.LOCAL_LOG_LEVEL_PROPERTY,"ERROR");
@@ -23,17 +27,60 @@ public class UIController {
 			e.printStackTrace();
 		}
 		//TODO: Maybe have a method within UserSignInWindow to check if logged in, if logged in then launch the FrontEnd and close the UserSignInWindow? 
-		//UserSignInWindow.launchWindow();
-		FrontEnd.launchWindow();
+		UserSignInWindow.launchWindow();
+		//FrontEnd.launchWindow();
 	}
-	
+
 	public static boolean createUser(String username, String password) {
 		User newUser = new User(username, password);
 		return newUser.createSafeStoreAccountThroughDatabase(databaseConnection);
-		
+
 	}
 	public static boolean loginUser(String username, String password) {
 		return User.loginThroughDatabase(databaseConnection, username, password);		
+	}
+	public static void setUserForSession(String username) {
+		Dao<UserEntity, String> userDao;
+		try {
+			userDao = DaoManager.createDao(databaseConnection, UserEntity.class);
+
+			UserEntity userEntity = userDao.queryForId(username);
+			safeStoreUser = new User(userEntity);
+			UserSignInWindow.closeWindow();
+			FrontEnd.launchWindow();
+		}catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+	public static WebsiteAccount getWebsiteAccountInfo(String nickname) {
+		WebsiteAccount website = null;
+		try {
+			website = WebsiteAccount.getWebsiteAccountFromNickname(databaseConnection, nickname, safeStoreUser);
+		} catch (Exception e) {
+
+		}
+		return website;
+	}
+	public static boolean addWebsiteAccount(String nickname, String username, String password) {
+		WebsiteAccount websiteAccount = new WebsiteAccount(safeStoreUser, nickname, username, password);
+		return websiteAccount.addWebsiteAccount(databaseConnection);
+	}
+
+	public static boolean modifyWebsiteAccount(String currentNickname, String newNickname, String newLogin, String newPassword) {
+		String[] fieldsToModify = {"","",""};
+		String[] newInputs = {newNickname,newLogin, newPassword};
+		if(!newNickname.isEmpty()) {
+			fieldsToModify[0] = "Nickname";
+		}
+		if(!newLogin.isEmpty()) {
+			fieldsToModify[1] = "Login";
+		}
+		if(!newPassword.isEmpty()) {
+			fieldsToModify[2] = "Password";
+		}
+		return WebsiteAccount.updateWebsiteAccount(databaseConnection, currentNickname, safeStoreUser, fieldsToModify, newInputs);
 	}
 
 }
