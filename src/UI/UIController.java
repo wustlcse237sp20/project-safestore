@@ -30,11 +30,11 @@ public class UIController {
 		UserSignInWindow.launchWindow();
 		//FrontEnd.launchWindow();
 	}
-	
+
 	public static boolean createUser(String username, String password) {
 		User newUser = new User(username, password);
 		return newUser.createSafeStoreAccountThroughDatabase(databaseConnection);
-		
+
 	}
 	public static boolean loginUser(String username, String password) {
 		return User.loginThroughDatabase(databaseConnection, username, password);		
@@ -43,32 +43,32 @@ public class UIController {
 		Dao<UserEntity, String> userDao;
 		try {
 			userDao = DaoManager.createDao(databaseConnection, UserEntity.class);
-		
-		UserEntity userEntity = userDao.queryForId(username);
-		safeStoreUser = new User(userEntity);
-		UserSignInWindow.closeWindow();
-		FrontEnd.launchWindow();
+
+			UserEntity userEntity = userDao.queryForId(username);
+			safeStoreUser = new User(userEntity);
+			UserSignInWindow.closeWindow();
+			FrontEnd.launchWindow();
 		}catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 	}
 	public static WebsiteAccount getWebsiteAccountInfo(String nickname) {
-			WebsiteAccount website = null;
-			try {
-				 website = WebsiteAccount.getWebsiteAccountFromNickname(databaseConnection, nickname, safeStoreUser);
-			} catch (Exception e) {
-				
-			}
-			return website;
+		WebsiteAccount website = null;
+		try {
+			website = WebsiteAccount.getWebsiteAccountFromNickname(databaseConnection, nickname, safeStoreUser);
+		} catch (Exception e) {
+
+		}
+		return website;
 	}
 	public static boolean addWebsiteAccount(String nickname, String username, String password) {
 		WebsiteAccount websiteAccount = new WebsiteAccount(safeStoreUser, nickname, username, password);
 		return websiteAccount.addWebsiteAccount(databaseConnection);
 	}
 
-	public static boolean modifyWebsiteAccount(String currentUsername, String newNickname, String newLogin, String newPassword) {
+	public static boolean modifyWebsiteAccount(String currentNickname, String newNickname, String newLogin, String newPassword) {
 		String[] fieldsToModify = {"","",""};
 		String[] newInputs = {newNickname,newLogin, newPassword};
 		if(!newNickname.isEmpty()) {
@@ -80,7 +80,7 @@ public class UIController {
 		if(!newPassword.isEmpty()) {
 			fieldsToModify[2] = "Password";
 		}
-		return WebsiteAccount.updateWebsiteAccount(databaseConnection, currentUsername, safeStoreUser, fieldsToModify, newInputs);
+		return WebsiteAccount.updateWebsiteAccount(databaseConnection, currentNickname, safeStoreUser, fieldsToModify, newInputs);
 	}
 
 }

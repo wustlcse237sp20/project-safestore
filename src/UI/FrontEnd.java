@@ -156,9 +156,13 @@ public class FrontEnd {
 				if(website != null) {
 					websiteAccountViewUsernameResult.setText(website.getWebsiteLogin());
 					websiteAccountViewPasswordResult.setText(website.getWebsitePassword());
+					websiteAccountSearchNicknameInput.setText("");
 				}else {
-					websiteAccountViewUsernameResult.setText("Site doesn't exist");
-					websiteAccountViewPasswordResult.setText(" ");
+					JOptionPane.showMessageDialog(frame, "You have no website stored under " + websiteAccountSearchNicknameInput.getText());
+					websiteAccountViewUsernameResult.setText("");
+					websiteAccountViewPasswordResult.setText("");
+					websiteAccountSearchNicknameInput.setText("");
+					
 				}
 			}
 		});
@@ -280,12 +284,12 @@ public class FrontEnd {
 
 					if(UIController.modifyWebsiteAccount(websiteAccountModifyCurrNicknameInput.getText(),websiteAccountModifyNicknameInput.getText(),websiteAccountModifyUsernameInput.getText(),String.valueOf(websiteAccountModifyPasswordInput.getPassword()))) {
 						JOptionPane.showMessageDialog(frame, "Website modified ");
-						
-						String siteNickname = "f";
+
+						String siteNickname = "";
 						if(websiteAccountModifyNicknameInput.getText().isEmpty()) {
-						siteNickname = websiteAccountModifyCurrNicknameInput.getText(); 
+							siteNickname = websiteAccountModifyCurrNicknameInput.getText(); 
 						}else {
-						siteNickname = websiteAccountModifyNicknameInput.getText();
+							siteNickname = websiteAccountModifyNicknameInput.getText();
 						}
 						setSearchWebsiteFieldAfterModifyingOrAddingSite(siteNickname);
 						resetModifyWebsiteFields();
@@ -923,7 +927,7 @@ public class FrontEnd {
 		initializeDebitCardTab(safeStore);
 
 	}
-	
+
 	// Display the new website updates automatically - implement better later - also do this for adding a website maybe
 	private void setSearchWebsiteFieldAfterModifyingOrAddingSite(String siteName) {
 		websiteAccountSearchNicknameInput.setText(siteName);
