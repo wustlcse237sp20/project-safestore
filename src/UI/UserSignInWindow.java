@@ -157,7 +157,7 @@ public class UserSignInWindow {
 				boolean creatingUser = true;
 				while(creatingUser){
 					int userSelection = JOptionPane.showConfirmDialog(frame, createBasePanel(), "New Account: ", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-				
+
 					if(userSelection == JOptionPane.OK_OPTION) {
 
 						if(newUsername.getText().isEmpty() || String.valueOf(newPassword.getPassword()).isEmpty()) {
@@ -192,7 +192,7 @@ public class UserSignInWindow {
 
 		basePanel.setOpaque(true);
 		basePanel.setBackground(Color.RED);
-		
+
 		JPanel centerPanel = new JPanel();
 		centerPanel.setLayout(new GridLayout(2, 2, 5, 5));
 		centerPanel.setBorder(

@@ -607,12 +607,16 @@ public class FrontEnd {
 		JButton modifyCreditCardButton = new JButton("Modify");
 		modifyCreditCardButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(UIController.modifyCreditCard(modifyCreditCardCurNicknameInput.getText(),modifyCreditCardNewNicknameInput.getText(),modifyCreditCardNumberInput.getText(),modifyCreditCardExpDateInput.getText(),modifyCreditCardCVVInput.getText(),modifyCreditCardStreetAddressInput.getText(),modifyCreditCardCityInput.getText(),modifyCreditCardStateInput.getText(),modifyCreditCardZipInput.getText())) {
-					JOptionPane.showMessageDialog(frame, "Credit Card Updated");
-					resetModifyCreditCard();
+				if(modifyCreditCardCurNicknameInput.getText().isEmpty()) {
+					JOptionPane.showMessageDialog(frame, "Enter a credit card to modify");
 				}else {
-					JOptionPane.showMessageDialog(frame, "Couldn't update credit card named" + modifyCreditCardCurNicknameInput.getText());
-					resetModifyCreditCard();
+					if(UIController.modifyCreditCard(modifyCreditCardCurNicknameInput.getText(),modifyCreditCardNewNicknameInput.getText(),modifyCreditCardNumberInput.getText(),modifyCreditCardExpDateInput.getText(),modifyCreditCardCVVInput.getText(),modifyCreditCardStreetAddressInput.getText(),modifyCreditCardCityInput.getText(),modifyCreditCardStateInput.getText(),modifyCreditCardZipInput.getText())) {
+						JOptionPane.showMessageDialog(frame, "Credit Card Updated");
+						resetModifyCreditCard();
+					}else {
+						JOptionPane.showMessageDialog(frame, "Couldn't update credit card named" + modifyCreditCardCurNicknameInput.getText());
+						resetModifyCreditCard();
+					}
 				}
 			}
 		});

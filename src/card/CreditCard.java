@@ -489,7 +489,7 @@ public class CreditCard implements Card{
 
 
 			if(fieldsToModify[0].equals("Nickname")) {
-				
+
 				requestedCreditCard.setNickname(newInputs[0], databaseConnection);
 			}
 			if(fieldsToModify[1].equals("Card Number")) {
