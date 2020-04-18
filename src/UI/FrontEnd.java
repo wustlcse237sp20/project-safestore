@@ -16,6 +16,7 @@ import java.awt.Font;
 import java.awt.Color;
 import javax.swing.SwingConstants;
 
+import card.CreditCard;
 import websiteAccount.WebsiteAccount;
 
 import javax.swing.JButton;
@@ -46,7 +47,7 @@ public class FrontEnd {
 	private JTextField creditCardAddCityInput;
 	private JTextField creditCardAddStateInput;
 	private JTextField creditCardAddZipInput;
-	private JTextField modifyCreditCardNumInput;
+	private JTextField modifyCreditCardNumberInput;
 	private JTextField modifyCreditCardNewNicknameInput;
 	private JTextField modifyCreditCardExpDateInput;
 	private JTextField modifyCreditCardCVVInput;
@@ -162,7 +163,7 @@ public class FrontEnd {
 					websiteAccountViewUsernameResult.setText("");
 					websiteAccountViewPasswordResult.setText("");
 					websiteAccountSearchNicknameInput.setText("");
-					
+
 				}
 			}
 		});
@@ -360,12 +361,35 @@ public class FrontEnd {
 		creditCardSearchLabel.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		creditCardViewTab.add(creditCardSearchLabel);
 
+		JTextArea creditCardViewDisplay = new JTextArea();
+		creditCardViewDisplay.setBounds(370, 64, 305, 248);
+		creditCardViewTab.add(creditCardViewDisplay);
+
 		creditCardSearchNicknameInput = new JTextField();
 		creditCardSearchNicknameInput.setBounds(313, 8, 130, 26);
 		creditCardSearchNicknameInput.setColumns(10);
 		creditCardViewTab.add(creditCardSearchNicknameInput);
 
 		JButton creditCardSearchButton = new JButton("Search");
+		creditCardSearchButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(creditCardSearchNicknameInput.getText().isEmpty()) {
+					JOptionPane.showMessageDialog(frame, "Enter the card's nickname (default is last 4 digits)");
+				}else {
+					CreditCard creditCard = UIController.getCreditCardInfo(creditCardSearchNicknameInput.getText());
+					if(creditCard != null) {
+						creditCardViewDisplay.setText(creditCard.toString());
+						creditCardSearchNicknameInput.setText("");
+					}else {
+						JOptionPane.showMessageDialog(frame, "You have no credit card stored under " + creditCardSearchNicknameInput.getText());
+						creditCardSearchNicknameInput.setText("");
+						creditCardViewDisplay.setText("");
+
+					}
+
+				}
+			}
+		});
 		creditCardSearchButton.setBounds(448, 6, 85, 29);
 		creditCardViewTab.add(creditCardSearchButton);
 
@@ -379,10 +403,7 @@ public class FrontEnd {
 		defaultNicknameDisclaimer.setBounds(501, 315, 251, 16);
 		creditCardViewTab.add(defaultNicknameDisclaimer);
 
-		JTextArea creditCardViewDisplay = new JTextArea();
-		creditCardViewDisplay.setText("call the toString method on \nCreditCard to display all \ncard information here");
-		creditCardViewDisplay.setBounds(415, 90, 230, 185);
-		creditCardViewTab.add(creditCardViewDisplay);
+
 	}
 
 	/**
@@ -472,6 +493,21 @@ public class FrontEnd {
 		creditCardAddTab.add(creditCardAddZipInput);
 
 		JButton creditCardAddButton = new JButton("Add");
+		creditCardAddButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(creditCardAddNumberInput.getText().isEmpty() || creditCardAddExpDateInput.getText().isEmpty() || creditCardAddCVVInput.getText().isEmpty() || creditCardAddStreetAdressInput.getText().isEmpty() || creditCardAddCityInput.getText().isEmpty() || creditCardAddStateInput.getText().isEmpty() || creditCardAddZipInput.getText().isEmpty()) {
+					JOptionPane.showMessageDialog(frame, "All fields marked with * must have a value");
+				}else {
+					if(UIController.addCreditCard(creditCardAddNumberInput.getText(),creditCardAddNicknameInput.getText(),creditCardAddExpDateInput.getText(),creditCardAddCVVInput.getText(),creditCardAddStreetAdressInput.getText(),creditCardAddCityInput.getText(),creditCardAddStateInput.getText(),creditCardAddZipInput.getText())) {
+						JOptionPane.showMessageDialog(frame, "Credit Card Added");
+						resetAddCreditCard();
+					}else {
+						JOptionPane.showMessageDialog(frame, "Credit card already added with number (and/or nickname?): " + creditCardAddNumberLabel.getText());
+						resetAddCreditCard();
+					}
+				}
+			}
+		});
 		creditCardAddButton.setBounds(495, 274, 117, 29);
 		creditCardAddTab.add(creditCardAddButton);
 
@@ -500,10 +536,10 @@ public class FrontEnd {
 		modifyCreditCardNumLabel.setBounds(371, 58, 98, 16);
 		creditCardModifyTab.add(modifyCreditCardNumLabel);
 
-		modifyCreditCardNumInput = new JTextField();
-		modifyCreditCardNumInput.setColumns(10);
-		modifyCreditCardNumInput.setBounds(462, 53, 205, 26);
-		creditCardModifyTab.add(modifyCreditCardNumInput);
+		modifyCreditCardNumberInput = new JTextField();
+		modifyCreditCardNumberInput.setColumns(10);
+		modifyCreditCardNumberInput.setBounds(462, 53, 205, 26);
+		creditCardModifyTab.add(modifyCreditCardNumberInput);
 
 		modifyCreditCardNewNicknameInput = new JTextField();
 		modifyCreditCardNewNicknameInput.setColumns(10);
@@ -569,6 +605,17 @@ public class FrontEnd {
 		creditCardModifyTab.add(modifyCreditCardZipInput);
 
 		JButton modifyCreditCardButton = new JButton("Modify");
+		modifyCreditCardButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(UIController.modifyCreditCard(modifyCreditCardCurNicknameInput.getText(),modifyCreditCardNewNicknameInput.getText(),modifyCreditCardNumberInput.getText(),modifyCreditCardExpDateInput.getText(),modifyCreditCardCVVInput.getText(),modifyCreditCardStreetAddressInput.getText(),modifyCreditCardCityInput.getText(),modifyCreditCardStateInput.getText(),modifyCreditCardZipInput.getText())) {
+					JOptionPane.showMessageDialog(frame, "Credit Card Updated");
+					resetModifyCreditCard();
+				}else {
+					JOptionPane.showMessageDialog(frame, "Couldn't update credit card named" + modifyCreditCardCurNicknameInput.getText());
+					resetModifyCreditCard();
+				}
+			}
+		});
 		modifyCreditCardButton.setBounds(482, 287, 117, 29);
 		creditCardModifyTab.add(modifyCreditCardButton);
 
@@ -649,7 +696,7 @@ public class FrontEnd {
 
 		JTextArea debitCardViewDisplay = new JTextArea();
 		debitCardViewDisplay.setText("call the toString method on \nDebitCard to display all \ncard information here");
-		debitCardViewDisplay.setBounds(391, 90, 230, 185);
+		debitCardViewDisplay.setBounds(372, 64, 293, 248);
 		debitCardViewTab.add(debitCardViewDisplay);
 
 		JLabel debitCardDefaultNicknameDisclaimer = new JLabel("*default nickname is last four digits of card number");
@@ -943,5 +990,27 @@ public class FrontEnd {
 		websiteAccountModifyUsernameInput.setText("");
 		websiteAccountModifyNicknameInput.setText("");
 		websiteAccountModifyPasswordInput.setText("");
+	}
+
+	private void resetAddCreditCard() {
+		creditCardAddNumberInput.setText("");
+		creditCardAddNicknameInput.setText("");
+		creditCardAddExpDateInput.setText("");
+		creditCardAddStateInput.setText("");
+		creditCardAddCityInput.setText("");
+		creditCardAddStreetAdressInput.setText("");
+		creditCardAddZipInput.setText("");
+		creditCardAddCVVInput.setText("");
+	}
+	private void resetModifyCreditCard() {
+		modifyCreditCardNumberInput.setText("");
+		modifyCreditCardCurNicknameInput.setText("");
+		modifyCreditCardNewNicknameInput.setText("");
+		modifyCreditCardExpDateInput.setText("");
+		modifyCreditCardStateInput.setText("");
+		modifyCreditCardCityInput.setText("");
+		modifyCreditCardStreetAddressInput.setText("");
+		modifyCreditCardZipInput.setText("");
+		modifyCreditCardCVVInput.setText("");
 	}
 }

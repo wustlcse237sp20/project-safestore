@@ -8,6 +8,9 @@ import com.j256.ormlite.jdbc.JdbcConnectionSource;
 import com.j256.ormlite.logger.LocalLog;
 import com.j256.ormlite.support.ConnectionSource;
 
+import card.Address;
+import card.CreditCard;
+import card.DebitCard;
 import tables.UserEntity;
 import user.User;
 import websiteAccount.WebsiteAccount;
@@ -81,6 +84,55 @@ public class UIController {
 			fieldsToModify[2] = "Password";
 		}
 		return WebsiteAccount.updateWebsiteAccount(databaseConnection, currentNickname, safeStoreUser, fieldsToModify, newInputs);
+	}
+
+	public static CreditCard getCreditCardInfo(String nickname) {
+		CreditCard creditCard = null;
+		try {
+			creditCard = CreditCard.getCreditCardFromNickname(nickname, safeStoreUser, databaseConnection);
+		} catch (Exception e) {
+
+		}
+		return creditCard;
+
+	}
+
+	public static boolean addCreditCard(String cardNumber, String nickname,String expDate, String cvv, String streetAddress, String city, String state, String zip) {
+		Address billingAddress = new Address(streetAddress, city, state, zip);
+		CreditCard creditCard;
+		if(!nickname.isEmpty()) {
+			creditCard = new CreditCard(safeStoreUser, nickname, cardNumber, expDate, cvv, billingAddress);
+		}
+		else {
+			creditCard = new CreditCard(safeStoreUser, cardNumber, expDate, cvv, billingAddress);
+		}
+		try {
+			return creditCard.addCard(databaseConnection);
+		} catch (Exception e) {
+			return false;
+		}
+	}
+
+	public static boolean modifyCreditCard(String currentNickname, String nickname, String cardNumber,String expDate, String cvv, String streetAddress, String city, String state, String zip) {
+		String[] fieldsToModify = {"","","","",""};
+		String[] newInputs = {nickname,cardNumber,expDate,cvv,streetAddress,city,state,zip};
+		if(!nickname.isEmpty()) {
+			fieldsToModify[0] = "Nickname";
+		}
+		if(!cardNumber.isEmpty()) {
+			fieldsToModify[1] = "Card Number";
+		}
+		if(!expDate.isEmpty()) {
+			fieldsToModify[2] = "Expiration Date";
+		}
+		if(!cvv.isEmpty()) {
+			fieldsToModify[3] = "CVV";
+		}
+		if(!streetAddress.isEmpty() || !city.isEmpty() || !state.isEmpty() || !zip.isEmpty()) {
+			fieldsToModify[4] = "BillingAddress";
+		}
+
+		return CreditCard.updateCreditCardInformation(currentNickname, databaseConnection, safeStoreUser, fieldsToModify, newInputs);
 	}
 
 }
