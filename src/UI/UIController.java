@@ -114,25 +114,8 @@ public class UIController {
 	}
 
 	public static boolean modifyCreditCard(String currentNickname, String nickname, String cardNumber,String expDate, String cvv, String streetAddress, String city, String state, String zip) {
-		String[] fieldsToModify = {"","","","",""};
 		String[] newInputs = {nickname,cardNumber,expDate,cvv,streetAddress,city,state,zip};
-		if(!nickname.isEmpty()) {
-			fieldsToModify[0] = "Nickname";
-		}
-		if(!cardNumber.isEmpty()) {
-			fieldsToModify[1] = "Card Number";
-		}
-		if(!expDate.isEmpty()) {
-			fieldsToModify[2] = "Expiration Date";
-		}
-		if(!cvv.isEmpty()) {
-			fieldsToModify[3] = "CVV";
-		}
-		if(!streetAddress.isEmpty() || !city.isEmpty() || !state.isEmpty() || !zip.isEmpty()) {
-			fieldsToModify[4] = "BillingAddress";
-		}
-
-		return CreditCard.updateCreditCardInformation(currentNickname, databaseConnection, safeStoreUser, fieldsToModify, newInputs);
+		return CreditCard.updateCreditCardInformation(currentNickname, databaseConnection, safeStoreUser, newInputs);
 	}
 
 }

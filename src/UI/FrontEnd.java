@@ -502,7 +502,7 @@ public class FrontEnd {
 						JOptionPane.showMessageDialog(frame, "Credit Card Added");
 						resetAddCreditCard();
 					}else {
-						JOptionPane.showMessageDialog(frame, "Credit card already added with number (and/or nickname?): " + creditCardAddNumberLabel.getText());
+						JOptionPane.showMessageDialog(frame, "Credit card already added with number (and/or nickname): " + creditCardAddNumberLabel.getText());
 						resetAddCreditCard();
 					}
 				}

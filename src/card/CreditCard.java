@@ -482,48 +482,48 @@ public class CreditCard implements Card{
 			e.printStackTrace();
 		}
 	}
-	public static boolean updateCreditCardInformation(String currentNickname, ConnectionSource databaseConnection, User safeStoreUser,String[] fieldsToModify, String[] newInputs) {
+	public static boolean updateCreditCardInformation(String currentNickname, ConnectionSource databaseConnection, User safeStoreUser, String[] newInputs) {
 
 		try {
 			CreditCard requestedCreditCard = CreditCard.getCreditCardFromNickname(currentNickname, safeStoreUser, databaseConnection);
 
 
-			if(fieldsToModify[0].equals("Nickname")) {
+			if(!newInputs[0].isEmpty()) {
 
 				requestedCreditCard.setNickname(newInputs[0], databaseConnection);
 			}
-			if(fieldsToModify[1].equals("Card Number")) {
+			if(!newInputs[1].isEmpty()) {
 
 				requestedCreditCard.setCardNumber(newInputs[1], databaseConnection);
 			}
-			if(fieldsToModify[2].equals("Expiration Date")) {
+			if(!newInputs[2].isEmpty()) {
 				requestedCreditCard.setExpirationDate(newInputs[2], databaseConnection);
 			}
-			if(fieldsToModify[3].equals("CVV")) {
+			if(!newInputs[3].isEmpty()) {
 
 				requestedCreditCard.setCvv(newInputs[3], databaseConnection);
 			}
-			if(fieldsToModify[4].equals("Billing Address")) {
-				Address oldBillingAddress = requestedCreditCard.billingAddress;
-				String streetAddress = oldBillingAddress.getStreetAddress();
-				String city = oldBillingAddress.getCity();
-				String state = oldBillingAddress.getState();
-				String zipCode = oldBillingAddress.getZipCode();
-				if(!newInputs[4].isEmpty()) {
-					streetAddress = newInputs[4];
-				}
-				if(!newInputs[5].isEmpty()) {
-					city = newInputs[5];
-				}
-				if(!newInputs[6].isEmpty()) {
-					state = newInputs[6];
-				}
-				if(!newInputs[7].isEmpty()) {
-					zipCode = newInputs[7];
-				}
-				Address newBillingAddress = new Address(streetAddress, city, state, zipCode);	
-				requestedCreditCard.setBillingAddress(newBillingAddress, databaseConnection);
+
+			Address oldBillingAddress = requestedCreditCard.billingAddress;
+			String streetAddress = oldBillingAddress.getStreetAddress();
+			String city = oldBillingAddress.getCity();
+			String state = oldBillingAddress.getState();
+			String zipCode = oldBillingAddress.getZipCode();
+			if(!newInputs[4].isEmpty()) {
+				streetAddress = newInputs[4];
 			}
+			if(!newInputs[5].isEmpty()) {
+				city = newInputs[5];
+			}
+			if(!newInputs[6].isEmpty()) {
+				state = newInputs[6];
+			}
+			if(!newInputs[7].isEmpty()) {
+				zipCode = newInputs[7];
+			}
+			Address newBillingAddress = new Address(streetAddress, city, state, zipCode);	
+			requestedCreditCard.setBillingAddress(newBillingAddress, databaseConnection);
+
 			return true;
 		} catch (Exception e) {
 			System.out.println(e);
