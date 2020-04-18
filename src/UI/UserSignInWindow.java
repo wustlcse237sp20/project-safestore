@@ -40,8 +40,8 @@ public class UserSignInWindow {
 	private static JFrame frame;
 	private JTextField usernameField;
 	private JPasswordField passwordField;	
-	JTextField newUsername = new JTextField(20);
-	JPasswordField newPassword = new JPasswordField(20);
+	JTextField newUsername = new JTextField(10);
+	JPasswordField newPassword = new JPasswordField(10);
 
 	/**
 	 * Launch the application.
@@ -135,8 +135,6 @@ public class UserSignInWindow {
 					if(isLoggedIn) {
 						// NEXT WINDOW
 						UIController.setUserForSession(username);
-
-
 					}
 					else {
 						JOptionPane.showMessageDialog(frame, "Username or password incorrect");
@@ -155,7 +153,6 @@ public class UserSignInWindow {
 		createAccountButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				// popup window stuff: https://stackoverflow.com/questions/12810460/joptionpane-input-dialog-box-program
-
 
 				boolean creatingUser = true;
 				while(creatingUser){
@@ -181,7 +178,6 @@ public class UserSignInWindow {
 					}else if(userSelection == JOptionPane.CANCEL_OPTION){
 						creatingUser = false;
 					}
-
 				}
 			}
 		});
@@ -198,7 +194,7 @@ public class UserSignInWindow {
 		basePanel.setBackground(Color.RED);
 
 		JPanel centerPanel = new JPanel();
-		centerPanel.setLayout(new GridLayout(3, 2, 5, 5));
+		centerPanel.setLayout(new GridLayout(2, 2, 5, 5));
 		centerPanel.setBorder(
 				BorderFactory.createEmptyBorder(5, 5, 5, 5));
 		centerPanel.setOpaque(true);
@@ -209,6 +205,7 @@ public class UserSignInWindow {
 		centerPanel.add(newPassword);
 
 		basePanel.add(centerPanel);
+
 		return basePanel;
 	}
 	public static void closeWindow() {

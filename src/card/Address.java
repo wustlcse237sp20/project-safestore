@@ -49,7 +49,7 @@ public class Address {
 	}
 	
 	public String getFullAddress() {
-		return this.getStreetAddress() + ", " + this.getCity() + ", " + this.getState() + " " + this.getZipCode();
+		return this.getStreetAddress() + "\n " + this.getCity() + ", " + this.getState() + "\n" + this.getZipCode();
 	}
 	
 	public void setStreetAddress(String streetAddress) {
