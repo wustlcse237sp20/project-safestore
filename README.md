@@ -27,7 +27,8 @@
 ## Implemented but Non-Working Stories:
 - Everything we implemented is working, but just know that Debit Card is not supposed to be working from the UI yet (it'll be done next iteration).
 ## Commands to Compile and Run Code:
-Note: do not copy and paste the $, they represent your terminal new lines
+Note: Do not copy and paste the $, they represent your terminal new lines
+Note 2: You will not be able to run this from Eclipse, this is intentional.
 ```sh
 $ git clone https://github.com/wustlcse237sp20/project-safestore.git
 $ cd project-safestore/
