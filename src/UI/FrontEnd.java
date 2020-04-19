@@ -157,7 +157,7 @@ public class FrontEnd {
 				if(website != null) {
 					websiteAccountViewUsernameResult.setText(website.getWebsiteLogin());
 					websiteAccountViewPasswordResult.setText(website.getWebsitePassword());
-					websiteAccountSearchNicknameInput.setText("");
+					websiteAccountSearchNicknameInput.setText(website.getNickname());
 				}else {
 					JOptionPane.showMessageDialog(frame, "You have no website stored under " + websiteAccountSearchNicknameInput.getText());
 					websiteAccountViewUsernameResult.setText("");

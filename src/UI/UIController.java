@@ -22,7 +22,7 @@ public class UIController {
 	public static void main(String[] args) {
 		// TODO Auto-generated constructor stub
 		System.setProperty(LocalLog.LOCAL_LOG_LEVEL_PROPERTY,"ERROR");
-		databaseUrl = "jdbc:sqlite:src/database/app.db";
+		databaseUrl = "jdbc:sqlite:database/app.db";
 		try {
 			databaseConnection = new JdbcConnectionSource(databaseUrl);
 		}
