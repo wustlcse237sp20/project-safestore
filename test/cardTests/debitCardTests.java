@@ -21,11 +21,11 @@ import com.j256.ormlite.jdbc.JdbcConnectionSource;
 import com.j256.ormlite.support.ConnectionSource;
 
 import card.Address;
-
+import card.CreditCard;
 import card.DebitCard;
 import encryption.Encryption;
 import tables.AddressEntity;
-
+import tables.CreditCardEntity;
 import tables.DebitCardEntity;
 import tables.UserEntity;
 import user.User;
@@ -1107,6 +1107,35 @@ class debitCardTests {
 		} catch (SQLException e) {			
 			e.printStackTrace();
 			fail("Error inserting test card (Database failure)");
+		}
+	}
+	
+	@Test
+	void testAddDebitCardExistingNickname() {
+		System.out.println("RUNNING TEST: testAddDebitCardExistingNickname");
+		
+		DebitCard testDebitCard = new DebitCard(testUser, "testNickname", "3333333333", "04/23", "123", "1234",testAddress);
+		try {
+			boolean firstAddResult = testDebitCard.addCard(databaseConnection);
+			assertTrue(firstAddResult, "first time adding should be successful");
+			DebitCardEntity firstDebitCard = testDebitCard.getDebitCardEntity();
+			
+			String encryptedDebitCardNumberTwo = Encryption.encrypt("0987654321");
+			DebitCard testDebitCardTwo = new DebitCard(testUser, "testNickname", "0987654321", "04/23", "123", "0123", testAddress);
+			boolean secondAddResult = testDebitCardTwo.addCard(databaseConnection);
+			assertFalse(secondAddResult, "Second add should return false due to same nickname");
+			
+			Dao<DebitCardEntity, String> debitCardDao = DaoManager.createDao(databaseConnection, DebitCardEntity.class);
+			DebitCardEntity returnedDebitCard = debitCardDao.queryForId(encryptedDebitCardNumberTwo);
+			assertTrue(returnedDebitCard == null, "The second credit card should not be in the database");
+			
+			debitCardDao.delete(firstDebitCard);
+			if(returnedDebitCard != null) {
+				debitCardDao.delete(returnedDebitCard);
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 }

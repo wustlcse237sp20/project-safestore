@@ -178,6 +178,32 @@ public class CreditCard implements Card{
 			return false;
 		}
 	}
+	
+	/**
+	 * Checks to see if a credit card with the supplied nickname already exists
+	 * @param databaseConnection
+	 * @param safeStoreUser
+	 * @param nickname
+	 * @return true is the nickname given doens't exist in db for that user, false otherwise
+	 */
+	public static boolean cardNicknameIsUnique(ConnectionSource databaseConnection, UserEntity safeStoreUser, String nickname) {
+		try {
+			Dao<CreditCardEntity, String> creditCardDao = DaoManager.createDao(databaseConnection, CreditCardEntity.class);
+			Map<String, Object> queryParams = new HashMap<String, Object>();
+			queryParams.put("nickname", Encryption.encrypt(nickname));
+			queryParams.put("safe_store_username", safeStoreUser.getUsername());
+			List<CreditCardEntity> returnedCreditCards = creditCardDao.queryForFieldValues(queryParams);
+			System.out.println(returnedCreditCards);
+			if (returnedCreditCards.isEmpty()) {
+				return true;
+			} else {
+				return false;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
 
 
 	/**
@@ -209,16 +235,12 @@ public class CreditCard implements Card{
 
 		try {
 			Dao<CreditCardEntity, String> creditCardDao = DaoManager.createDao(databaseConnection, CreditCardEntity.class);
-			Map<String, Object> queryParams = new HashMap<String, Object>();
-			queryParams.put("nickname", Encryption.encrypt(this.getNickname()));
-			queryParams.put("safe_store_username", this.creditCardEntity.getSafeStoreUser());
-			List<CreditCardEntity> returnedCreditCards = creditCardDao.queryForFieldValues(queryParams);
-			if (returnedCreditCards.size() > 0) {
+			if (cardNicknameIsUnique(databaseConnection, this.creditCardEntity.getSafeStoreUser(), this.getNickname())) {
+				creditCardDao.create(this.creditCardEntity);
+				return true;
+			} else {
 				return false;
 			}
-
-			creditCardDao.create(this.creditCardEntity);
-			return true;
 		} catch (SQLException e) {
 			e.printStackTrace();
 			throw(new Exception("Failed to connect to database"));
@@ -475,8 +497,8 @@ public class CreditCard implements Card{
 			User safeStoreUser = new User("testUser", "testPassword");
 			safeStoreUser.createSafeStoreAccountThroughDatabase(databaseConnection);
 			CreditCard.addCreditCard(databaseConnection, keyboard, safeStoreUser);
-			CreditCard.updateCreditCardInformation(databaseConnection, keyboard, safeStoreUser);
-			CreditCard.getCreditCardInformation(databaseConnection, keyboard, safeStoreUser);
+//			CreditCard.updateCreditCardInformation(databaseConnection, keyboard, safeStoreUser);
+//			CreditCard.getCreditCardInformation(databaseConnection, keyboard, safeStoreUser);
 		}
 		catch (SQLException e) {
 			e.printStackTrace();
@@ -489,8 +511,9 @@ public class CreditCard implements Card{
 
 
 			if(!newInputs[0].isEmpty()) {
-
-				requestedCreditCard.setNickname(newInputs[0], databaseConnection);
+				if (cardNicknameIsUnique(databaseConnection, safeStoreUser.getUserEntity(), newInputs[0])) {
+					requestedCreditCard.setNickname(newInputs[0], databaseConnection);
+				}
 			}
 			if(!newInputs[1].isEmpty()) {
 

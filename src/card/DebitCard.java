@@ -12,6 +12,7 @@ import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.support.ConnectionSource;
 
 import encryption.Encryption;
+import tables.CreditCardEntity;
 import tables.DebitCardEntity;
 import tables.UserEntity;
 import user.User;
@@ -201,6 +202,31 @@ public class DebitCard implements Card {
 			return false;
 		}
 	}
+	
+	/**
+	 * Checks to see if a debit card with the supplied nickname already exists
+	 * @param databaseConnection
+	 * @param safeStoreUser
+	 * @param nickname
+	 * @return true is the nickname given doens't exist in db for that user, false otherwise
+	 */
+	public static boolean cardNicknameIsUnique(ConnectionSource databaseConnection, UserEntity safeStoreUser, String nickname) {
+		try {
+			Dao<DebitCardEntity, String> debitCardDao = DaoManager.createDao(databaseConnection, DebitCardEntity.class);
+			Map<String, Object> queryParams = new HashMap<String, Object>();
+			queryParams.put("nickname", Encryption.encrypt(nickname));
+			queryParams.put("safe_store_username", safeStoreUser);
+			List<DebitCardEntity> returnedDebitCards = debitCardDao.queryForFieldValues(queryParams);
+			if (returnedDebitCards.isEmpty()) {
+				return true;
+			} else {
+				return false;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
 
 
 	/**
@@ -232,16 +258,13 @@ public class DebitCard implements Card {
 
 		try {
 			Dao<DebitCardEntity, String> debitCardDao = DaoManager.createDao(databaseConnection, DebitCardEntity.class);
-			Map<String, Object> queryParams = new HashMap<String, Object>();
-			queryParams.put("nickname", Encryption.encrypt(this.getNickname()));
-			queryParams.put("safe_store_username", this.debitCardEntity.getSafeStoreUser());
-			List<DebitCardEntity> returnedDebitCards = debitCardDao.queryForFieldValues(queryParams);
-			if (returnedDebitCards.size() > 0) {
+			if (cardNicknameIsUnique(databaseConnection, this.debitCardEntity.getSafeStoreUser(), this.getNickname())) {
+				debitCardDao.create(this.debitCardEntity);
+				return true;
+			}
+			else {
 				return false;
 			}
-
-			debitCardDao.create(this.debitCardEntity);
-			return true;
 		} catch (SQLException e) {
 			e.printStackTrace();
 			throw(new Exception("Failed to connect to database"));

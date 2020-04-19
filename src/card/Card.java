@@ -31,4 +31,5 @@ public interface Card {
 	
 	public boolean addCard(ConnectionSource databaseConnection) throws Exception;
 	
+	
 }
