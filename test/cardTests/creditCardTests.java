@@ -1087,4 +1087,29 @@ class creditCardTests {
 			fail("Error inserting test card (Database failure)");
 		}
 	}
+	
+	@Test
+	void testCardNicknameIsUnique() {
+		System.out.println("RUNNING TEST: testCardNicknameIsUnique");
+		CreditCard testCreditCard = new CreditCard(testUser, "testNickname", "3333333333", "04/23", "123", testAddress);
+		try {
+			boolean firstAddResult = testCreditCard.addCard(databaseConnection);
+			assertTrue(firstAddResult, "first time adding should be successful");
+			CreditCardEntity firstCreditCard = testCreditCard.getCreditCardEntity();
+			
+			boolean checkSameNickname = CreditCard.cardNicknameIsUnique(databaseConnection, testUser.getUserEntity(), "testNickname");
+			assertFalse(checkSameNickname, "The nicknames are the same so it should return false");
+			
+			boolean checkDifferentNickname = CreditCard.cardNicknameIsUnique(databaseConnection, testUser.getUserEntity(), "testNickname1");
+			assertTrue(checkDifferentNickname, "The nicknames are different so it should return true");
+			
+			Dao<CreditCardEntity, String> creditCardDao = DaoManager.createDao(databaseConnection, CreditCardEntity.class);
+			creditCardDao.delete(firstCreditCard);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	
+	
 }

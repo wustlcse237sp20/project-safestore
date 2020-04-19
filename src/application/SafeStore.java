@@ -25,7 +25,7 @@ import websiteAccount.WebsiteAccount;
 //a -cp flag but this seemed simpler, not sure if there's a setting that could be changed in another file 
 
 public class SafeStore {
-
+	
 	public static void main(String[] args) {
 		System.setProperty(LocalLog.LOCAL_LOG_LEVEL_PROPERTY, "ERROR");
 		ConnectionSource databaseConnection;
