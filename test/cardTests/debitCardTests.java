@@ -1138,6 +1138,28 @@ class debitCardTests {
 			e.printStackTrace();
 		}
 	}
+	
+	@Test
+	void testCardNicknameIsUnique() {
+		System.out.println("RUNNING TEST: testCardNicknameIsUnique");
+		DebitCard testDebitCard = new DebitCard(testUser, "testNickname", "3333333333", "04/23", "123", "1234", testAddress);
+		try {
+			boolean firstAddResult = testDebitCard.addCard(databaseConnection);
+			assertTrue(firstAddResult, "first time adding should be successful");
+			DebitCardEntity firstDebitCard = testDebitCard.getDebitCardEntity();
+			
+			boolean checkSameNickname = DebitCard.cardNicknameIsUnique(databaseConnection, testUser.getUserEntity(), "testNickname");
+			assertFalse(checkSameNickname, "The nicknames are the same so it should return false");
+			
+			boolean checkDifferentNickname = DebitCard.cardNicknameIsUnique(databaseConnection, testUser.getUserEntity(), "testNickname1");
+			assertTrue(checkDifferentNickname, "The nicknames are different so it should return true");
+			
+			Dao<DebitCardEntity, String> debitCardDao = DaoManager.createDao(databaseConnection, DebitCardEntity.class);
+			debitCardDao.delete(firstDebitCard);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 }
 
 

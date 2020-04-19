@@ -473,37 +473,7 @@ public class CreditCard implements Card{
 		}
 	}
 
-	/**
-	 * Main here is just to test out adding a card through the console, would be deleted when functionality
-	 * added to SafeStore.java
-	 */
-	public static void main(String[] args) {
-		ConnectionSource databaseConnection;
-		String databaseUrl = "jdbc:sqlite:src/database/app.db";
-		try {
-			databaseConnection = new JdbcConnectionSource(databaseUrl);
-			@SuppressWarnings("resource")
-			Scanner keyboard = new Scanner(System.in);
-			//			System.out.println("Would you like to add a Website Account, Credit Card, or Debit Card?");
-			//			String userInput = keyboard.nextLine();
-			//			while (!userInput.trim().equals("WebsiteAccount") && !userInput.trim().equals("Credit Card") && !userInput.trim().equals("Debit Card")) {
-			//				System.out.println("Enter 'Website Account', 'Credit Card', or 'Debit Card'");
-			//		        userInput = keyboard.nextLine();
-			//		    }
-			//			if(userInput.equals("Credit Card")) {
-			//				User safeStoreUser = new User("testUser", "testPassword");
-			//				CreditCard.addCreditCard(databaseConnection, keyboard, safeStoreUser);
-			//			}
-			User safeStoreUser = new User("testUser", "testPassword");
-			safeStoreUser.createSafeStoreAccountThroughDatabase(databaseConnection);
-			CreditCard.addCreditCard(databaseConnection, keyboard, safeStoreUser);
-//			CreditCard.updateCreditCardInformation(databaseConnection, keyboard, safeStoreUser);
-//			CreditCard.getCreditCardInformation(databaseConnection, keyboard, safeStoreUser);
-		}
-		catch (SQLException e) {
-			e.printStackTrace();
-		}
-	}
+	
 	public static boolean updateCreditCardInformation(String currentNickname, ConnectionSource databaseConnection, User safeStoreUser, String[] newInputs) {
 
 		try {
