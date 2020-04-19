@@ -11,6 +11,7 @@
 8. Modify Credit Card Information From UI #25
 9. Add Credit Card Information From UI #23
 10. View Credit Card Information From UI #26
+11. Credit/Debit Card Unique Nickname #64
 
 ## Iteration Three User Stories:
 1. Modify Debit Card Information From UI #29
