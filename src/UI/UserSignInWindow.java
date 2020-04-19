@@ -19,7 +19,6 @@ import com.j256.ormlite.jdbc.JdbcDatabaseConnection;
 import com.j256.ormlite.logger.LocalLog;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.support.DatabaseConnection;
-import com.sun.glass.events.WindowEvent;
 
 import user.User;
 

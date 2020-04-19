@@ -10,5 +10,5 @@ for i in `ls ../lib/*.jar`
     THE_CLASSPATH=${THE_CLASSPATH}:${i}
 done
 
-javac -classpath ".:${THE_CLASSPATH}" application/SafeStore.java
-java -classpath ".:${THE_CLASSPATH}" application.SafeStore
+javac -classpath ".:${THE_CLASSPATH}" UI/UIController.java
+java -classpath ".:${THE_CLASSPATH}" UI.UIController
