@@ -76,6 +76,7 @@ class debitCardTests {
 			e.printStackTrace();
 		}
 	}
+	
 	@AfterEach
 	public void tearDown() {
 		testAddress.deleteAddress(databaseConnection);
@@ -93,6 +94,7 @@ class debitCardTests {
 		DebitCard testDebitCard = new DebitCard(testUser, "4323 3249 2013 3232", "04/34", "123", "1234", testAddress);
 		assertTrue(testDebitCard.getNickname().equals("3232"), "Default nickname was not the last four digits");
 	}
+	
 	@Test
 	void testAddDebitCardExistingAddressDefaultNickname() {
 		System.out.println("RUNNING TEST: testAddDebitCardExistingAddressDefaultNickname");
@@ -146,137 +148,7 @@ class debitCardTests {
 			e1.printStackTrace();
 		}
 	}
-	@Test
-	void testStaticAddDebitCardDefaultNickname() {
-		System.out.println("RUNNING TEST: testStaticAddDebitCardDefaultNickname");
-
-		String encryptedDebitCardNumber = Encryption.encrypt("1234567890");
-		String expectedNickname = "7890";
-		String expectedExpDate = "04/23";
-		String expectedCvv = "321";
-		String expectedPin = "4321";
-		String expectedStreetAddress = "456 lazy rd";
-		String expectedCity = "STL";
-		String expectedState = "MO";
-		String expectedZipCode = "54321";
-
-
-		File file = new File("test/cardTests/addDebitCardDefaultNicknameInput.txt");
-		try {
-			UserEntity returnedUser = userDao.queryForSameId(testUserEntity);
-			ForeignCollection<DebitCardEntity> usersAssociatedDebitCards = returnedUser.getDebitCards();
-			int initialNumCards = usersAssociatedDebitCards.size();
-
-			Scanner keyboard = new Scanner(file);
-			boolean result = DebitCard.addDebitCard(databaseConnection, keyboard, testUser);
-
-			assertTrue(result, "Should return true if debit card is added");
-
-			Map<String, Object> addressQueryParams = new HashMap<String, Object>();
-			addressQueryParams.put("street_address", Encryption.encrypt(expectedStreetAddress));
-			addressQueryParams.put("city", Encryption.encrypt(expectedCity));
-			addressQueryParams.put("state", Encryption.encrypt(expectedState));
-			addressQueryParams.put("zip_code", Encryption.encrypt(expectedZipCode));
-
-			try {
-				List<AddressEntity> returnedAddresses = addressDao.queryForFieldValues(addressQueryParams);
-				String errMsg = "Only one address should exist in the table with this particular street address, city, state, and zip code";
-				assertTrue(returnedAddresses.size() == 1, errMsg);
-
-				AddressEntity returnedAddressEntity = returnedAddresses.get(0);
-				ForeignCollection<DebitCardEntity> associatedDebitCards = returnedAddressEntity.getDebitCards();
-				assertTrue(associatedDebitCards.size() == 1, "Address should only have one card associated with it");
-
-				returnedUser = userDao.queryForSameId(testUserEntity);
-				usersAssociatedDebitCards = returnedUser.getDebitCards();
-				int newNumCards = usersAssociatedDebitCards.size();
-				assertTrue(initialNumCards + 1 == newNumCards, "User should have a debit card added to their collection");
-
-				Dao<DebitCardEntity, String> debitCardDao = DaoManager.createDao(databaseConnection, DebitCardEntity.class);
-				DebitCardEntity queriedCard = debitCardDao.queryForId(encryptedDebitCardNumber);
-				DebitCard queriedDebitCard = new DebitCard(queriedCard);
-				assertTrue(queriedDebitCard.getNickname().equals(expectedNickname), "Nickname doesn't match");
-				assertTrue(queriedDebitCard.getCardNumber().equals("1234567890"), "Debit card number doesn't match");
-				assertTrue(queriedDebitCard.getExpirationDate().equals(expectedExpDate), "Expiration date doesn't match");
-				assertTrue(queriedDebitCard.getCvv().equals(expectedCvv), "CVV doesn't match");
-				assertTrue(queriedDebitCard.getPin().equals(expectedPin), "Pin doesn't match");
-
-				addressDao.delete(returnedAddressEntity);
-				debitCardDao.delete(queriedCard);
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}	
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	@Test
-	void testStaticAddDebitCardWithNickname() {
-		System.out.println("RUNNING TEST: testStaticAddDebitCardWithNickname");
-
-		String encryptedDebitCardNumber = Encryption.encrypt("1234567890");
-		String expectedExpDate = "03/24";
-		String expectedCvv = "123";
-		String expectedNickname = "CSR";
-		String expectedStreetAddress = "123 cherry ln";
-		String expectedCity = "STL";
-		String expectedState = "MO";
-		String expectedZipCode = "12345";
-		String expectedPin = "1234";
-
-		File file = new File("test/cardTests/addDebitCardWithNicknameInput.txt");
-		try {
-			UserEntity returnedUser = userDao.queryForSameId(testUserEntity);
-			ForeignCollection<DebitCardEntity> usersAssociatedDebitCards = returnedUser.getDebitCards();
-			int initialNumCards = usersAssociatedDebitCards.size();
-
-			Scanner keyboard = new Scanner(file);
-			boolean result = DebitCard.addDebitCard(databaseConnection, keyboard, testUser);
-
-			assertTrue(result, "Should return true if debit card is added");
-
-			Map<String, Object> addressQueryParams = new HashMap<String, Object>();
-			addressQueryParams.put("street_address", Encryption.encrypt(expectedStreetAddress));
-			addressQueryParams.put("city", Encryption.encrypt(expectedCity));
-			addressQueryParams.put("state", Encryption.encrypt(expectedState));
-			addressQueryParams.put("zip_code", Encryption.encrypt(expectedZipCode));
-
-			try {
-				List<AddressEntity> returnedAddresses = addressDao.queryForFieldValues(addressQueryParams);
-				String errMsg = "Only one address should exist in the table with this particular street address, city, state, and zip code";
-				assertTrue(returnedAddresses.size() == 1, errMsg);
-
-				AddressEntity returnedAddressEntity = returnedAddresses.get(0);
-				ForeignCollection<DebitCardEntity> associatedDebitCards = returnedAddressEntity.getDebitCards();
-				assertTrue(associatedDebitCards.size() == 1, "Address should only have one card associated with it");
-
-
-				returnedUser = userDao.queryForSameId(testUserEntity);
-				usersAssociatedDebitCards = returnedUser.getDebitCards();
-				int newNumCards = usersAssociatedDebitCards.size();
-				assertTrue(initialNumCards + 1 == newNumCards, "User should have a debit card added to their collection");
-
-				Dao<DebitCardEntity, String> debitCardDao = DaoManager.createDao(databaseConnection, DebitCardEntity.class);
-				DebitCardEntity queriedCard = debitCardDao.queryForId(encryptedDebitCardNumber);
-				DebitCard queriedDebitCard = new DebitCard(queriedCard);
-				assertTrue(queriedDebitCard.getNickname().equals(expectedNickname), "Nickname doesn't match");
-				assertTrue(queriedDebitCard.getCardNumber().equals("1234567890"), "Debit card number doesn't match");
-				assertTrue(queriedDebitCard.getExpirationDate().equals(expectedExpDate), "Expiration date doesn't match");
-				assertTrue(queriedDebitCard.getCvv().equals(expectedCvv), "CVV doesn't match");
-				assertTrue(queriedDebitCard.getPin().equals(expectedPin), "Pin doesn't match");
-
-				addressDao.delete(returnedAddressEntity);
-				debitCardDao.delete(queriedCard);
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+	
 	@Test
 	void testGetDebitCardFromNickname() {
 		String nickname = "nickyname";
@@ -304,229 +176,6 @@ class debitCardTests {
 			}
 
 			debitCardDao.delete(testDebitCardEntity);
-		} catch (SQLException e) {			
-			e.printStackTrace();
-			fail("Error inserting test card (Database failure)");
-		}
-	}
-
-
-	@Test
-	void testGetDebitCardInformationAll() {
-		String nickname = "testNickname";
-		String cardNumber = "99998888877776666";
-		String expirationDate = "04/23";
-		String cvv = "987";
-		String pin = "6789";
-		try {
-			DebitCard testDebitCard = new DebitCard(testUser, nickname, cardNumber, expirationDate, cvv, pin, testAddress);
-			DebitCardEntity testDebitCardEntity = testDebitCard.getDebitCardEntity();
-			Dao<DebitCardEntity, String> debitCardDao = DaoManager.createDao(databaseConnection, DebitCardEntity.class);
-			debitCardDao.create(testDebitCardEntity);
-			String expectedOutput = testDebitCard.toString();
-			try {
-				File userInput = new File("test/cardTests/getAllInput.txt");
-				Scanner keyboard = new Scanner(userInput);
-				String output = DebitCard.getDebitCardInformation(databaseConnection, keyboard, testUser);
-				assertTrue(output.equals(expectedOutput), "Expected: " + expectedOutput + " but got: " + output);
-
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-				debitCardDao.delete(testDebitCardEntity);			
-				fail("Error with user input text file");
-			}
-
-			debitCardDao.delete(testDebitCardEntity);			
-		} catch (SQLException e) {			
-			e.printStackTrace();
-			fail("Error inserting test card (Database failure)");
-		}
-	}
-
-	@Test 
-	void testGetDebitCardInformaitonBillingAddress() {
-		String nickname = "testNickname";
-		String cardNumber = "9999888886666";
-		String expirationDate = "04/23";
-		String cvv = "987";
-		String pin = "6789";
-		try {
-			DebitCard testDebitCard = new DebitCard(testUser, nickname, cardNumber, expirationDate, cvv, pin, testAddress);
-			DebitCardEntity testDebitCardEntity = testDebitCard.getDebitCardEntity();
-			Dao<DebitCardEntity, String> debitCardDao = DaoManager.createDao(databaseConnection, DebitCardEntity.class);
-			debitCardDao.create(testDebitCardEntity);
-			String expectedOutput = testDebitCard.getBillingAddress();
-			try {
-				File userInput = new File("test/cardTests/getBillingAddressInput.txt");
-				Scanner keyboard = new Scanner(userInput);
-				String output = DebitCard.getDebitCardInformation(databaseConnection, keyboard, testUser);
-				assertTrue(output.equals(expectedOutput), "Expected: " + expectedOutput + " but got: " + output);
-
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-				debitCardDao.delete(testDebitCardEntity);			
-				fail("Error with user input text file");
-			}
-
-			debitCardDao.delete(testDebitCardEntity);			
-		} catch (SQLException e) {			
-			e.printStackTrace();
-			fail("Error inserting test card (Database failure)");
-		}
-	}
-
-	@Test
-	void testGetDebitCardInformationCardNumber() {
-		String nickname = "testNickname";
-		String cardNumber = "99998888877776666";
-		String expirationDate = "04/23";
-		String cvv = "987";
-		String pin = "6789";
-		try {
-			DebitCard testDebitCard = new DebitCard(testUser, nickname, cardNumber, expirationDate, cvv, pin, testAddress);
-			DebitCardEntity testDebitCardEntity = testDebitCard.getDebitCardEntity();
-			Dao<DebitCardEntity, String> debitCardDao = DaoManager.createDao(databaseConnection, DebitCardEntity.class);
-			debitCardDao.create(testDebitCardEntity);
-			String expectedOutput = testDebitCard.getCardNumber();
-			try {
-				File userInput = new File("test/cardTests/getCardNumberInput.txt");
-				Scanner keyboard = new Scanner(userInput);
-				String output = DebitCard.getDebitCardInformation(databaseConnection, keyboard, testUser);
-				assertTrue(output.equals(expectedOutput), "Expected: " + expectedOutput + " but got: " + output);
-
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-				debitCardDao.delete(testDebitCardEntity);			
-				fail("Error with user input text file");
-			}
-
-			debitCardDao.delete(testDebitCardEntity);			
-		} catch (SQLException e) {			
-			e.printStackTrace();
-			fail("Error inserting test card (Database failure)");
-		}
-	}
-
-	@Test 
-	void testGetDebitCardInformationCvv() {
-		String nickname = "testNickname";
-		String cardNumber = "99998888877776666";
-		String expirationDate = "04/23";
-		String cvv = "987";
-		String pin = "6789";
-		try {
-			DebitCard testDebitCard = new DebitCard(testUser, nickname, cardNumber, expirationDate, cvv, pin, testAddress);
-			DebitCardEntity testDebitCardEntity = testDebitCard.getDebitCardEntity();
-			Dao<DebitCardEntity, String> debitCardDao = DaoManager.createDao(databaseConnection, DebitCardEntity.class);
-			debitCardDao.create(testDebitCardEntity);
-			String expectedOutput = testDebitCard.getCvv();
-			try {
-				File userInput = new File("test/cardTests/getCvvInput.txt");
-				Scanner keyboard = new Scanner(userInput);
-				String output = DebitCard.getDebitCardInformation(databaseConnection, keyboard, testUser);
-				assertTrue(output.equals(expectedOutput), "Expected: " + expectedOutput + " but got: " + output);
-
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-				debitCardDao.delete(testDebitCardEntity);			
-				fail("Error with user input text file");
-			}
-
-			debitCardDao.delete(testDebitCardEntity);			
-		} catch (SQLException e) {			
-			e.printStackTrace();
-			fail("Error inserting test card (Database failure)");
-		}
-	}
-	@Test 
-	void testGetDebitCardInformationPin() {
-		String nickname = "testNickname";
-		String cardNumber = "99998888877776666";
-		String expirationDate = "04/23";
-		String cvv = "987";
-		String pin = "6789";
-		try {
-			DebitCard testDebitCard = new DebitCard(testUser, nickname, cardNumber, expirationDate, cvv, pin, testAddress);
-			DebitCardEntity testDebitCardEntity = testDebitCard.getDebitCardEntity();
-			Dao<DebitCardEntity, String> debitCardDao = DaoManager.createDao(databaseConnection, DebitCardEntity.class);
-			debitCardDao.create(testDebitCardEntity);
-			String expectedOutput = testDebitCard.getPin();
-			try {
-				File userInput = new File("test/cardTests/getPinInput.txt");
-				Scanner keyboard = new Scanner(userInput);
-				String output = DebitCard.getDebitCardInformation(databaseConnection, keyboard, testUser);
-				assertTrue(output.equals(expectedOutput), "Expected: " + expectedOutput + " but got: " + output);
-
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-				debitCardDao.delete(testDebitCardEntity);			
-				fail("Error with user input text file");
-			}
-
-			debitCardDao.delete(testDebitCardEntity);			
-		} catch (SQLException e) {			
-			e.printStackTrace();
-			fail("Error inserting test card (Database failure)");
-		}
-	}
-	@Test
-	void testGetDebitCardInformationExpDate() {
-		String nickname = "testNickname";
-		String cardNumber = "99998888877776666";
-		String expirationDate = "04/23";
-		String cvv = "987";
-		String pin = "6789";
-		try {
-			DebitCard testDebitCard = new DebitCard(testUser, nickname, cardNumber, expirationDate, cvv, pin, testAddress);
-			DebitCardEntity testDebitCardEntity = testDebitCard.getDebitCardEntity();
-			Dao<DebitCardEntity, String> debitCardDao = DaoManager.createDao(databaseConnection, DebitCardEntity.class);
-			debitCardDao.create(testDebitCardEntity);
-			String expectedOutput = testDebitCard.getExpirationDate();
-			try {
-				File userInput = new File("test/cardTests/getExpDateInput.txt");
-				Scanner keyboard = new Scanner(userInput);
-				String output = DebitCard.getDebitCardInformation(databaseConnection, keyboard, testUser);
-				assertTrue(output.equals(expectedOutput), "Expected: " + expectedOutput + " but got: " + output);
-
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-				debitCardDao.delete(testDebitCardEntity);			
-				fail("Error with user input text file");
-			}
-
-			debitCardDao.delete(testDebitCardEntity);			
-		} catch (SQLException e) {			
-			e.printStackTrace();
-			fail("Error inserting test card (Database failure)");
-		}
-	}
-
-	@Test
-	void testGetDebitCardInformationZipCode() {
-		String nickname = "testNickname";
-		String cardNumber = "99998888877776666";
-		String expirationDate = "04/23";
-		String cvv = "987";
-		String pin = "6789";
-		try {
-			DebitCard testDebitCard = new DebitCard(testUser, nickname, cardNumber, expirationDate, cvv, pin, testAddress);
-			DebitCardEntity testDebitCardEntity = testDebitCard.getDebitCardEntity();
-			Dao<DebitCardEntity, String> debitCardDao = DaoManager.createDao(databaseConnection, DebitCardEntity.class);
-			debitCardDao.create(testDebitCardEntity);
-			String expectedOutput = testDebitCard.getZipCode();
-			try {
-				File userInput = new File("test/cardTests/getZipCodeInput.txt");
-				Scanner keyboard = new Scanner(userInput);
-				String output = DebitCard.getDebitCardInformation(databaseConnection, keyboard, testUser);
-				assertTrue(output.equals(expectedOutput), "Expected: " + expectedOutput + " but got: " + output);
-
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-				debitCardDao.delete(testDebitCardEntity);			
-				fail("Error with user input text file");
-			}
-
-			debitCardDao.delete(testDebitCardEntity);			
 		} catch (SQLException e) {			
 			e.printStackTrace();
 			fail("Error inserting test card (Database failure)");
@@ -874,25 +523,22 @@ class debitCardTests {
 			DebitCardEntity testDebitCardEntity = testDebitCard.getDebitCardEntity();
 			Dao<DebitCardEntity, String> debitCardDao = DaoManager.createDao(databaseConnection, DebitCardEntity.class);
 			debitCardDao.create(testDebitCardEntity);
+				
+			//0: nickname, 1: card number, 2: expiration date, 3: cvv, 4: pin, 5: st address, 6: city, 7: state, 8: zip 
+			String[] newInputs = {"name", "", "","", "", "","", "", ""};
+			boolean result = DebitCard.updateDebitCardInformation(nickname, databaseConnection, testUser, newInputs);
+			assertTrue(result, "Should have returned true if updated debit card");
 
-			try {
-				File userInput = new File("test/cardTests/updateCardNicknameInput.txt");
-				Scanner keyboard = new Scanner(userInput);
-				boolean result = DebitCard.updateDebitCardInformation(databaseConnection, keyboard, testUser);
-				assertTrue(result, "Should have returned true if updated debit card");
+			DebitCardEntity queriedEntity = debitCardDao.queryForId(Encryption.encrypt(cardNumber));
+			assertFalse(queriedEntity==null, "Should have found debit card in the database still");
 
-				DebitCardEntity queriedEntity = debitCardDao.queryForId(Encryption.encrypt(cardNumber));
-				assertFalse(queriedEntity==null, "Should have found debit card in the database still");
-
-				DebitCard queriedDebitCard = new DebitCard(queriedEntity);
-				String gottenNickname = queriedDebitCard.getNickname();
-				assertTrue(gottenNickname.equals("name"), "Nickname was not updated. Expected 'name' but got: " + gottenNickname);
-
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-				debitCardDao.delete(testDebitCardEntity);			
-				fail("Error with user input text file");
-			}
+			DebitCard queriedDebitCard = new DebitCard(queriedEntity);
+			String gottenNickname = queriedDebitCard.getNickname();
+			assertTrue(gottenNickname.equals("name"), "Nickname was not updated. Expected 'name' but got: " + gottenNickname);
+			assertTrue(queriedDebitCard.getCardNumber().equals(cardNumber), "Card number did not remain the same. Expected '92347109485193857' but got: " + queriedDebitCard.getCardNumber());
+			assertTrue(queriedDebitCard.getExpirationDate().equals(expirationDate), "Exp Date did not remain the same. Expected '04/23' but got: " + queriedDebitCard.getExpirationDate());
+			assertTrue(queriedDebitCard.getCvv().equals(cvv), "Cvv did not remain the same. Expected '988' but got: " + queriedDebitCard.getCvv());
+			assertTrue(queriedDebitCard.getPin().equals(pin), "Pin did not remain the same. Expected '6789' but got: " + queriedDebitCard.getPin());
 
 			debitCardDao.delete(testDebitCardEntity);			
 		} catch (SQLException e) {			
@@ -914,29 +560,27 @@ class debitCardTests {
 			DebitCardEntity testDebitCardEntity = testDebitCard.getDebitCardEntity();
 			Dao<DebitCardEntity, String> debitCardDao = DaoManager.createDao(databaseConnection, DebitCardEntity.class);
 			debitCardDao.create(testDebitCardEntity);
+			
+			//0: nickname, 1: card number, 2: expiration date, 3: cvv, 4: pin, 5: st address, 6: city, 7: state, 8: zip 
+			String[] newInputs = {"", "8888888888888888", "", "", "", "", "", "", ""};
+			boolean result = DebitCard.updateDebitCardInformation(nickname, databaseConnection, testUser, newInputs);
+			assertTrue(result, "Should have returned true if updated debit card");
 
-			try {
-				File userInput = new File("test/cardTests/updateCardNumInput.txt");
-				Scanner keyboard = new Scanner(userInput);
-				boolean result = DebitCard.updateDebitCardInformation(databaseConnection, keyboard, testUser);
-				assertTrue(result, "Should have returned true if updated debit card");
+			DebitCardEntity queriedEntity = debitCardDao.queryForId(Encryption.encrypt("8888888888888888"));
+			assertFalse(queriedEntity==null, "card number not updated");
 
-				DebitCardEntity queriedEntity = debitCardDao.queryForId(Encryption.encrypt("8888888888888888"));
-				assertFalse(queriedEntity==null, "card number not updated");
+			DebitCard queriedCard = new DebitCard(queriedEntity);
+			String queriedCardNumber = queriedCard.getCardNumber();
+			assertTrue(queriedCardNumber.equals("8888888888888888"), "Card Number was not updated. Expected: 8888888888888888 but got: " + queriedCardNumber);
+			assertTrue(queriedCard.getNickname().equals(nickname), "Nickname did not remain the same. Expected 'card' but got: " + queriedCard.getNickname());
+			assertTrue(queriedCard.getExpirationDate().equals(expirationDate), "Card expiration date did not remain the same. Expected '04/23' but got: " + queriedCard.getExpirationDate());
+			assertTrue(queriedCard.getCvv().equals(cvv), "Cvv did not remain the same. Expected '988' but got: " + queriedCard.getCvv());
+			assertTrue(queriedCard.getPin().equals(pin), "Pin did not remain the same. Expected '6789' but got: " + queriedCard.getPin());
+			
+			DebitCardEntity queriedOldNum = debitCardDao.queryForId(Encryption.encrypt(cardNumber));
+			assertTrue(queriedOldNum==null, "No card should exist with old number");
 
-				DebitCard queriedCard = new DebitCard(queriedEntity);
-				String queriedCardNumber = queriedCard.getCardNumber();
-				assertTrue(queriedCardNumber.equals("8888888888888888"), "Card Number was not updated. Expected: 8888888888888888 but got: " + queriedCardNumber);
-
-				DebitCardEntity queriedOldNum = debitCardDao.queryForId(Encryption.encrypt(cardNumber));
-				assertTrue(queriedOldNum==null, "No card should exist with old number");
-
-				debitCardDao.delete(queriedEntity);
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-				debitCardDao.delete(testDebitCardEntity);			
-				fail("Error with user input text file");
-			}
+			debitCardDao.delete(queriedEntity);
 
 		} catch (SQLException e) {			
 			e.printStackTrace();
@@ -956,27 +600,24 @@ class debitCardTests {
 			DebitCardEntity testDebitCardEntity = testDebitCard.getDebitCardEntity();
 			Dao<DebitCardEntity, String> debitCardDao = DaoManager.createDao(databaseConnection, DebitCardEntity.class);
 			debitCardDao.create(testDebitCardEntity);
+			
+			//0: nickname, 1: card number, 2: expiration date, 3: cvv, 4: pin, 5: st address, 6: city, 7: state, 8: zip 
+			String[] newInputs = {"", "", "04/30", "", "", "", "", "", ""};
+			boolean result = DebitCard.updateDebitCardInformation(nickname, databaseConnection, testUser, newInputs);
+			assertTrue(result, "Should have returned true if updated debit card");
 
-			try {
-				File userInput = new File("test/cardTests/updateCardExpDateInput.txt");
-				Scanner keyboard = new Scanner(userInput);
-				boolean result = DebitCard.updateDebitCardInformation(databaseConnection, keyboard, testUser);
-				assertTrue(result, "Should have returned true if updated debit card");
+			DebitCardEntity queriedEntity = debitCardDao.queryForId(Encryption.encrypt(cardNumber));
+			assertFalse(queriedEntity==null, "card not found in database");
 
-				DebitCardEntity queriedEntity = debitCardDao.queryForId(Encryption.encrypt(cardNumber));
-				assertFalse(queriedEntity==null, "card not found in database");
+			DebitCard queriedCard = new DebitCard(queriedEntity);
+			String queriedExpDate= queriedCard.getExpirationDate();
+			assertTrue(queriedExpDate.equals("04/30"), "Expiration date was not updated. Expected: 04/30 but got: " + queriedExpDate);
+			assertTrue(queriedCard.getCardNumber().equals(cardNumber), "Card number did not remain the same. Expected '48537459283001394' but got: " + queriedCard.getCardNumber());
+			assertTrue(queriedCard.getNickname().equals(nickname), "Nickname did not remain the same. Expected 'C1' but got: " + queriedCard.getNickname());
+			assertTrue(queriedCard.getCvv().equals(cvv), "Card CVV did not remain the same. Expected '908' but got: " + queriedCard.getCvv());
+			assertTrue(queriedCard.getPin().equals(pin), "Card pin did not remain the same. Expected '6789' but got: " + queriedCard.getPin());
 
-				DebitCard queriedCard = new DebitCard(queriedEntity);
-				String queriedExpDate= queriedCard.getExpirationDate();
-				assertTrue(queriedExpDate.equals("04/30"), "Card Number was not updated. Expected: 04/30 but got: " + queriedExpDate);
-
-
-				debitCardDao.delete(queriedEntity);
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-				debitCardDao.delete(testDebitCardEntity);			
-				fail("Error with user input text file");
-			}
+			debitCardDao.delete(queriedEntity);
 
 		} catch (SQLException e) {			
 			e.printStackTrace();
@@ -998,26 +639,25 @@ class debitCardTests {
 			Dao<DebitCardEntity, String> debitCardDao = DaoManager.createDao(databaseConnection, DebitCardEntity.class);
 			debitCardDao.create(testDebitCardEntity);
 
-			try {
-				File userInput = new File("test/cardTests/updateCardCvvInput.txt");
-				Scanner keyboard = new Scanner(userInput);
-				boolean result = DebitCard.updateDebitCardInformation(databaseConnection, keyboard, testUser);
-				assertTrue(result, "Should have returned true if updated debit card");
+			//0: nickname, 1: card number, 2: expiration date, 3: cvv, 4: pin, 5: st address, 6: city, 7: state, 8: zip 
+			String[] newInputs = {"", "", "", "669", "", "", "", "", ""};
+			boolean result = DebitCard.updateDebitCardInformation(nickname, databaseConnection, testUser, newInputs);
+			assertTrue(result, "Should have returned true if updated debit card");
 
-				DebitCardEntity queriedEntity = debitCardDao.queryForId(Encryption.encrypt(cardNumber));
-				assertFalse(queriedEntity==null, "card not found in database");
+			DebitCardEntity queriedEntity = debitCardDao.queryForId(Encryption.encrypt(cardNumber));
+			assertFalse(queriedEntity==null, "card not found in database");
 
-				DebitCard queriedCard = new DebitCard(queriedEntity);
-				String queriedCvv= queriedCard.getCvv();
-				assertTrue(queriedCvv.equals("669"), "Card Number was not updated. Expected: 669 but got: " + queriedCvv);
+			DebitCard queriedCard = new DebitCard(queriedEntity);
+			String queriedCvv= queriedCard.getCvv();
+			assertTrue(queriedCvv.equals("669"), "CVV was not updated. Expected: 669 but got: " + queriedCvv);
+			assertTrue(queriedCard.getExpirationDate().equals(expirationDate), "Card Expiration date did not remain the same. Expected: 04/23 but got: " + queriedCard.getExpirationDate());
+			assertTrue(queriedCard.getCardNumber().equals(cardNumber), "Card number did not remain the same. Expected '48537459283001394' but got: " + queriedCard.getCardNumber());
+			assertTrue(queriedCard.getNickname().equals(nickname), "Nickname did not remain the same. Expected '7up' but got: " + queriedCard.getNickname());
+			assertTrue(queriedCard.getPin().equals(pin), "Card pin did not remain the same. Expected '6789' but got: " + queriedCard.getPin());
 
+			
 
-				debitCardDao.delete(queriedEntity);
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-				debitCardDao.delete(testDebitCardEntity);			
-				fail("Error with user input text file");
-			}
+			debitCardDao.delete(queriedEntity);
 
 		} catch (SQLException e) {			
 			e.printStackTrace();
@@ -1038,27 +678,24 @@ class debitCardTests {
 			DebitCardEntity testDebitCardEntity = testDebitCard.getDebitCardEntity();
 			Dao<DebitCardEntity, String> debitCardDao = DaoManager.createDao(databaseConnection, DebitCardEntity.class);
 			debitCardDao.create(testDebitCardEntity);
+	
+			//0: nickname, 1: card number, 2: expiration date, 3: cvv, 4: pin, 5: st address, 6: city, 7: state, 8: zip 
+			String[] newInputs = {"", "", "", "", "1111", "", "", "", ""};
+			boolean result = DebitCard.updateDebitCardInformation(nickname, databaseConnection, testUser, newInputs);
+			assertTrue(result, "Should have returned true if updated debit card");
 
-			try {
-				File userInput = new File("test/cardTests/updateDebitCardPinInput.txt");
-				Scanner keyboard = new Scanner(userInput);
-				boolean result = DebitCard.updateDebitCardInformation(databaseConnection, keyboard, testUser);
-				assertTrue(result, "Should have returned true if updated debit card");
+			DebitCardEntity queriedEntity = debitCardDao.queryForId(Encryption.encrypt(cardNumber));
+			assertFalse(queriedEntity==null, "card not found in database");
 
-				DebitCardEntity queriedEntity = debitCardDao.queryForId(Encryption.encrypt(cardNumber));
-				assertFalse(queriedEntity==null, "card not found in database");
+			DebitCard queriedCard = new DebitCard(queriedEntity);
+			String queriedPin= queriedCard.getPin();
+			assertTrue(queriedPin.equals("1111"), "Pin was not updated. Expected: 6699 but got: " + queriedPin);
+			assertTrue(queriedCard.getExpirationDate().equals(expirationDate), "Card Expiration date did not remain the same. Expected: 04/23 but got: " + queriedCard.getExpirationDate());
+			assertTrue(queriedCard.getCardNumber().equals(cardNumber), "Card number did not remain the same. Expected '48537459283001394' but got: " + queriedCard.getCardNumber());
+			assertTrue(queriedCard.getNickname().equals(nickname), "Nickname did not remain the same. Expected '7up' but got: " + queriedCard.getNickname());
+			assertTrue(queriedCard.getCvv().equals(cvv), "Card CVV did not remain the same. Expected '908' but got: " + queriedCard.getCvv());
 
-				DebitCard queriedCard = new DebitCard(queriedEntity);
-				String queriedPin= queriedCard.getPin();
-				assertTrue(queriedPin.equals("6699"), "Pin was not updated. Expected: 6699 but got: " + queriedPin);
-
-
-				debitCardDao.delete(queriedEntity);
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-				debitCardDao.delete(testDebitCardEntity);			
-				fail("Error with user input text file");
-			}
+			debitCardDao.delete(queriedEntity);
 
 		} catch (SQLException e) {			
 			e.printStackTrace();
@@ -1079,31 +716,35 @@ class debitCardTests {
 			Dao<DebitCardEntity, String> debitCardDao = DaoManager.createDao(databaseConnection, DebitCardEntity.class);
 			debitCardDao.create(testDebitCardEntity);
 
-			try {
-				File userInput = new File("test/cardTests/updateCardBillingAddressInput.txt");
-				Scanner keyboard = new Scanner(userInput);
-				boolean result = DebitCard.updateDebitCardInformation(databaseConnection, keyboard, testUser);
-				assertTrue(result, "Should have returned true if updated debit card");
+			String stAddress = "6820 Redwood Ave";
+			String city = "Redwood City";
+			String state = "CA";
+			String zip = "11111";
+			
+			//0: nickname, 1: card number, 2: expiration date, 3: cvv, 4: pin, 5: st address, 6: city, 7: state, 8: zip 
+			String[] newInputs = {"", "", "", "", "", stAddress, city, state, zip};
+			boolean result = DebitCard.updateDebitCardInformation(nickname, databaseConnection, testUser, newInputs);
+			assertTrue(result, "Should have returned true if updated debit card");
 
-				DebitCardEntity queriedEntity = debitCardDao.queryForId(Encryption.encrypt(cardNumber));
-				assertFalse(queriedEntity==null, "card not found in database");
+			DebitCardEntity queriedEntity = debitCardDao.queryForId(Encryption.encrypt(cardNumber));
+			assertFalse(queriedEntity==null, "card not found in database");
 
-				DebitCard queriedCard = new DebitCard(queriedEntity);
-				String queriedBillingAddress = queriedCard.getBillingAddress();
-				Address expectedAddress = new Address("999 9th st", "Miami", "FL", "23423");
-				String expectedAddressString = expectedAddress.getFullAddress();
-				assertTrue(queriedBillingAddress.equals(expectedAddressString), "Card Number was not updated. Expected: " + expectedAddressString + "but got: " + queriedBillingAddress);
+			DebitCard queriedCard = new DebitCard(queriedEntity);
+			String queriedBillingAddress = queriedCard.getBillingAddress();
+			Address expectedAddress = new Address(stAddress, city, state, zip);
+			String expectedAddressString = expectedAddress.getFullAddress();
+			assertTrue(queriedBillingAddress.equals(expectedAddressString), "Card Address was not updated. Expected: " + expectedAddressString + "but got: " + queriedBillingAddress);
+			assertTrue(queriedCard.getExpirationDate().equals(expirationDate), "Card Expiration date did not remain the same. Expected: 04/23 but got: " + queriedCard.getExpirationDate());
+			assertTrue(queriedCard.getCardNumber().equals(cardNumber), "Card number did not remain the same. Expected '48537459283001394' but got: " + queriedCard.getCardNumber());
+			assertTrue(queriedCard.getNickname().equals(nickname), "Nickname did not remain the same. Expected '7up' but got: " + queriedCard.getNickname());
+			assertTrue(queriedCard.getCvv().equals(cvv), "Card CVV did not remain the same. Expected '908' but got: " + queriedCard.getCvv());
+			assertTrue(queriedCard.getPin().equals(pin), "Card pin did not remain the same. Expected '6789' but got: " + queriedCard.getPin());
+			
+			expectedAddress.updateToExistingAddress(databaseConnection);
+			expectedAddress.deleteAddress(databaseConnection);
 
-				expectedAddress.updateToExistingAddress(databaseConnection);
-				expectedAddress.deleteAddress(databaseConnection);
-
-				debitCardDao.delete(queriedEntity);
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-				debitCardDao.delete(testDebitCardEntity);			
-				fail("Error with user input text file");
-			}
-
+			debitCardDao.delete(queriedEntity);
+			
 		} catch (SQLException e) {			
 			e.printStackTrace();
 			fail("Error inserting test card (Database failure)");

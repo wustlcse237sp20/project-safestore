@@ -117,5 +117,37 @@ public class UIController {
 		String[] newInputs = {nickname,cardNumber,expDate,cvv,streetAddress,city,state,zip};
 		return CreditCard.updateCreditCardInformation(currentNickname, databaseConnection, safeStoreUser, newInputs);
 	}
+	
+	public static DebitCard getDebitCardInfo(String nickname) {
+		DebitCard debitCard = null;
+		try {
+			debitCard = DebitCard.getDebitCardFromNickname(nickname, safeStoreUser, databaseConnection);
+		} catch (Exception e) {
+
+		}
+		return debitCard;
+
+	}
+	
+	public static boolean addDebitCard(String cardNumber, String nickname,String expDate, String cvv, String pin, String streetAddress, String city, String state, String zip) {
+		Address billingAddress = new Address(streetAddress, city, state, zip);
+		DebitCard debitCard;
+		if(!nickname.isEmpty()) {
+			debitCard = new DebitCard(safeStoreUser, nickname, cardNumber, expDate, cvv, pin, billingAddress);
+		}
+		else {
+			debitCard = new DebitCard(safeStoreUser, cardNumber, expDate, cvv, pin, billingAddress);
+		}
+		try {
+			return debitCard.addCard(databaseConnection);
+		} catch (Exception e) {
+			return false;
+		}
+	}
+
+	public static boolean modifyDebitCard(String currentNickname, String nickname, String cardNumber,String expDate, String cvv, String pin, String streetAddress, String city, String state, String zip) {
+		String[] newInputs = {nickname,cardNumber,expDate,cvv,pin,streetAddress,city,state,zip};
+		return DebitCard.updateDebitCardInformation(currentNickname, databaseConnection, safeStoreUser, newInputs);
+	}
 
 }
