@@ -15,10 +15,11 @@ import tables.UserEntity;
 import user.User;
 import websiteAccount.WebsiteAccount;
 
-public class UIController {
+public class SafeStore {
 	static ConnectionSource databaseConnection;
 	static String databaseUrl;
 	static User safeStoreUser;
+	
 	public static void main(String[] args) {
 		// TODO Auto-generated constructor stub
 		System.setProperty(LocalLog.LOCAL_LOG_LEVEL_PROPERTY,"ERROR");
@@ -39,9 +40,11 @@ public class UIController {
 		return newUser.createSafeStoreAccountThroughDatabase(databaseConnection);
 
 	}
+	
 	public static boolean loginUser(String username, String password) {
 		return User.loginThroughDatabase(databaseConnection, username, password);		
 	}
+	
 	public static void setUserForSession(String username) {
 		Dao<UserEntity, String> userDao;
 		try {
@@ -57,6 +60,7 @@ public class UIController {
 		}
 
 	}
+	
 	public static WebsiteAccount getWebsiteAccountInfo(String nickname) {
 		WebsiteAccount website = null;
 		try {
@@ -66,6 +70,7 @@ public class UIController {
 		}
 		return website;
 	}
+	
 	public static boolean addWebsiteAccount(String nickname, String username, String password) {
 		WebsiteAccount websiteAccount = new WebsiteAccount(safeStoreUser, nickname, username, password);
 		return websiteAccount.addWebsiteAccount(databaseConnection);

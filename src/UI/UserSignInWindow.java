@@ -115,10 +115,10 @@ public class UserSignInWindow {
 				String passwordString = String.valueOf(password);
 
 				if(!passwordString.isEmpty() && !username.isEmpty()) {
-					boolean isLoggedIn = UIController.loginUser(username, passwordString); 
+					boolean isLoggedIn = SafeStore.loginUser(username, passwordString); 
 					if(isLoggedIn) {
 						// NEXT WINDOW
-						UIController.setUserForSession(username);
+						SafeStore.setUserForSession(username);
 					}
 					else {
 						JOptionPane.showMessageDialog(frame, "Username or password incorrect");
@@ -148,11 +148,11 @@ public class UserSignInWindow {
 							JOptionPane.showMessageDialog(frame, "Username and password must contain values");
 						}else {
 
-							boolean createdNewUser = UIController.createUser(newUsername.getText(),String.valueOf(newPassword.getPassword())); 
+							boolean createdNewUser = SafeStore.createUser(newUsername.getText(),String.valueOf(newPassword.getPassword())); 
 							if(createdNewUser) {
 								creatingUser = false;
 								//NEXT WINDOW
-								UIController.setUserForSession(newUsername.getText());
+								SafeStore.setUserForSession(newUsername.getText());
 
 							}else {
 								JOptionPane.showMessageDialog(frame, "Username taken, choose another");

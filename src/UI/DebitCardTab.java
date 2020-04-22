@@ -86,7 +86,7 @@ public class DebitCardTab {
 				if(debitCardSearchInput.getText().isEmpty()) {
 					JOptionPane.showMessageDialog(frame, "Enter the card's nickname (default is last 4 digits)");
 				}else {
-					DebitCard debitCard = UIController.getDebitCardInfo(debitCardSearchInput.getText());
+					DebitCard debitCard = SafeStore.getDebitCardInfo(debitCardSearchInput.getText());
 					if(debitCard != null) {
 						debitCardViewDisplay.setText(debitCard.toString());
 						debitCardSearchInput.setText("");
@@ -224,7 +224,7 @@ public class DebitCardTab {
 				if(debitCardAddNumberInput.getText().isEmpty() || debitCardAddExpDateInput.getText().isEmpty() || debitCardAddCvvInput.getText().isEmpty() || debitCardAddStAdressInput.getText().isEmpty() || debitCardAddCityInput.getText().isEmpty() || debitCardAddStateInput.getText().isEmpty() || debitCardAddZipInput.getText().isEmpty()) {
 					JOptionPane.showMessageDialog(frame, "All fields marked with * must have a value");
 				}else {
-					if(UIController.addDebitCard(debitCardAddNumberInput.getText(),debitCardAddNicknameInput.getText(),debitCardAddExpDateInput.getText(),debitCardAddCvvInput.getText(),debitCardAddPinInput.getText(),debitCardAddStAdressInput.getText(),debitCardAddCityInput.getText(),debitCardAddStateInput.getText(),debitCardAddZipInput.getText())) {
+					if(SafeStore.addDebitCard(debitCardAddNumberInput.getText(),debitCardAddNicknameInput.getText(),debitCardAddExpDateInput.getText(),debitCardAddCvvInput.getText(),debitCardAddPinInput.getText(),debitCardAddStAdressInput.getText(),debitCardAddCityInput.getText(),debitCardAddStateInput.getText(),debitCardAddZipInput.getText())) {
 						JOptionPane.showMessageDialog(frame, "Debit Card Added");
 						resetAddDebitCard();
 					}else {
@@ -367,7 +367,7 @@ public class DebitCardTab {
 				if(debitCardModifyCurrNicknameInput.getText().isEmpty()) {
 					JOptionPane.showMessageDialog(frame, "Enter a debit card to modify");
 				}else {
-					if(UIController.modifyDebitCard(debitCardModifyCurrNicknameInput.getText(),debitCardModifyNewNicknameInput.getText(),debitCardModifyNumInput.getText(),debitCardModifyExpDateInput.getText(),debitCardModifyCvvInput.getText(),debitCardModifyPinInput.getText(),debitCardModifyStAddressInput.getText(),debitCardModifyCityInput.getText(),debitCardModifyStateInput.getText(),debitCardModifyZipInput.getText())) {
+					if(SafeStore.modifyDebitCard(debitCardModifyCurrNicknameInput.getText(),debitCardModifyNewNicknameInput.getText(),debitCardModifyNumInput.getText(),debitCardModifyExpDateInput.getText(),debitCardModifyCvvInput.getText(),debitCardModifyPinInput.getText(),debitCardModifyStAddressInput.getText(),debitCardModifyCityInput.getText(),debitCardModifyStateInput.getText(),debitCardModifyZipInput.getText())) {
 						JOptionPane.showMessageDialog(frame, "Debit Card Updated");
 						resetModifyDebitCard();
 					}else {

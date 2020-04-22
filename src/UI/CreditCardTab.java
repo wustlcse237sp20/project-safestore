@@ -73,7 +73,7 @@ public class CreditCardTab {
 				if(creditCardSearchNicknameInput.getText().isEmpty()) {
 					JOptionPane.showMessageDialog(frame, "Enter the card's nickname (default is last 4 digits)");
 				}else {
-					CreditCard creditCard = UIController.getCreditCardInfo(creditCardSearchNicknameInput.getText());
+					CreditCard creditCard = SafeStore.getCreditCardInfo(creditCardSearchNicknameInput.getText());
 					if(creditCard != null) {
 						creditCardViewDisplay.setText(creditCard.toString());
 						creditCardSearchNicknameInput.setText("");
@@ -205,7 +205,7 @@ public class CreditCardTab {
 				if(creditCardAddNumberInput.getText().isEmpty() || creditCardAddExpDateInput.getText().isEmpty() || creditCardAddCVVInput.getText().isEmpty() || creditCardAddStreetAdressInput.getText().isEmpty() || creditCardAddCityInput.getText().isEmpty() || creditCardAddStateInput.getText().isEmpty() || creditCardAddZipInput.getText().isEmpty()) {
 					JOptionPane.showMessageDialog(frame, "All fields marked with * must have a value");
 				}else {
-					if(UIController.addCreditCard(creditCardAddNumberInput.getText(),creditCardAddNicknameInput.getText(),creditCardAddExpDateInput.getText(),creditCardAddCVVInput.getText(),creditCardAddStreetAdressInput.getText(),creditCardAddCityInput.getText(),creditCardAddStateInput.getText(),creditCardAddZipInput.getText())) {
+					if(SafeStore.addCreditCard(creditCardAddNumberInput.getText(),creditCardAddNicknameInput.getText(),creditCardAddExpDateInput.getText(),creditCardAddCVVInput.getText(),creditCardAddStreetAdressInput.getText(),creditCardAddCityInput.getText(),creditCardAddStateInput.getText(),creditCardAddZipInput.getText())) {
 						JOptionPane.showMessageDialog(frame, "Credit Card Added");
 						resetAddCreditCard();
 					}else {
@@ -329,7 +329,7 @@ public class CreditCardTab {
 				if(creditCardModifyCurNicknameInput.getText().isEmpty()) {
 					JOptionPane.showMessageDialog(frame, "Enter a credit card to modify");
 				}else {
-					if(UIController.modifyCreditCard(creditCardModifyCurNicknameInput.getText(),creditCardModifyNewNicknameInput.getText(),creditCardModifyNumberInput.getText(),creditCardModifyExpDateInput.getText(),creditCardModifyCVVInput.getText(),creditCardModifyStreetAddressInput.getText(),creditCardModifyCityInput.getText(),creditCardModifyStateInput.getText(),creditCardModifyZipInput.getText())) {
+					if(SafeStore.modifyCreditCard(creditCardModifyCurNicknameInput.getText(),creditCardModifyNewNicknameInput.getText(),creditCardModifyNumberInput.getText(),creditCardModifyExpDateInput.getText(),creditCardModifyCVVInput.getText(),creditCardModifyStreetAddressInput.getText(),creditCardModifyCityInput.getText(),creditCardModifyStateInput.getText(),creditCardModifyZipInput.getText())) {
 						JOptionPane.showMessageDialog(frame, "Credit Card Updated");
 						resetModifyCreditCard();
 					}else {

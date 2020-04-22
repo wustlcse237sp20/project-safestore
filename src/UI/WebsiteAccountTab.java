@@ -89,7 +89,7 @@ public class WebsiteAccountTab {
 
 		websiteAccountSearchButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				WebsiteAccount website = UIController.getWebsiteAccountInfo(websiteAccountSearchNicknameInput.getText());
+				WebsiteAccount website = SafeStore.getWebsiteAccountInfo(websiteAccountSearchNicknameInput.getText());
 				if(website != null) {
 					websiteAccountViewUsernameResult.setText(website.getWebsiteLogin());
 					websiteAccountViewPasswordResult.setText(website.getWebsitePassword());
@@ -163,7 +163,7 @@ public class WebsiteAccountTab {
 				if(websiteAccountAddNicknameInput.getText().isEmpty() || String.valueOf(websiteAccountAddPasswordInput.getPassword()).isEmpty()|| websiteAccountAddUsernameInput.getText().isEmpty()) {
 					JOptionPane.showMessageDialog(frame, "Username, password, and nickname must contain values");
 				}else {
-					if(UIController.addWebsiteAccount(websiteAccountAddNicknameInput.getText(), websiteAccountAddUsernameInput.getText(),String.valueOf(websiteAccountAddPasswordInput.getPassword()))) {
+					if(SafeStore.addWebsiteAccount(websiteAccountAddNicknameInput.getText(), websiteAccountAddUsernameInput.getText(),String.valueOf(websiteAccountAddPasswordInput.getPassword()))) {
 						JOptionPane.showMessageDialog(frame, "Website Added Succesfully!");
 						setSearchWebsiteFieldAfterModifyingOrAddingSite(websiteAccountAddNicknameInput.getText());
 						resetAddWebsiteFields();
@@ -237,7 +237,7 @@ public class WebsiteAccountTab {
 					JOptionPane.showMessageDialog(frame, "Please enter the nickname of the account you want to modify");
 				}else {
 
-					if(UIController.modifyWebsiteAccount(websiteAccountModifyCurrNicknameInput.getText(),websiteAccountModifyNicknameInput.getText(),websiteAccountModifyUsernameInput.getText(),String.valueOf(websiteAccountModifyPasswordInput.getPassword()))) {
+					if(SafeStore.modifyWebsiteAccount(websiteAccountModifyCurrNicknameInput.getText(),websiteAccountModifyNicknameInput.getText(),websiteAccountModifyUsernameInput.getText(),String.valueOf(websiteAccountModifyPasswordInput.getPassword()))) {
 						JOptionPane.showMessageDialog(frame, "Website modified ");
 
 						String siteNickname = "";
