@@ -12,26 +12,13 @@ import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Color;
 import javax.swing.SwingConstants;
-import javax.swing.UIManager;
-
-import com.j256.ormlite.jdbc.JdbcConnectionSource;
-import com.j256.ormlite.jdbc.JdbcDatabaseConnection;
-import com.j256.ormlite.logger.LocalLog;
-import com.j256.ormlite.support.ConnectionSource;
-import com.j256.ormlite.support.DatabaseConnection;
-
-import user.User;
 
 import javax.swing.JTextField;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JEditorPane;
 import javax.swing.JPasswordField;
-import java.awt.Component;
-import java.awt.Rectangle;
 import java.awt.ComponentOrientation;
 import java.awt.event.ActionListener;
-import java.sql.SQLException;
 import java.awt.event.ActionEvent;
 
 public class UserSignInWindow {
@@ -46,8 +33,6 @@ public class UserSignInWindow {
 	 * Launch the application.
 	 */
 	public static void launchWindow() {
-
-
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
@@ -130,10 +115,10 @@ public class UserSignInWindow {
 				String passwordString = String.valueOf(password);
 
 				if(!passwordString.isEmpty() && !username.isEmpty()) {
-					boolean isLoggedIn = UIController.loginUser(username, passwordString); 
+					boolean isLoggedIn = SafeStore.loginUser(username, passwordString); 
 					if(isLoggedIn) {
 						// NEXT WINDOW
-						UIController.setUserForSession(username);
+						SafeStore.setUserForSession(username);
 					}
 					else {
 						JOptionPane.showMessageDialog(frame, "Username or password incorrect");
@@ -163,11 +148,11 @@ public class UserSignInWindow {
 							JOptionPane.showMessageDialog(frame, "Username and password must contain values");
 						}else {
 
-							boolean createdNewUser = UIController.createUser(newUsername.getText(),String.valueOf(newPassword.getPassword())); 
+							boolean createdNewUser = SafeStore.createUser(newUsername.getText(),String.valueOf(newPassword.getPassword())); 
 							if(createdNewUser) {
 								creatingUser = false;
 								//NEXT WINDOW
-								UIController.setUserForSession(newUsername.getText());
+								SafeStore.setUserForSession(newUsername.getText());
 
 							}else {
 								JOptionPane.showMessageDialog(frame, "Username taken, choose another");
@@ -207,13 +192,10 @@ public class UserSignInWindow {
 
 		return basePanel;
 	}
+	
 	public static void closeWindow() {
-
 		frame.setVisible(false);
 		frame.dispose();
-
-
-
 	}
 
 }
