@@ -23,7 +23,7 @@ public class SafeStore {
 	public static void main(String[] args) {
 		// TODO Auto-generated constructor stub
 		System.setProperty(LocalLog.LOCAL_LOG_LEVEL_PROPERTY,"ERROR");
-		databaseUrl = "jdbc:sqlite:database/app.db";
+		databaseUrl = "jdbc:sqlite:src/database/app.db";
 		try {
 			databaseConnection = new JdbcConnectionSource(databaseUrl);
 		}
@@ -134,7 +134,7 @@ public class SafeStore {
 
 	}
 	
-	public static boolean addDebitCard(String cardNumber, String nickname,String expDate, String cvv, String pin, String streetAddress, String city, String state, String zip) {
+	public static boolean addDebitCard(String cardNumber, String nickname, String expDate, String cvv, String pin, String streetAddress, String city, String state, String zip) {
 		Address billingAddress = new Address(streetAddress, city, state, zip);
 		DebitCard debitCard;
 		if(!nickname.isEmpty()) {

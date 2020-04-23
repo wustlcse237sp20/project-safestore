@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.regex.Pattern;
 
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
@@ -32,8 +33,8 @@ public class DebitCard implements Card {
 		String encryptedPin = Encryption.encrypt(pin);
 		this.debitCardEntity = new DebitCardEntity(safeStoreUserEntity, defaultNickname, encryptedDCNumber, encryptedExpDate, encryptedCvv, encryptedPin, billingAddress.getAddressEntity());
 		this.billingAddress = billingAddress;
-		
 	}
+	
 	public DebitCard(User safeStoreUser, String nickname, String debitCardNumber, String expirationDate, String cvv, String pin, Address billingAddress) {
 		
 		String encryptedNickname = Encryption.encrypt(nickname);
@@ -44,8 +45,8 @@ public class DebitCard implements Card {
 		String encryptedPin = Encryption.encrypt(pin);
 		this.debitCardEntity = new DebitCardEntity(safeStoreUserEntity, encryptedNickname, encryptedDCNumber, encryptedExpDate, encryptedCvv, encryptedPin, billingAddress.getAddressEntity());
 		this.billingAddress = billingAddress;
-		
 	}
+	
 	public DebitCard(DebitCardEntity debitCardEntity) {
 		this.debitCardEntity = debitCardEntity;
 		this.billingAddress = new Address(debitCardEntity.getBillingAddress());
@@ -227,8 +228,60 @@ public class DebitCard implements Card {
 		}
 		return false;
 	}
+	
+	/**
+	 * Simple regex to test for a valid card number that is between 13-16 digits
+	 * This doesn't test for validation by card companies (like all Mastercards start
+	 * with 51-55). It just tests to make sure it is the correct number of digits
+	 * @param cardNumber
+	 * @return true if the card number is all digits and 13-16 in length
+	 */
+	public static boolean validateCardNumber(String cardNumber) {
+		return Pattern.matches("^\\d{13,16}$", cardNumber);
+	}
+	
+	/**
+	 * Simple regex to test for a valid expiration in the formats M/YY, MM/YY, M/YYYY, MM/YYYY
+	 * It just checks for digits, it does NOT check to make sure the card is not expired or the year
+	 * is whacky such as 1245
+	 * @param expirationDate
+	 * @return
+	 */
+	public static boolean validateExpirationDate(String expirationDate) {
+		// format MM/YY
+		boolean formatOne = Pattern.matches("^[0]\\d/\\d{2}$", expirationDate) || Pattern.matches("^[1][012]/\\d{2}$", expirationDate);
+		
+		// format MM/YYYY
+		boolean formatTwo = Pattern.matches("^[0]\\d/\\d{4}$", expirationDate) || Pattern.matches("^[1][012]/\\d{4}$", expirationDate);
+		
+		// format M/YY
+		boolean formatThree = Pattern.matches("^\\d/\\d{2}", expirationDate);
+		
+		// format M/YYYY
+		boolean formatFour = Pattern.matches("^\\d/\\d{4}", expirationDate);
 
-
+		return (formatOne || formatTwo || formatThree || formatFour);
+	}
+	
+	/**
+	 * Simple regex to check for a 3 or 4 digit CVV
+	 * @param cvv
+	 * @return
+	 */
+	public static boolean validateCvv(String cvv) {
+		return Pattern.matches("^\\d{3,4}$", cvv);
+	}
+	
+	/**
+	 * Simple regex to check for a 4 digit pin number
+	 * @param pin
+	 * @return
+	 */
+	public static boolean validatePin(String pin) {
+		return Pattern.matches("^\\d{4}$", pin);
+	}
+	
+	
 	/**
 	 * Checks if the address associated already exists, if it does then just adds the 
 	 * debit card with a the foreign key to the appropriate existing address. If it can't
@@ -255,7 +308,22 @@ public class DebitCard implements Card {
 				throw(new Exception("Address not added properly, abort add card"));
 			}
 		}
-
+		
+		// validate inputs
+		if (!validateCardNumber(this.getCardNumber())) {
+			throw(new Exception("Card number not in the correct format"));
+		}
+		if (!validateExpirationDate(this.getExpirationDate())) {
+			throw(new Exception("Expiration date not in the correct format"));
+		}
+		if (!validateCvv(this.getCvv())) {
+			throw(new Exception("CVV not in the correct format"));
+		}
+		if (!validatePin(this.getCardNumber())) {
+			throw(new Exception("Pin not in the correct format"));
+		}
+		
+		
 		try {
 			Dao<DebitCardEntity, String> debitCardDao = DaoManager.createDao(databaseConnection, DebitCardEntity.class);
 			if (cardNicknameIsUnique(databaseConnection, this.debitCardEntity.getSafeStoreUser(), this.getNickname())) {
@@ -312,18 +380,16 @@ public class DebitCard implements Card {
 					requestedDebitCard.setNickname(newInputs[0], databaseConnection);
 				}
 			}
-			if(!newInputs[1].isEmpty()) {
-
+			if(!newInputs[1].isEmpty() && validateCardNumber(newInputs[1])) {
 				requestedDebitCard.setCardNumber(newInputs[1], databaseConnection);
 			}
-			if(!newInputs[2].isEmpty()) {
+			if(!newInputs[2].isEmpty() && validateExpirationDate(newInputs[2])) {
 				requestedDebitCard.setExpirationDate(newInputs[2], databaseConnection);
 			}
-			if(!newInputs[3].isEmpty()) {
-
+			if(!newInputs[3].isEmpty() && validateCvv(newInputs[3])) {
 				requestedDebitCard.setCvv(newInputs[3], databaseConnection);
 			}
-			if(!newInputs[4].isEmpty()) {
+			if(!newInputs[4].isEmpty() && validatePin(newInputs[4])) {
 				requestedDebitCard.setPin(newInputs[4], databaseConnection);
 			}
 
