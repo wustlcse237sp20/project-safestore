@@ -85,16 +85,15 @@ public class DebitCardTab {
 			public void actionPerformed(ActionEvent e) {
 				if(debitCardSearchInput.getText().isEmpty()) {
 					JOptionPane.showMessageDialog(frame, "Enter the card's nickname (default is last 4 digits)");
-				}else {
+				} else {
 					DebitCard debitCard = SafeStore.getDebitCardInfo(debitCardSearchInput.getText());
 					if(debitCard != null) {
 						debitCardViewDisplay.setText(debitCard.toString());
 						debitCardSearchInput.setText("");
-					}else {
+					} else {
 						JOptionPane.showMessageDialog(frame, "You have no debit card stored under " + debitCardSearchInput.getText());
 						debitCardSearchInput.setText("");
 						debitCardViewDisplay.setText("");
-
 					}
 
 				}
@@ -221,13 +220,29 @@ public class DebitCardTab {
 		JButton debitCardAddButton = new JButton("Add");
 		debitCardAddButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(debitCardAddNumberInput.getText().isEmpty() || debitCardAddExpDateInput.getText().isEmpty() || debitCardAddCvvInput.getText().isEmpty() || debitCardAddStAdressInput.getText().isEmpty() || debitCardAddCityInput.getText().isEmpty() || debitCardAddStateInput.getText().isEmpty() || debitCardAddZipInput.getText().isEmpty()) {
+				if (debitCardAddNumberInput.getText().isEmpty() || debitCardAddExpDateInput.getText().isEmpty() || debitCardAddCvvInput.getText().isEmpty() || debitCardAddStAdressInput.getText().isEmpty() || debitCardAddCityInput.getText().isEmpty() || debitCardAddStateInput.getText().isEmpty() || debitCardAddZipInput.getText().isEmpty()) {
 					JOptionPane.showMessageDialog(frame, "All fields marked with * must have a value");
-				}else {
-					if(SafeStore.addDebitCard(debitCardAddNumberInput.getText(),debitCardAddNicknameInput.getText(),debitCardAddExpDateInput.getText(),debitCardAddCvvInput.getText(),debitCardAddPinInput.getText(),debitCardAddStAdressInput.getText(),debitCardAddCityInput.getText(),debitCardAddStateInput.getText(),debitCardAddZipInput.getText())) {
+				} else if (!Validation.validateCardNumber(debitCardAddNumberInput.getText())) {
+					
+					JOptionPane.showMessageDialog(frame, "Card number must be in the form ################ and be between 13-16 numbers long");
+					
+				} else if (!Validation.validateExpirationDate(debitCardAddExpDateInput.getText())) {
+					
+					JOptionPane.showMessageDialog(frame, "Exp date must in one of the forms: M/YY, M/YYYY, MM/YY, MM/YYYY");
+					
+				} else if (!Validation.validateCvv(debitCardAddCvvInput.getText())) {
+					
+					JOptionPane.showMessageDialog(frame, "Cvv must be in one of the forms: ### or ####");
+					
+				} else if (!Validation.validatePin(debitCardAddPinInput.getText())) {
+					
+					JOptionPane.showMessageDialog(frame, "Pin must be in the form ####");
+					
+				} else {
+					if (SafeStore.addDebitCard(debitCardAddNumberInput.getText(),debitCardAddNicknameInput.getText(),debitCardAddExpDateInput.getText(),debitCardAddCvvInput.getText(),debitCardAddPinInput.getText(),debitCardAddStAdressInput.getText(),debitCardAddCityInput.getText(),debitCardAddStateInput.getText(),debitCardAddZipInput.getText())) {
 						JOptionPane.showMessageDialog(frame, "Debit Card Added");
 						resetAddDebitCard();
-					}else {
+					} else {
 						JOptionPane.showMessageDialog(frame, "Debit card already added with number (and/or nickname): " + debitCardAddNumberLabel.getText());
 						resetAddDebitCard();
 					}
@@ -364,9 +379,25 @@ public class DebitCardTab {
 		JButton debitCardModifyButton = new JButton("Modify");
 		debitCardModifyButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(debitCardModifyCurrNicknameInput.getText().isEmpty()) {
+				if (debitCardModifyCurrNicknameInput.getText().isEmpty()) {
 					JOptionPane.showMessageDialog(frame, "Enter a debit card to modify");
-				}else {
+				} else if (!Validation.validateCardNumber(debitCardModifyNumInput.getText())) {
+					
+					JOptionPane.showMessageDialog(frame, "Card number must be in the form ################ and be between 13-16 numbers long");
+					
+				} else if (!Validation.validateExpirationDate(debitCardModifyExpDateInput.getText())) {
+					
+					JOptionPane.showMessageDialog(frame, "Exp date must in one of the forms: M/YY, M/YYYY, MM/YY, MM/YYYY");
+					
+				} else if (!Validation.validateCvv(debitCardModifyCvvInput.getText())) {
+					
+					JOptionPane.showMessageDialog(frame, "Cvv must be in one of the forms: ### or ####");
+					
+				} else if (!Validation.validatePin(debitCardModifyPinInput.getText())) {
+					
+					JOptionPane.showMessageDialog(frame, "Pin must be in the form ####");
+					
+				} else {
 					if(SafeStore.modifyDebitCard(debitCardModifyCurrNicknameInput.getText(),debitCardModifyNewNicknameInput.getText(),debitCardModifyNumInput.getText(),debitCardModifyExpDateInput.getText(),debitCardModifyCvvInput.getText(),debitCardModifyPinInput.getText(),debitCardModifyStAddressInput.getText(),debitCardModifyCityInput.getText(),debitCardModifyStateInput.getText(),debitCardModifyZipInput.getText())) {
 						JOptionPane.showMessageDialog(frame, "Debit Card Updated");
 						resetModifyDebitCard();
