@@ -202,21 +202,13 @@ public class CreditCardTab {
 		JButton creditCardAddButton = new JButton("Add");
 		creditCardAddButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				String errors = Validation.validateCreditCardParams(creditCardAddNumberInput.getText(), creditCardAddExpDateInput.getText(), creditCardAddCVVInput.getText());
 				if(creditCardAddNumberInput.getText().isEmpty() || creditCardAddExpDateInput.getText().isEmpty() || creditCardAddCVVInput.getText().isEmpty() || creditCardAddStreetAdressInput.getText().isEmpty() || creditCardAddCityInput.getText().isEmpty() || creditCardAddStateInput.getText().isEmpty() || creditCardAddZipInput.getText().isEmpty()) {
 					JOptionPane.showMessageDialog(frame, "All fields marked with * must have a value");
-				} else if (!Validation.validateCardNumber(creditCardAddNumberInput.getText())) {
-					
-					JOptionPane.showMessageDialog(frame, "Card number must be in the form ################ and be between 13-16 numbers long");
-					
-				} else if (!Validation.validateExpirationDate(creditCardAddExpDateInput.getText())) {
-					
-					JOptionPane.showMessageDialog(frame, "Exp date must in one of the forms: M/YY, M/YYYY, MM/YY, MM/YYYY");
-					
-				} else if (!Validation.validateCvv(creditCardAddCVVInput.getText())) {
-					
-					JOptionPane.showMessageDialog(frame, "Cvv must be in one of the forms: ### or ####");
-					
-				} else {
+				} else if (!errors.equals("")) {
+					JOptionPane.showMessageDialog(frame, errors);
+				}
+			    else {
 					if(SafeStore.addCreditCard(creditCardAddNumberInput.getText(),creditCardAddNicknameInput.getText(),creditCardAddExpDateInput.getText(),creditCardAddCVVInput.getText(),creditCardAddStreetAdressInput.getText(),creditCardAddCityInput.getText(),creditCardAddStateInput.getText(),creditCardAddZipInput.getText())) {
 						JOptionPane.showMessageDialog(frame, "Credit Card Added");
 						resetAddCreditCard();
@@ -338,20 +330,11 @@ public class CreditCardTab {
 		JButton modifyCreditCardButton = new JButton("Modify");
 		modifyCreditCardButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				String errors = Validation.validateCreditCardParams(creditCardModifyNumberInput.getText(), creditCardModifyExpDateInput.getText(), creditCardModifyCVVInput.getText());
 				if(creditCardModifyCurNicknameInput.getText().isEmpty()) {
 					JOptionPane.showMessageDialog(frame, "Enter a credit card to modify");
-				} else if (!Validation.validateCardNumber(creditCardModifyNumberInput.getText())) {
-					
-					JOptionPane.showMessageDialog(frame, "Card number must be in the form ################ and be between 13-16 numbers long");
-					
-				} else if (!Validation.validateExpirationDate(creditCardModifyExpDateInput.getText())) {
-					
-					JOptionPane.showMessageDialog(frame, "Exp date must in one of the forms: M/YY, M/YYYY, MM/YY, MM/YYYY");
-					
-				} else if (!Validation.validateCvv(creditCardModifyCVVInput.getText())) {
-					
-					JOptionPane.showMessageDialog(frame, "Cvv must be in one of the forms: ### or ####");
-					
+				} else if (!errors.equals("")) {
+					JOptionPane.showMessageDialog(frame, errors);
 				} else {
 					if(SafeStore.modifyCreditCard(creditCardModifyCurNicknameInput.getText(),creditCardModifyNewNicknameInput.getText(),creditCardModifyNumberInput.getText(),creditCardModifyExpDateInput.getText(),creditCardModifyCVVInput.getText(),creditCardModifyStreetAddressInput.getText(),creditCardModifyCityInput.getText(),creditCardModifyStateInput.getText(),creditCardModifyZipInput.getText())) {
 						JOptionPane.showMessageDialog(frame, "Credit Card Updated");

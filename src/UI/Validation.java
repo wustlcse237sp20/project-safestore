@@ -56,4 +56,40 @@ public class Validation {
 		return Pattern.matches("^\\d{4}$", pin);
 	}
 	
+	public static String validateCreditCardParams(String cardNumber, String expirationDate, String cvv) {
+		String errors = "";
+		if (!validateCardNumber(cardNumber)) {
+			errors += "Card number must be in the form ################ and be between 13-16 numbers long";
+			errors += '\n';
+		}
+		if (!validateExpirationDate(expirationDate)) {
+			errors += "Exp date must in one of the forms: M/YY, M/YYYY, MM/YY, MM/YYYY";
+			errors += '\n';
+		}
+		if (!validateCvv(cvv)) {
+			errors += "Cvv must be in one of the forms: ### or ####";
+		}
+		return errors;
+	}
+	
+	public static String validateDebitCardParams(String cardNumber, String expirationDate, String cvv, String pin) {
+		String errors = "";
+		if (!validateCardNumber(cardNumber)) {
+			errors += "Card number must be in the form ################ and be between 13-16 numbers long";
+			errors += '\n';
+		}
+		if (!validateExpirationDate(expirationDate)) {
+			errors += "Exp date must in one of the forms: M/YY, M/YYYY, MM/YY, MM/YYYY";
+			errors += '\n';
+		}
+		if (!validateCvv(cvv)) {
+			errors += "Cvv must be in one of the forms: ### or ####";
+			errors += '\n';
+		}
+		if (!validatePin(pin)) {
+			errors += "Pin must be in the form ####";
+		}
+		return errors;
+	}
+	
 }
