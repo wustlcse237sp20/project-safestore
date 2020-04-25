@@ -1,18 +1,15 @@
 package card;
 
 import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
 
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.support.ConnectionSource;
 
 import encryption.Encryption;
-import tables.CreditCardEntity;
 import tables.DebitCardEntity;
 import tables.UserEntity;
 import user.User;
@@ -32,8 +29,8 @@ public class DebitCard implements Card {
 		String encryptedPin = Encryption.encrypt(pin);
 		this.debitCardEntity = new DebitCardEntity(safeStoreUserEntity, defaultNickname, encryptedDCNumber, encryptedExpDate, encryptedCvv, encryptedPin, billingAddress.getAddressEntity());
 		this.billingAddress = billingAddress;
-		
 	}
+	
 	public DebitCard(User safeStoreUser, String nickname, String debitCardNumber, String expirationDate, String cvv, String pin, Address billingAddress) {
 		
 		String encryptedNickname = Encryption.encrypt(nickname);
@@ -44,8 +41,8 @@ public class DebitCard implements Card {
 		String encryptedPin = Encryption.encrypt(pin);
 		this.debitCardEntity = new DebitCardEntity(safeStoreUserEntity, encryptedNickname, encryptedDCNumber, encryptedExpDate, encryptedCvv, encryptedPin, billingAddress.getAddressEntity());
 		this.billingAddress = billingAddress;
-		
 	}
+	
 	public DebitCard(DebitCardEntity debitCardEntity) {
 		this.debitCardEntity = debitCardEntity;
 		this.billingAddress = new Address(debitCardEntity.getBillingAddress());
@@ -227,8 +224,8 @@ public class DebitCard implements Card {
 		}
 		return false;
 	}
-
-
+	
+	
 	/**
 	 * Checks if the address associated already exists, if it does then just adds the 
 	 * debit card with a the foreign key to the appropriate existing address. If it can't
@@ -254,8 +251,8 @@ public class DebitCard implements Card {
 			if(!addAddressSuccessful) {
 				throw(new Exception("Address not added properly, abort add card"));
 			}
-		}
-
+		}		
+		
 		try {
 			Dao<DebitCardEntity, String> debitCardDao = DaoManager.createDao(databaseConnection, DebitCardEntity.class);
 			if (cardNicknameIsUnique(databaseConnection, this.debitCardEntity.getSafeStoreUser(), this.getNickname())) {
@@ -313,14 +310,12 @@ public class DebitCard implements Card {
 				}
 			}
 			if(!newInputs[1].isEmpty()) {
-
 				requestedDebitCard.setCardNumber(newInputs[1], databaseConnection);
 			}
 			if(!newInputs[2].isEmpty()) {
 				requestedDebitCard.setExpirationDate(newInputs[2], databaseConnection);
 			}
 			if(!newInputs[3].isEmpty()) {
-
 				requestedDebitCard.setCvv(newInputs[3], databaseConnection);
 			}
 			if(!newInputs[4].isEmpty()) {
