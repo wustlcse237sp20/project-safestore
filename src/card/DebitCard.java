@@ -1,19 +1,15 @@
 package card;
 
 import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
-import java.util.regex.Pattern;
 
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.support.ConnectionSource;
 
 import encryption.Encryption;
-import tables.CreditCardEntity;
 import tables.DebitCardEntity;
 import tables.UserEntity;
 import user.User;
