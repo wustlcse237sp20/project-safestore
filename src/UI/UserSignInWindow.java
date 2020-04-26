@@ -28,6 +28,7 @@ public class UserSignInWindow {
 	private JPasswordField passwordField;	
 	JTextField newUsername = new JTextField(10);
 	JPasswordField newPassword = new JPasswordField(10);
+	JPasswordField repeatPassword = new JPasswordField(10);
 
 	/**
 	 * Launch the application.
@@ -137,29 +138,28 @@ public class UserSignInWindow {
 		createAccountButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				// popup window stuff: https://stackoverflow.com/questions/12810460/joptionpane-input-dialog-box-program
-
 				boolean creatingUser = true;
-				while(creatingUser){
+				while (creatingUser) {
 					int userSelection = JOptionPane.showConfirmDialog(frame, createBasePanel(), "New Account: ", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-
-					if(userSelection == JOptionPane.OK_OPTION) {
-
-						if(newUsername.getText().isEmpty() || String.valueOf(newPassword.getPassword()).isEmpty()) {
-							JOptionPane.showMessageDialog(frame, "Username and password must contain values");
-						}else {
-
-							boolean createdNewUser = SafeStore.createUser(newUsername.getText(),String.valueOf(newPassword.getPassword())); 
-							if(createdNewUser) {
+					if (userSelection == JOptionPane.OK_OPTION) {
+						String username = newUsername.getText();
+						String password = String.valueOf(newPassword.getPassword());
+						String confirmPassword = String.valueOf(repeatPassword.getPassword());
+						
+						if (username.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
+							JOptionPane.showMessageDialog(frame, "Username and both password fields must contain values");
+						} else if (!password.equals(confirmPassword)) {
+							JOptionPane.showMessageDialog(frame, "Passwords do not match");
+						} else {
+							boolean createdNewUser = SafeStore.createUser(username, password); 
+							if (createdNewUser) {
 								creatingUser = false;
-								//NEXT WINDOW
-								SafeStore.setUserForSession(newUsername.getText());
-
-							}else {
+								SafeStore.setUserForSession(username); // go to main account window
+							} else {
 								JOptionPane.showMessageDialog(frame, "Username taken, choose another");
 							}
 						}
-
-					}else if(userSelection == JOptionPane.CANCEL_OPTION){
+					} else if (userSelection == JOptionPane.CANCEL_OPTION){
 						creatingUser = false;
 					}
 				}
@@ -178,7 +178,7 @@ public class UserSignInWindow {
 		basePanel.setBackground(Color.RED);
 
 		JPanel centerPanel = new JPanel();
-		centerPanel.setLayout(new GridLayout(2, 2, 5, 5));
+		centerPanel.setLayout(new GridLayout(3, 3, 5, 5));
 		centerPanel.setBorder(
 				BorderFactory.createEmptyBorder(5, 5, 5, 5));
 		centerPanel.setOpaque(true);
@@ -187,6 +187,8 @@ public class UserSignInWindow {
 		centerPanel.add(newUsername);
 		centerPanel.add(new JLabel("Password "));
 		centerPanel.add(newPassword);
+		centerPanel.add(new JLabel("Confirm Password "));
+		centerPanel.add(repeatPassword);
 
 		basePanel.add(centerPanel);
 
