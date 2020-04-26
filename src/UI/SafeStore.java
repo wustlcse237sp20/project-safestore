@@ -77,18 +77,8 @@ public class SafeStore {
 	}
 
 	public static boolean modifyWebsiteAccount(String currentNickname, String newNickname, String newLogin, String newPassword) {
-		String[] fieldsToModify = {"","",""};
 		String[] newInputs = {newNickname,newLogin, newPassword};
-		if(!newNickname.isEmpty()) {
-			fieldsToModify[0] = "Nickname";
-		}
-		if(!newLogin.isEmpty()) {
-			fieldsToModify[1] = "Login";
-		}
-		if(!newPassword.isEmpty()) {
-			fieldsToModify[2] = "Password";
-		}
-		return WebsiteAccount.updateWebsiteAccount(databaseConnection, currentNickname, safeStoreUser, fieldsToModify, newInputs);
+		return WebsiteAccount.updateWebsiteAccount(databaseConnection, currentNickname, safeStoreUser, newInputs);
 	}
 
 	public static CreditCard getCreditCardInfo(String nickname) {

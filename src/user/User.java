@@ -6,11 +6,8 @@ import com.j256.ormlite.support.ConnectionSource;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
 import java.sql.SQLException;
-import java.util.Base64;
-import java.util.Scanner;
 
 import tables.UserEntity;
 
@@ -95,28 +92,6 @@ public class User {
 	}
 	
 	/**
-	 * user login via terminal 
-	 * @param databaseConnection to connect to UserEntity table
-	 * @param scanner to get input from user in terminal 
-	 * @return username if successful login. null if unsucessful login. 
-	 * unsuccessful login may be due to username and password not matching or 
-	 * unable to connect to database. 
-	 */
-	public static String terminalLogin(ConnectionSource databaseConnection, Scanner scanner) {
-		System.out.println("Type your usernmae:");
-		String username = scanner.nextLine();
-		System.out.println("Type your password:");
-		String password = scanner.nextLine();
-		boolean login = User.loginThroughDatabase(databaseConnection, username, password);
-		if(login) {
-			return username;
-		}
-		else {
-			return null;
-		}
-	}
-	
-	/**
 	 *  method from: 
 	 *  https://howtodoinjava.com/security/how-to-generate-secure-password-hash-md5-sha-pbkdf2-bcrypt-examples/
 	 * @return random md5 salt
@@ -194,36 +169,5 @@ public class User {
 		}
 	}
 	
-	/**
-	 * user account creation via terminal 
-	 * @param databaseConnection to connect to UserEntity table 
-	 * @param scanner to get input from user in terminal 
-	 * @return username if successful account creation. null if unable to 
-	 * create account due to duplicated username or unable to connect to database.
-	 */
-	public static String createSafeStoreAccountTerminal(ConnectionSource databaseConnection, Scanner scanner) {
-		System.out.println("Type your username:");
-		String username = scanner.nextLine();
-		while(username.trim().isEmpty() || 
-				!User.isUniqueUsername(databaseConnection, username)) {
-			System.out.println("Your username cannot be empty and it must "
-					+ "be unique. Try another.");
-			username = scanner.nextLine();
-		}
-		System.out.println("Type your password:");
-		String password = scanner.nextLine();
-		while(password.trim().isEmpty()) {
-			System.out.println("Your password cannot be empty.");
-			password = scanner.nextLine();
-		}
-		User newUser = new User(username, password);
-		boolean createdNewUser = newUser.createSafeStoreAccountThroughDatabase(databaseConnection);
-		if(createdNewUser) {
-			return username;
-		}
-		else {
-			return null;
-		}
-	}
 
 }
