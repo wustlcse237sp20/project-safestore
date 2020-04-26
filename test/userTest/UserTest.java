@@ -2,16 +2,9 @@ package userTest;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintStream;
 import java.sql.SQLException;
-import java.util.Scanner;
 
-import org.junit.After;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -56,75 +49,6 @@ class UserTest {
 		} catch (SQLException e) {
 			fail("failed to create user dao");
 			e.printStackTrace();
-		}
-	}
-	
-
-	@Test
-	void testCreateAccountThroughTerminal() throws IOException {
-		File createAccountUserInput = new File("test/userTest/terminalCreateAccount");
-		
-		// output stream code from https://limzhenghong.wordpress.com/2015/03/18/junit-with-system-out-println/“
-		//Prepare to redirect output
-		ByteArrayOutputStream os = new ByteArrayOutputStream();
-		PrintStream ps = new PrintStream(os);
-		System.setOut(ps);
-		
-		try {
-			Scanner terminalCreateAcounnt = new Scanner(createAccountUserInput);
-			
-			//case: empty line before unique username. password  entered normally.
-			assertEquals("test user", User.createSafeStoreAccountTerminal(databaseConnection, terminalCreateAcounnt));
-			assertEquals("Type your username:" + System.getProperty("line.separator")
-					+ "Your username cannot be empty and it must be unique. Try another." 
-					+ System.getProperty("line.separator") + "Type your password:"
-					+ System.getProperty("line.separator"), os.toString());
-			//Restore normal output
-			System.setOut(System.out);
-			os.reset();
-			
-			//case: unique username entered normally. empty line entered before password
-			assertEquals("test user2", User.createSafeStoreAccountTerminal(databaseConnection, terminalCreateAcounnt));
-			assertEquals("Type your username:" + System.getProperty("line.separator")
-				 + "Type your password:" + System.getProperty("line.separator")
-				 + "Your password cannot be empty."+ System.getProperty("line.separator")
-				 , os.toString());
-			System.setOut(System.out);
-			os.reset();
-		
-			//case: unique username and password entered normally
-			assertEquals("test user3", User.createSafeStoreAccountTerminal(databaseConnection, terminalCreateAcounnt));
-			assertEquals("Type your username:" + System.getProperty("line.separator")
-			 	+ "Type your password:"
-				+ System.getProperty("line.separator"), os.toString());
-			System.setOut(System.out);
-			os.reset();
-			
-			//case: non-unique username entered first. Unique username entered
-			//after with password entered normally
-			assertEquals("test user4", User.createSafeStoreAccountTerminal(databaseConnection, terminalCreateAcounnt));
-			assertEquals("Type your username:" + System.getProperty("line.separator")
-			+ "Your username cannot be empty and it must be unique. Try another." 
-			+ System.getProperty("line.separator") + "Type your password:"
-			+ System.getProperty("line.separator"), os.toString());
-			System.setOut(System.out);
-			os.reset();
-			
-			os.close();
-			ps.close();
-			try {
-				Dao<UserEntity, String> userDao = DaoManager.createDao(databaseConnection, UserEntity.class);
-				userDao.deleteById("test user");
-				userDao.deleteById("test user2");
-				userDao.deleteById("test user3");
-				userDao.deleteById("test user4");
-			} catch (SQLException e) {
-				fail("failed to create user dao");
-				e.printStackTrace();
-			}
-			terminalCreateAcounnt.close();
-		} catch (FileNotFoundException e1) {
-			e1.printStackTrace();
 		}
 	}
 	
@@ -188,41 +112,6 @@ class UserTest {
 		}
 	}
 	
-	@Test
-	void testLoginViaTerminal() {
-		String username = "testNewUser";
-		String password = "testNewPassword";	
-		User newUser = new User(username, password);
-		assertTrue(newUser.createSafeStoreAccountThroughDatabase(databaseConnection), "should be successful account creation.");
-		try {
-			File loginUserInput = new File("test/userTest/terminalLoginTest");
-			Scanner terminalLogin = new Scanner(loginUserInput);
-			
-			//normal case: correct username and password
-			assertEquals(username, User.terminalLogin(databaseConnection, terminalLogin), 
-					"Should return username for a successful login.");
-			
-			//registered username but incorrect password
-			assertNull(User.terminalLogin(databaseConnection, terminalLogin), "Should return null"
-					+ "for an unsuccessful login");
-			
-			//not a registered username 
-			assertNull(User.terminalLogin(databaseConnection, terminalLogin), "Should return null"
-					+ "for an unsuccessful login");
-			
-			terminalLogin.close();
-			try {
-				Dao<UserEntity, String> userDao = DaoManager.createDao(databaseConnection, UserEntity.class);
-				userDao.deleteById("testNewUser");
-			} catch (SQLException e) {
-				fail("failed to create user dao");
-				e.printStackTrace();
-			}
-		} catch (FileNotFoundException e) {
-			fail("failed to open terminal login file");
-			e.printStackTrace();
-		}
-	}
 	
 	@AfterEach 
 	void cleanUp() {
