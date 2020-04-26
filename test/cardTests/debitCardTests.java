@@ -150,6 +150,87 @@ class debitCardTests {
 	}
 	
 	@Test
+	void testAddDebitCardExistingNicknameDifferentUser() {
+		System.out.println("RUNNING TEST: testAddDebitCardExistingNicknameDifferentUser");
+		DebitCard testDebitCard = new DebitCard(testUser, "blah", "5555555555", "04/23", "123", "321", testAddress);
+		try {
+			boolean firstAddResult = testDebitCard.addCard(databaseConnection);
+			assertTrue(firstAddResult, "first time adding should be successful");
+			DebitCardEntity firstDebititCard = testDebitCard.getDebitCardEntity();
+			
+			String encryptedDebitCardNumberTwo = Encryption.encrypt("8888888888");
+			DebitCard testDebitCardTwo = new DebitCard(testUserTwo, "blah", "8888888888", "04/23", "123", "321", testAddress);
+			boolean secondAddResult = testDebitCardTwo.addCard(databaseConnection);
+			assertTrue(secondAddResult, "Second add should return true due to different user");
+			
+			Dao<DebitCardEntity, String> debitCardDao = DaoManager.createDao(databaseConnection, DebitCardEntity.class);
+			DebitCardEntity returnedDebitCard = debitCardDao.queryForId(encryptedDebitCardNumberTwo);
+			assertFalse(returnedDebitCard == null, "The second credit card should be in the database");
+			debitCardDao.delete(firstDebititCard);
+			debitCardDao.delete(returnedDebitCard);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Test
+	void testAddDebitCardNewAddress() {
+		System.out.println("RUNNING TEST: testAddDebitCardNewAddress");
+		
+		String encryptedDebitCardNumber = Encryption.encrypt("0000000000");
+		Address newAddress = new Address("123 oak st", "STL", "MO", "63130");
+		DebitCard testDebitCard = new DebitCard(testUser, "0000000000", "04/23", "123", "321", newAddress);
+		try {
+			UserEntity returnedUser = userDao.queryForSameId(testUserEntity);
+			ForeignCollection<DebitCardEntity> usersAssociatedDebitCards = returnedUser.getDebitCards();
+			int initialNumCards = usersAssociatedDebitCards.size();
+			
+			boolean result = testDebitCard.addCard(databaseConnection);
+			assertTrue(result, "Should return true if add was successful");
+			DebitCardEntity testDebitCardEntity = testDebitCard.getDebitCardEntity();
+			
+			Map<String, Object> addressQueryParams = new HashMap<String, Object>();
+			addressQueryParams.put("street_address", Encryption.encrypt(newAddress.getStreetAddress()));
+			addressQueryParams.put("city", Encryption.encrypt(newAddress.getCity()));
+			addressQueryParams.put("state", Encryption.encrypt(newAddress.getState()));
+			addressQueryParams.put("zip_code", Encryption.encrypt(newAddress.getZipCode()));
+			try {
+				List<AddressEntity> returnedAddresses = addressDao.queryForFieldValues(addressQueryParams);
+				String errMsg = "Only one address should exist in the table with this particular street address, city, state, and zip code";
+				assertTrue(returnedAddresses.size() == 1, errMsg);
+				
+				AddressEntity returnedAddressEntity = returnedAddresses.get(0);
+				ForeignCollection<DebitCardEntity> associatedDebitCards = returnedAddressEntity.getDebitCards();
+				assertTrue(associatedDebitCards.size() == 1, "Address should only have one card associated with it");
+				
+				returnedUser = userDao.queryForSameId(testUserEntity);
+				usersAssociatedDebitCards = returnedUser.getDebitCards();
+				int newNumCards = usersAssociatedDebitCards.size();
+				assertTrue(initialNumCards + 1 == newNumCards, "User should have an added debit card to their collection");
+				
+				Dao<DebitCardEntity, String> debitCardDao = DaoManager.createDao(databaseConnection, DebitCardEntity.class);
+				DebitCardEntity queriedCard = debitCardDao.queryForId(encryptedDebitCardNumber);
+				DebitCard queriedDebitCard = new DebitCard(queriedCard);
+				assertTrue(queriedDebitCard.getNickname().equals("0000"), "Nickname doesn't match");
+				assertTrue(queriedDebitCard.getCardNumber().equals("0000000000"), "Credit card number doesn't match");
+				assertTrue(queriedDebitCard.getExpirationDate().equals("04/23"), "Expiration date doesn't match");
+				assertTrue(queriedDebitCard.getCvv().equals("123"), "CVV doesn't match");
+				
+				debitCardDao.delete(testDebitCardEntity);
+				newAddress.deleteAddress(databaseConnection);
+				
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+	}
+	
+	@Test
 	void testGetDebitCardFromNickname() {
 		String nickname = "nickyname";
 		String cardNumber = "99998888877776666";
