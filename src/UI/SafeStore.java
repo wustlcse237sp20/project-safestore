@@ -15,14 +15,15 @@ import tables.UserEntity;
 import user.User;
 import websiteAccount.WebsiteAccount;
 
-public class UIController {
+public class SafeStore {
 	static ConnectionSource databaseConnection;
 	static String databaseUrl;
 	static User safeStoreUser;
+	
 	public static void main(String[] args) {
 		// TODO Auto-generated constructor stub
 		System.setProperty(LocalLog.LOCAL_LOG_LEVEL_PROPERTY,"ERROR");
-		databaseUrl = "jdbc:sqlite:database/app.db";
+		databaseUrl = "jdbc:sqlite:src/database/app.db";
 		try {
 			databaseConnection = new JdbcConnectionSource(databaseUrl);
 		}
@@ -39,9 +40,11 @@ public class UIController {
 		return newUser.createSafeStoreAccountThroughDatabase(databaseConnection);
 
 	}
+	
 	public static boolean loginUser(String username, String password) {
 		return User.loginThroughDatabase(databaseConnection, username, password);		
 	}
+	
 	public static void setUserForSession(String username) {
 		Dao<UserEntity, String> userDao;
 		try {
@@ -57,6 +60,7 @@ public class UIController {
 		}
 
 	}
+	
 	public static WebsiteAccount getWebsiteAccountInfo(String nickname) {
 		WebsiteAccount website = null;
 		try {
@@ -66,24 +70,15 @@ public class UIController {
 		}
 		return website;
 	}
+	
 	public static boolean addWebsiteAccount(String nickname, String username, String password) {
 		WebsiteAccount websiteAccount = new WebsiteAccount(safeStoreUser, nickname, username, password);
 		return websiteAccount.addWebsiteAccount(databaseConnection);
 	}
 
 	public static boolean modifyWebsiteAccount(String currentNickname, String newNickname, String newLogin, String newPassword) {
-		String[] fieldsToModify = {"","",""};
 		String[] newInputs = {newNickname,newLogin, newPassword};
-		if(!newNickname.isEmpty()) {
-			fieldsToModify[0] = "Nickname";
-		}
-		if(!newLogin.isEmpty()) {
-			fieldsToModify[1] = "Login";
-		}
-		if(!newPassword.isEmpty()) {
-			fieldsToModify[2] = "Password";
-		}
-		return WebsiteAccount.updateWebsiteAccount(databaseConnection, currentNickname, safeStoreUser, fieldsToModify, newInputs);
+		return WebsiteAccount.updateWebsiteAccount(databaseConnection, currentNickname, safeStoreUser, newInputs);
 	}
 
 	public static CreditCard getCreditCardInfo(String nickname) {
@@ -116,6 +111,38 @@ public class UIController {
 	public static boolean modifyCreditCard(String currentNickname, String nickname, String cardNumber,String expDate, String cvv, String streetAddress, String city, String state, String zip) {
 		String[] newInputs = {nickname,cardNumber,expDate,cvv,streetAddress,city,state,zip};
 		return CreditCard.updateCreditCardInformation(currentNickname, databaseConnection, safeStoreUser, newInputs);
+	}
+	
+	public static DebitCard getDebitCardInfo(String nickname) {
+		DebitCard debitCard = null;
+		try {
+			debitCard = DebitCard.getDebitCardFromNickname(nickname, safeStoreUser, databaseConnection);
+		} catch (Exception e) {
+
+		}
+		return debitCard;
+
+	}
+	
+	public static boolean addDebitCard(String cardNumber, String nickname, String expDate, String cvv, String pin, String streetAddress, String city, String state, String zip) {
+		Address billingAddress = new Address(streetAddress, city, state, zip);
+		DebitCard debitCard;
+		if(!nickname.isEmpty()) {
+			debitCard = new DebitCard(safeStoreUser, nickname, cardNumber, expDate, cvv, pin, billingAddress);
+		}
+		else {
+			debitCard = new DebitCard(safeStoreUser, cardNumber, expDate, cvv, pin, billingAddress);
+		}
+		try {
+			return debitCard.addCard(databaseConnection);
+		} catch (Exception e) {
+			return false;
+		}
+	}
+
+	public static boolean modifyDebitCard(String currentNickname, String nickname, String cardNumber,String expDate, String cvv, String pin, String streetAddress, String city, String state, String zip) {
+		String[] newInputs = {nickname,cardNumber,expDate,cvv,pin,streetAddress,city,state,zip};
+		return DebitCard.updateDebitCardInformation(currentNickname, databaseConnection, safeStoreUser, newInputs);
 	}
 
 }
