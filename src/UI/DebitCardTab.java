@@ -220,17 +220,27 @@ public class DebitCardTab {
 		JButton debitCardAddButton = new JButton("Add");
 		debitCardAddButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				String errors = Validation.validateDebitCardParams(debitCardAddNumberInput.getText(), debitCardAddExpDateInput.getText(), debitCardAddCvvInput.getText(), debitCardAddPinInput.getText());
-				if (debitCardAddNumberInput.getText().isEmpty() || debitCardAddExpDateInput.getText().isEmpty() || debitCardAddCvvInput.getText().isEmpty() || debitCardAddStAdressInput.getText().isEmpty() || debitCardAddCityInput.getText().isEmpty() || debitCardAddStateInput.getText().isEmpty() || debitCardAddZipInput.getText().isEmpty()) {
+				String cardNickname = debitCardAddNicknameInput.getText().trim();
+				String cardNumber = debitCardAddNumberInput.getText().trim();
+				String cardExpDate =  debitCardAddExpDateInput.getText().trim();
+				String cardCVV = debitCardAddCvvInput.getText().trim();
+				String cardStAddress = debitCardAddStAdressInput.getText().trim();
+				String cardCity = debitCardAddCityInput.getText().trim();
+				String cardState = debitCardAddStateInput.getText().trim();
+				String cardZip = debitCardAddZipInput.getText().trim();
+				String cardPin = debitCardAddPinInput.getText().trim();
+				String errors = Validation.validateDebitCardParams(cardNumber, cardExpDate, cardCVV, cardPin);
+				
+				if (cardNumber.isEmpty() || cardExpDate.isEmpty() || cardCVV.isEmpty() || cardPin.isEmpty() || cardStAddress.isEmpty() || cardCity.isEmpty() || cardState.isEmpty() || cardZip.isEmpty()) {
 					JOptionPane.showMessageDialog(frame, "All fields marked with * must have a value");
 				} else if (!errors.equals("")) {
 					JOptionPane.showMessageDialog(frame, errors);
 				} else {
-					if (SafeStore.addDebitCard(debitCardAddNumberInput.getText(),debitCardAddNicknameInput.getText(),debitCardAddExpDateInput.getText(),debitCardAddCvvInput.getText(),debitCardAddPinInput.getText(),debitCardAddStAdressInput.getText(),debitCardAddCityInput.getText(),debitCardAddStateInput.getText(),debitCardAddZipInput.getText())) {
+					if (SafeStore.addDebitCard(cardNumber,cardNickname,cardExpDate,cardCVV,cardPin,cardStAddress,cardCity,cardState,cardZip)) {
 						JOptionPane.showMessageDialog(frame, "Debit Card Added");
 						resetAddDebitCard();
 					} else {
-						JOptionPane.showMessageDialog(frame, "Debit card already added with number (and/or nickname): " + debitCardAddNumberLabel.getText());
+						JOptionPane.showMessageDialog(frame, "Debit card already added with number (and/or nickname): " + cardNumber);
 						resetAddDebitCard();
 					}
 				}
@@ -366,17 +376,27 @@ public class DebitCardTab {
 		JButton debitCardModifyButton = new JButton("Modify");
 		debitCardModifyButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				String errors = Validation.validateDebitCardParams(debitCardModifyNumInput.getText(), debitCardModifyExpDateInput.getText(), debitCardModifyCvvInput.getText(), debitCardModifyPinInput.getText());
-				if (debitCardModifyCurrNicknameInput.getText().isEmpty()) {
+				String cardCurNickname = debitCardModifyCurrNicknameInput.getText().trim();
+				String cardNewNickname = debitCardModifyNewNicknameInput.getText().trim();
+				String cardNumber = debitCardModifyNumInput.getText().trim();
+				String cardExpDate =  debitCardModifyExpDateInput.getText().trim();
+				String cardCVV = debitCardModifyCvvInput.getText().trim();
+				String cardStAddress = debitCardModifyStAddressInput.getText().trim();
+				String cardCity = debitCardModifyCityInput.getText().trim();
+				String cardState = debitCardModifyStateInput.getText().trim();
+				String cardZip = debitCardModifyZipInput.getText().trim();
+				String cardPin = debitCardModifyPinInput.getText().trim();
+				String errors = Validation.validateDebitCardParams(cardNumber, cardExpDate,  cardCVV, cardPin);
+				if (cardCurNickname.isEmpty()) {
 					JOptionPane.showMessageDialog(frame, "Enter a debit card to modify");
 				} else if (!errors.equals("")) {
 					JOptionPane.showMessageDialog(frame, errors);
 				} else {
-					if(SafeStore.modifyDebitCard(debitCardModifyCurrNicknameInput.getText(),debitCardModifyNewNicknameInput.getText(),debitCardModifyNumInput.getText(),debitCardModifyExpDateInput.getText(),debitCardModifyCvvInput.getText(),debitCardModifyPinInput.getText(),debitCardModifyStAddressInput.getText(),debitCardModifyCityInput.getText(),debitCardModifyStateInput.getText(),debitCardModifyZipInput.getText())) {
+					if(SafeStore.modifyDebitCard(cardCurNickname,cardNewNickname,cardNumber,cardExpDate,cardCVV,cardPin,cardStAddress,cardCity,cardState,cardZip)) {
 						JOptionPane.showMessageDialog(frame, "Debit Card Updated");
 						resetModifyDebitCard();
 					}else {
-						JOptionPane.showMessageDialog(frame, "Couldn't update debit card named" + debitCardModifyCurrNicknameInput.getText());
+						JOptionPane.showMessageDialog(frame, "Couldn't update debit card named" + cardCurNickname);
 						resetModifyDebitCard();
 					}
 				}

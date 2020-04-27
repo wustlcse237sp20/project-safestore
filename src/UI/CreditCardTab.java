@@ -26,7 +26,7 @@ public class CreditCardTab {
 	private JTextField creditCardAddNumberInput;
 	private JTextField creditCardAddExpDateInput;
 	private JTextField creditCardAddCVVInput;
-	private JTextField creditCardAddStreetAdressInput;
+	private JTextField creditCardAddStreetAddressInput;
 	private JTextField creditCardAddCityInput;
 	private JTextField creditCardAddStateInput;
 	private JTextField creditCardAddZipInput;
@@ -108,7 +108,7 @@ public class CreditCardTab {
 		creditCardAddExpDateInput.setText("");
 		creditCardAddStateInput.setText("");
 		creditCardAddCityInput.setText("");
-		creditCardAddStreetAdressInput.setText("");
+		creditCardAddStreetAddressInput.setText("");
 		creditCardAddZipInput.setText("");
 		creditCardAddCVVInput.setText("");
 	}
@@ -179,10 +179,10 @@ public class CreditCardTab {
 		creditCardAddCVVInput.setBounds(424, 124, 256, 26);
 		creditCardAddTab.add(creditCardAddCVVInput);
 
-		creditCardAddStreetAdressInput = new JTextField();
-		creditCardAddStreetAdressInput.setColumns(10);
-		creditCardAddStreetAdressInput.setBounds(494, 152, 185, 26);
-		creditCardAddTab.add(creditCardAddStreetAdressInput);
+		creditCardAddStreetAddressInput = new JTextField();
+		creditCardAddStreetAddressInput.setColumns(10);
+		creditCardAddStreetAddressInput.setBounds(494, 152, 185, 26);
+		creditCardAddTab.add(creditCardAddStreetAddressInput);
 
 		creditCardAddCityInput = new JTextField();
 		creditCardAddCityInput.setColumns(10);
@@ -202,18 +202,28 @@ public class CreditCardTab {
 		JButton creditCardAddButton = new JButton("Add");
 		creditCardAddButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				String errors = Validation.validateCreditCardParams(creditCardAddNumberInput.getText(), creditCardAddExpDateInput.getText(), creditCardAddCVVInput.getText());
-				if(creditCardAddNumberInput.getText().isEmpty() || creditCardAddExpDateInput.getText().isEmpty() || creditCardAddCVVInput.getText().isEmpty() || creditCardAddStreetAdressInput.getText().isEmpty() || creditCardAddCityInput.getText().isEmpty() || creditCardAddStateInput.getText().isEmpty() || creditCardAddZipInput.getText().isEmpty()) {
+				String cardNickname = creditCardAddNicknameInput.getText().trim();
+				String cardNumber = creditCardAddNumberInput.getText().trim();
+				String cardExpDate =  creditCardAddExpDateInput.getText().trim();
+				String cardCVV = creditCardAddCVVInput.getText().trim();
+				String cardStAddress = creditCardAddStreetAddressInput.getText().trim();
+				
+				String cardCity = creditCardAddCityInput.getText().trim();
+				String cardState = creditCardAddStateInput.getText().trim();
+				String cardZip = creditCardAddZipInput.getText().trim();
+				
+				String errors = Validation.validateCreditCardParams(cardNumber, cardExpDate,cardCVV);
+				if(cardNumber.isEmpty() || cardExpDate.isEmpty() || cardCVV.isEmpty() || cardStAddress.isEmpty() || cardCity.isEmpty() || cardState.isEmpty() || cardZip.isEmpty()) {
 					JOptionPane.showMessageDialog(frame, "All fields marked with * must have a value");
 				} else if (!errors.equals("")) {
 					JOptionPane.showMessageDialog(frame, errors);
 				}
 			    else {
-					if(SafeStore.addCreditCard(creditCardAddNumberInput.getText(),creditCardAddNicknameInput.getText(),creditCardAddExpDateInput.getText(),creditCardAddCVVInput.getText(),creditCardAddStreetAdressInput.getText(),creditCardAddCityInput.getText(),creditCardAddStateInput.getText(),creditCardAddZipInput.getText())) {
+					if(SafeStore.addCreditCard(cardNumber,cardNickname,cardExpDate,cardCVV,cardStAddress,cardCity,cardState,cardZip)) {
 						JOptionPane.showMessageDialog(frame, "Credit Card Added");
 						resetAddCreditCard();
 					}else {
-						JOptionPane.showMessageDialog(frame, "Credit card already added with number (and/or nickname): " + creditCardAddNumberLabel.getText());
+						JOptionPane.showMessageDialog(frame, "Credit card already added with number (and/or nickname): " + cardNumber);
 						resetAddCreditCard();
 					}
 				}
@@ -330,17 +340,26 @@ public class CreditCardTab {
 		JButton modifyCreditCardButton = new JButton("Modify");
 		modifyCreditCardButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				String errors = Validation.validateCreditCardParams(creditCardModifyNumberInput.getText(), creditCardModifyExpDateInput.getText(), creditCardModifyCVVInput.getText());
+				String cardCurNickname = creditCardModifyCurNicknameInput.getText().trim();
+				String cardNewNickname = creditCardModifyNewNicknameInput.getText().trim();
+				String cardNumber = creditCardModifyNumberInput.getText().trim();
+				String cardExpDate =  creditCardModifyExpDateInput.getText().trim();
+				String cardCVV = creditCardModifyCVVInput.getText().trim();
+				String cardStAddress = creditCardModifyStreetAddressInput.getText().trim();
+				String cardCity = creditCardModifyCityInput.getText().trim();
+				String cardState = creditCardModifyStateInput.getText().trim();
+				String cardZip = creditCardModifyZipInput.getText().trim();
+				String errors = Validation.validateCreditCardParams(cardNumber, cardExpDate, cardCVV);
 				if(creditCardModifyCurNicknameInput.getText().isEmpty()) {
 					JOptionPane.showMessageDialog(frame, "Enter a credit card to modify");
 				} else if (!errors.equals("")) {
 					JOptionPane.showMessageDialog(frame, errors);
 				} else {
-					if(SafeStore.modifyCreditCard(creditCardModifyCurNicknameInput.getText(),creditCardModifyNewNicknameInput.getText(),creditCardModifyNumberInput.getText(),creditCardModifyExpDateInput.getText(),creditCardModifyCVVInput.getText(),creditCardModifyStreetAddressInput.getText(),creditCardModifyCityInput.getText(),creditCardModifyStateInput.getText(),creditCardModifyZipInput.getText())) {
+					if(SafeStore.modifyCreditCard(cardCurNickname,cardNewNickname,cardNumber,cardExpDate,cardCVV,cardStAddress,cardCity,cardState,cardZip)) {
 						JOptionPane.showMessageDialog(frame, "Credit Card Updated");
 						resetModifyCreditCard();
 					}else {
-						JOptionPane.showMessageDialog(frame, "Couldn't update credit card named" + creditCardModifyCurNicknameInput.getText());
+						JOptionPane.showMessageDialog(frame, "Couldn't update credit card named" + cardCurNickname);
 						resetModifyCreditCard();
 					}
 				}

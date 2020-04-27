@@ -1,9 +1,14 @@
 package UI;
 
+import java.awt.List;
 import java.sql.SQLException;
+import java.util.LinkedList;
+
+import javax.swing.JList;
 
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
+import com.j256.ormlite.dao.ForeignCollection;
 import com.j256.ormlite.jdbc.JdbcConnectionSource;
 import com.j256.ormlite.logger.LocalLog;
 import com.j256.ormlite.support.ConnectionSource;
@@ -11,7 +16,9 @@ import com.j256.ormlite.support.ConnectionSource;
 import card.Address;
 import card.CreditCard;
 import card.DebitCard;
+import encryption.Encryption;
 import tables.UserEntity;
+import tables.WebsiteAccountEntity;
 import user.User;
 import websiteAccount.WebsiteAccount;
 
@@ -59,6 +66,17 @@ public class SafeStore {
 			e.printStackTrace();
 		}
 
+	}
+	
+	public static String[] getUsersWebsites() {
+		ForeignCollection<WebsiteAccountEntity> websiteEntities = WebsiteAccount.getAllWebsiteAccounts(databaseConnection, safeStoreUser);
+		LinkedList<String> websiteNicknamesList = new LinkedList<String>();
+		for(WebsiteAccountEntity websiteEntity :  websiteEntities) {
+			websiteNicknamesList.add(Encryption.decrypt(websiteEntity.getNickname()));
+		}
+		String[] websiteNicknamesArray = websiteNicknamesList.toArray(new String[0]);
+		
+		return websiteNicknamesArray;
 	}
 	
 	public static WebsiteAccount getWebsiteAccountInfo(String nickname) {
