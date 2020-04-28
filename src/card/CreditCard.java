@@ -7,6 +7,7 @@ import java.util.Map;
 
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
+import com.j256.ormlite.dao.ForeignCollection;
 import com.j256.ormlite.support.ConnectionSource;
 
 import encryption.Encryption;
@@ -245,7 +246,25 @@ public class CreditCard implements Card{
 
 	}
 
-
+	/**
+	 * gets the foreign collection of all credit card rows for that user
+	 * @param databaseConnection
+	 * @param safeStoreUser of type User
+	 * @return a ForeignCollection<WebsiteAccountEntity> that holds all the db rows of credit cards
+	 * 			for the safeStoreUser
+	 */
+	public static ForeignCollection<CreditCardEntity> getAllCreditCards(ConnectionSource databaseConnection, User safeStoreUser) {
+		Dao<UserEntity, String> userDao;
+		try {
+			userDao = DaoManager.createDao(databaseConnection, UserEntity.class);
+			UserEntity userEntity = userDao.queryForSameId(safeStoreUser.getUserEntity());
+			return userEntity.getCreditCards();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
 	/**
 	 * Gets a Credit card from the database based off the nickname and SafeStore user
 	 * 

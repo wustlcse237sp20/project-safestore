@@ -5,17 +5,25 @@ import java.awt.ComponentOrientation;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseListener;
+import java.util.Arrays;
+import java.awt.event.MouseEvent;
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
+import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+
+import com.sun.xml.internal.fastinfoset.util.StringArray;
 
 import websiteAccount.WebsiteAccount;
 
@@ -33,7 +41,7 @@ public class WebsiteAccountTab {
 	private JLabel websiteAccountViewUsernameResult;
 	private JLabel websiteAccountViewPasswordResult;
 	private JButton websiteAccountSearchButton;
-
+	private DefaultListModel<String> websiteModel;
 
 	public WebsiteAccountTab(JFrame frame) {
 		this.frame = frame;
@@ -62,11 +70,9 @@ public class WebsiteAccountTab {
 		websiteAccountSearchLabel.setBounds(47, 76, 67, 16);
 		websiteAccounts.add(websiteAccountSearchLabel);
 
-		JTextArea websiteAccountNicknames = new JTextArea();
-		websiteAccountNicknames.setText("will hold account \nnicknames in \nnext iteration");
-		websiteAccountNicknames.setBounds(47, 109, 130, 257);
-		websiteAccounts.add(websiteAccountNicknames);
-
+		websiteModel = new DefaultListModel<String>();
+		updateAccountList(websiteAccounts, websiteModel);
+		
 		JLabel websiteAccountViewUsernameLabel = new JLabel("Username:");
 		websiteAccountViewUsernameLabel.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		websiteAccountViewUsernameLabel.setBounds(189, 181, 75, 16);
@@ -94,6 +100,7 @@ public class WebsiteAccountTab {
 					websiteAccountViewUsernameResult.setText(website.getWebsiteLogin());
 					websiteAccountViewPasswordResult.setText(website.getWebsitePassword());
 					websiteAccountSearchNicknameInput.setText(website.getNickname());
+					
 				}else {
 					JOptionPane.showMessageDialog(frame, "You have no website stored under " + websiteAccountSearchNicknameInput.getText());
 					websiteAccountViewUsernameResult.setText("");
@@ -111,11 +118,33 @@ public class WebsiteAccountTab {
 		websiteAccountAddUsernameInput.setText("");
 	}
 	
-	private void setSearchWebsiteFieldAfterModifyingOrAddingSite(String siteName) {
+	private void searchWebsite(String siteName) {
 		websiteAccountSearchNicknameInput.setText(siteName);
 		websiteAccountSearchButton.doClick();
 	}
 
+	public void updateAccountList(JPanel websiteAccounts, DefaultListModel<String> websiteModel) {
+		websiteModel.clear();
+		String[] websites = SafeStore.getUsersWebsites();
+		Arrays.sort(websites,String.CASE_INSENSITIVE_ORDER);
+		 for(String site : websites) {
+			 websiteModel.addElement(site);
+		 }
+		 JList<String> websiteList = new JList<String>(websiteModel);
+		 JScrollPane websiteScrollPane = new JScrollPane(websiteList);
+		 websiteScrollPane.setBounds(47, 109, 130, 257);
+		 websiteAccounts.add(websiteScrollPane);
+		 
+		 MouseListener mouseListener = new MouseAdapter() {
+			 public void mouseClicked(MouseEvent e) {
+				
+		        searchWebsite(websiteModel.get(websiteList.getSelectedIndex()));
+				 
+		     }
+		 };
+		 websiteList.addMouseListener(mouseListener);
+		 
+	}
 	/**
 	 * 
 	 * Initializes the add section of the website account tab.
@@ -160,13 +189,18 @@ public class WebsiteAccountTab {
 		JButton websiteAccountAddButton = new JButton("Add");
 		websiteAccountAddButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(websiteAccountAddNicknameInput.getText().isEmpty() || String.valueOf(websiteAccountAddPasswordInput.getPassword()).isEmpty()|| websiteAccountAddUsernameInput.getText().isEmpty()) {
+				String websiteNickname = websiteAccountAddNicknameInput.getText().trim();
+				String websiteUsername = websiteAccountAddUsernameInput.getText().trim();
+				String websitePassword = String.valueOf(websiteAccountAddPasswordInput.getPassword()).trim();
+						
+				if(websiteNickname.isEmpty() || websitePassword.isEmpty()|| websiteUsername.isEmpty()) {
 					JOptionPane.showMessageDialog(frame, "Username, password, and nickname must contain values");
 				}else {
-					if(SafeStore.addWebsiteAccount(websiteAccountAddNicknameInput.getText(), websiteAccountAddUsernameInput.getText(),String.valueOf(websiteAccountAddPasswordInput.getPassword()))) {
+					if(SafeStore.addWebsiteAccount(websiteNickname, websiteUsername, websitePassword)) {
 						JOptionPane.showMessageDialog(frame, "Website Added Succesfully!");
-						setSearchWebsiteFieldAfterModifyingOrAddingSite(websiteAccountAddNicknameInput.getText());
+						searchWebsite(websiteNickname);
 						resetAddWebsiteFields();
+						websiteModel.addElement(websiteNickname);
 					}else {
 						JOptionPane.showMessageDialog(frame, "Could not add website - Website with nickname already exists");
 						resetAddWebsiteFields();
@@ -241,12 +275,13 @@ public class WebsiteAccountTab {
 						JOptionPane.showMessageDialog(frame, "Website modified ");
 
 						String siteNickname = "";
-						if(websiteAccountModifyNicknameInput.getText().isEmpty()) {
-							siteNickname = websiteAccountModifyCurrNicknameInput.getText(); 
+						if(websiteAccountModifyNicknameInput.getText().trim().isEmpty()) {
+							siteNickname = websiteAccountModifyCurrNicknameInput.getText();
 						}else {
-							siteNickname = websiteAccountModifyNicknameInput.getText();
+							siteNickname = websiteAccountModifyNicknameInput.getText().trim();
+							updateAccountList(websiteAccounts, websiteModel);
 						}
-						setSearchWebsiteFieldAfterModifyingOrAddingSite(siteNickname);
+						searchWebsite(siteNickname);
 						resetModifyWebsiteFields();
 					}else {
 						JOptionPane.showMessageDialog(frame, "Couldn't Modify website");
@@ -299,6 +334,9 @@ public class WebsiteAccountTab {
 		initializeWebAccountViewSection(websiteAccounts);
 		intializeWebAccountAddSection(websiteAccounts);
 		initializeWebAccountModifySection(websiteAccounts);	
+
 	}
+	
+
 
 }

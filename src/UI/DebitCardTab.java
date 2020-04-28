@@ -5,23 +5,33 @@ import java.awt.ComponentOrientation;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.util.Arrays;
 
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import card.DebitCard;
 
 public class DebitCardTab {
 
 	private JFrame frame;
-	private JTextField debitCardSearchInput;
+	private static JTextField debitCardSearchInput;
+	private static JButton debitCardSearchButton;
 	private JTextField debitCardAddNicknameInput;
 	private JTextField debitCardAddNumberInput;
 	private JTextField debitCardAddExpDateInput;
@@ -41,6 +51,10 @@ public class DebitCardTab {
 	private JTextField debitCardModifyStateInput;
 	private JTextField debitCardModifyZipInput;
 	private JTextField debitCardModifyCurrNicknameInput;
+	private DefaultListModel<String> debitCardModel = new DefaultListModel<String>();
+	private JPanel debitCardViewTab;
+	private JPanel debitCardAddTab;
+	private JPanel debitCardModifyTab;
 
 	public DebitCardTab(JFrame frame) {
 		this.frame = frame;
@@ -51,7 +65,7 @@ public class DebitCardTab {
 	 * 
 	 */
 	private void initializeDebitCardViewTab(JTabbedPane debitCardTabbedPane) {
-		JPanel debitCardViewTab = new JPanel();
+		debitCardViewTab = new JPanel();
 		debitCardTabbedPane.addTab("View", null, debitCardViewTab, null);
 		debitCardViewTab.setLayout(null);
 
@@ -65,10 +79,7 @@ public class DebitCardTab {
 		debitCardSearchInput.setBounds(289, 8, 130, 26);
 		debitCardViewTab.add(debitCardSearchInput);
 
-		JTextArea debitCardDisplayNicknamesView = new JTextArea();
-		debitCardDisplayNicknamesView.setText("will hold account \nnicknames in \nnext iteration");
-		debitCardDisplayNicknamesView.setBounds(171, 64, 113, 248);
-		debitCardViewTab.add(debitCardDisplayNicknamesView);
+		updateDebitCardList(debitCardViewTab, debitCardModel);
 
 		JTextArea debitCardViewDisplay = new JTextArea();
 		debitCardViewDisplay.setText("");
@@ -80,7 +91,7 @@ public class DebitCardTab {
 		debitCardDefaultNicknameDisclaimer.setBounds(477, 315, 251, 16);
 		debitCardViewTab.add(debitCardDefaultNicknameDisclaimer);
 
-		JButton debitCardSearchButton = new JButton("Search");
+		debitCardSearchButton = new JButton("Search");
 		debitCardSearchButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if(debitCardSearchInput.getText().isEmpty()) {
@@ -102,6 +113,32 @@ public class DebitCardTab {
 		debitCardSearchButton.setBounds(424, 6, 85, 29);
 		debitCardViewTab.add(debitCardSearchButton);
 	}
+	/**
+	 * 
+	 * @param debitCardTab - debit card tab to add the list to
+	 * @param debitCardModel - model that holds the debit cards
+	 */
+
+	public static void updateDebitCardList(JPanel debitCardTab, DefaultListModel<String> debitCardModel) {
+		debitCardModel.clear();
+		String[] debitCards = SafeStore.getUsersDebitCards();
+		Arrays.sort(debitCards,String.CASE_INSENSITIVE_ORDER);
+		for(String card : debitCards) {
+			debitCardModel.addElement(card);
+		}
+		JList<String> debitCardList = new JList<String>(debitCardModel);
+		JScrollPane debitCardScrollPane = new JScrollPane(debitCardList);
+		debitCardScrollPane.setBounds(171, 64, 113, 248);
+		debitCardTab.add(debitCardScrollPane);
+
+		MouseListener mouseListener = new MouseAdapter() {
+			public void mouseClicked(MouseEvent e) {
+				debitCardSearchInput.setText(debitCardModel.get(debitCardList.getSelectedIndex()));
+				debitCardSearchButton.doClick();
+			}
+		};
+		debitCardList.addMouseListener(mouseListener);
+	}
 
 	private void resetAddDebitCard() {
 		debitCardAddNumberInput.setText("");
@@ -120,7 +157,7 @@ public class DebitCardTab {
 	 * 
 	 */
 	private void initializeDebitCardAddTab(JTabbedPane debitCardTabbedPane) {
-		JPanel debitCardAddTab = new JPanel();
+		debitCardAddTab = new JPanel();
 		debitCardTabbedPane.addTab("Add", null, debitCardAddTab, null);
 		debitCardAddTab.setLayout(null);
 
@@ -157,10 +194,7 @@ public class DebitCardTab {
 		debitCardAddZipLabel.setBounds(384, 269, 77, 16);
 		debitCardAddTab.add(debitCardAddZipLabel);
 
-		JTextArea debitCardAddDisplayNickname = new JTextArea();
-		debitCardAddDisplayNickname.setText("will display\nthe list of \nnicknames");
-		debitCardAddDisplayNickname.setBounds(95, 45, 168, 212);
-		debitCardAddTab.add(debitCardAddDisplayNickname);
+		updateDebitCardList(debitCardAddTab, debitCardModel);
 
 		debitCardAddNicknameInput = new JTextField();
 		debitCardAddNicknameInput.setColumns(10);
@@ -220,17 +254,29 @@ public class DebitCardTab {
 		JButton debitCardAddButton = new JButton("Add");
 		debitCardAddButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				String errors = Validation.validateDebitCardParams(debitCardAddNumberInput.getText(), debitCardAddExpDateInput.getText(), debitCardAddCvvInput.getText(), debitCardAddPinInput.getText());
-				if (debitCardAddNumberInput.getText().isEmpty() || debitCardAddExpDateInput.getText().isEmpty() || debitCardAddCvvInput.getText().isEmpty() || debitCardAddStAdressInput.getText().isEmpty() || debitCardAddCityInput.getText().isEmpty() || debitCardAddStateInput.getText().isEmpty() || debitCardAddZipInput.getText().isEmpty()) {
+				String cardNickname = debitCardAddNicknameInput.getText().trim();
+				String cardNumber = debitCardAddNumberInput.getText().trim();
+				String cardExpDate =  debitCardAddExpDateInput.getText().trim();
+				String cardCVV = debitCardAddCvvInput.getText().trim();
+				String cardStAddress = debitCardAddStAdressInput.getText().trim();
+				String cardCity = debitCardAddCityInput.getText().trim();
+				String cardState = debitCardAddStateInput.getText().trim();
+				String cardZip = debitCardAddZipInput.getText().trim();
+				String cardPin = debitCardAddPinInput.getText().trim();
+				String errors = Validation.validateDebitCardParams(cardNumber, cardExpDate, cardCVV, cardPin);
+
+				if (cardNumber.isEmpty() || cardExpDate.isEmpty() || cardCVV.isEmpty() || cardPin.isEmpty() || cardStAddress.isEmpty() || cardCity.isEmpty() || cardState.isEmpty() || cardZip.isEmpty()) {
 					JOptionPane.showMessageDialog(frame, "All fields marked with * must have a value");
 				} else if (!errors.equals("")) {
 					JOptionPane.showMessageDialog(frame, errors);
 				} else {
-					if (SafeStore.addDebitCard(debitCardAddNumberInput.getText(),debitCardAddNicknameInput.getText(),debitCardAddExpDateInput.getText(),debitCardAddCvvInput.getText(),debitCardAddPinInput.getText(),debitCardAddStAdressInput.getText(),debitCardAddCityInput.getText(),debitCardAddStateInput.getText(),debitCardAddZipInput.getText())) {
+					if (SafeStore.addDebitCard(cardNumber,cardNickname,cardExpDate,cardCVV,cardPin,cardStAddress,cardCity,cardState,cardZip)) {
 						JOptionPane.showMessageDialog(frame, "Debit Card Added");
 						resetAddDebitCard();
+						updateDebitCardList(debitCardAddTab, debitCardModel);
+					
 					} else {
-						JOptionPane.showMessageDialog(frame, "Debit card already added with number (and/or nickname): " + debitCardAddNumberLabel.getText());
+						JOptionPane.showMessageDialog(frame, "Debit card already added with number (and/or nickname): " + cardNumber);
 						resetAddDebitCard();
 					}
 				}
@@ -258,14 +304,11 @@ public class DebitCardTab {
 	 * 
 	 */
 	private void initializeDebitCardModifyTab(JTabbedPane debitCardTabbedPane) {
-		JPanel debitCardModifyTab = new JPanel();
+		debitCardModifyTab = new JPanel();
 		debitCardTabbedPane.addTab("Modify", null, debitCardModifyTab, null);
 		debitCardModifyTab.setLayout(null);
-
-		JTextArea debitCardModifyDisplayNickname = new JTextArea();
-		debitCardModifyDisplayNickname.setText("will display\nthe list of \nnicknames");
-		debitCardModifyDisplayNickname.setBounds(109, 50, 168, 212);
-		debitCardModifyTab.add(debitCardModifyDisplayNickname);
+	
+		updateDebitCardList(debitCardModifyTab, debitCardModel);
 
 		JLabel debitCardModifyRequiredFieldLabel = new JLabel("* required field");
 		debitCardModifyRequiredFieldLabel.setForeground(Color.RED);
@@ -366,17 +409,29 @@ public class DebitCardTab {
 		JButton debitCardModifyButton = new JButton("Modify");
 		debitCardModifyButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				String errors = Validation.validateDebitCardParams(debitCardModifyNumInput.getText(), debitCardModifyExpDateInput.getText(), debitCardModifyCvvInput.getText(), debitCardModifyPinInput.getText());
-				if (debitCardModifyCurrNicknameInput.getText().isEmpty()) {
+				String cardCurNickname = debitCardModifyCurrNicknameInput.getText().trim();
+				String cardNewNickname = debitCardModifyNewNicknameInput.getText().trim();
+				String cardNumber = debitCardModifyNumInput.getText().trim();
+				String cardExpDate =  debitCardModifyExpDateInput.getText().trim();
+				String cardCVV = debitCardModifyCvvInput.getText().trim();
+				String cardStAddress = debitCardModifyStAddressInput.getText().trim();
+				String cardCity = debitCardModifyCityInput.getText().trim();
+				String cardState = debitCardModifyStateInput.getText().trim();
+				String cardZip = debitCardModifyZipInput.getText().trim();
+				String cardPin = debitCardModifyPinInput.getText().trim();
+				String errors = Validation.validateDebitCardParams(cardNumber, cardExpDate,  cardCVV, cardPin);
+				if (cardCurNickname.isEmpty()) {
 					JOptionPane.showMessageDialog(frame, "Enter a debit card to modify");
 				} else if (!errors.equals("")) {
 					JOptionPane.showMessageDialog(frame, errors);
 				} else {
-					if(SafeStore.modifyDebitCard(debitCardModifyCurrNicknameInput.getText(),debitCardModifyNewNicknameInput.getText(),debitCardModifyNumInput.getText(),debitCardModifyExpDateInput.getText(),debitCardModifyCvvInput.getText(),debitCardModifyPinInput.getText(),debitCardModifyStAddressInput.getText(),debitCardModifyCityInput.getText(),debitCardModifyStateInput.getText(),debitCardModifyZipInput.getText())) {
+					if(SafeStore.modifyDebitCard(cardCurNickname,cardNewNickname,cardNumber,cardExpDate,cardCVV,cardPin,cardStAddress,cardCity,cardState,cardZip)) {
 						JOptionPane.showMessageDialog(frame, "Debit Card Updated");
 						resetModifyDebitCard();
+						updateDebitCardList(debitCardModifyTab, debitCardModel);
+						
 					}else {
-						JOptionPane.showMessageDialog(frame, "Couldn't update debit card named" + debitCardModifyCurrNicknameInput.getText());
+						JOptionPane.showMessageDialog(frame, "Couldn't update debit card named" + cardCurNickname);
 						resetModifyDebitCard();
 					}
 				}
@@ -414,6 +469,16 @@ public class DebitCardTab {
 		initializeDebitCardViewTab(debitCardTabbedPane);
 		initializeDebitCardAddTab(debitCardTabbedPane);
 		initializeDebitCardModifyTab(debitCardTabbedPane);
-	}
 
+		JPanel[] panels = {debitCardViewTab, debitCardAddTab, debitCardModifyTab};
+
+		debitCardTabbedPane.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				updateDebitCardList(panels[debitCardTabbedPane.getSelectedIndex()],debitCardModel);
+			}
+
+
+		});
+	}
 }

@@ -5,28 +5,38 @@ import java.awt.ComponentOrientation;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.util.Arrays;
 
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import card.CreditCard;
 
 public class CreditCardTab {
 
 	private JFrame frame;
-	private JTextField creditCardSearchNicknameInput;
+	private static JTextField creditCardSearchNicknameInput;
+	private static JButton creditCardSearchButton;
 	private JTextField creditCardAddNicknameInput;
 	private JTextField creditCardAddNumberInput;
 	private JTextField creditCardAddExpDateInput;
 	private JTextField creditCardAddCVVInput;
-	private JTextField creditCardAddStreetAdressInput;
+	private JTextField creditCardAddStreetAddressInput;
 	private JTextField creditCardAddCityInput;
 	private JTextField creditCardAddStateInput;
 	private JTextField creditCardAddZipInput;
@@ -39,7 +49,11 @@ public class CreditCardTab {
 	private JTextField creditCardModifyStateInput;
 	private JTextField creditCardModifyZipInput;
 	private JTextField creditCardModifyCurNicknameInput;
-
+	private DefaultListModel<String> creditCardModel = new DefaultListModel<String>();
+	private JPanel creditCardViewTab;
+	private JPanel creditCardAddTab;
+	private JPanel creditCardModifyTab;
+	
 	public CreditCardTab(JFrame frame) {
 		this.frame = frame;
 	}
@@ -49,7 +63,7 @@ public class CreditCardTab {
 	 * Initializes the credit card view tab for the credit card tab.
 	 */
 	private void initializeCreditCardViewTab(JTabbedPane creditCardTabbedPane) {
-		JPanel creditCardViewTab = new JPanel();
+		creditCardViewTab = new JPanel();
 		creditCardTabbedPane.addTab("View", null, creditCardViewTab, null);
 		creditCardViewTab.setLayout(null);
 
@@ -67,7 +81,7 @@ public class CreditCardTab {
 		creditCardSearchNicknameInput.setColumns(10);
 		creditCardViewTab.add(creditCardSearchNicknameInput);
 
-		JButton creditCardSearchButton = new JButton("Search");
+		creditCardSearchButton = new JButton("Search");
 		creditCardSearchButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if(creditCardSearchNicknameInput.getText().isEmpty()) {
@@ -90,16 +104,40 @@ public class CreditCardTab {
 		creditCardSearchButton.setBounds(448, 6, 85, 29);
 		creditCardViewTab.add(creditCardSearchButton);
 
-		JTextArea creditCardDisplayNicknamesView = new JTextArea();
-		creditCardDisplayNicknamesView.setBounds(195, 64, 113, 248);
-		creditCardDisplayNicknamesView.setText("will hold account \nnicknames in \nnext iteration");
-		creditCardViewTab.add(creditCardDisplayNicknamesView);
-
+		updateCreditCardList(creditCardViewTab, creditCardModel); 
+			
 		JLabel defaultNicknameDisclaimer = new JLabel("*default nickname is last four digits of card number");
 		defaultNicknameDisclaimer.setFont(new Font("Lucida Grande", Font.PLAIN, 9));
 		defaultNicknameDisclaimer.setBounds(501, 315, 251, 16);
 		creditCardViewTab.add(defaultNicknameDisclaimer);
 
+	}
+	
+	/**
+	 * 
+	 * @param creditCardTab - credit card tab to add the list to
+	 * @param creditCardModel - model that holds the credit cards
+	 */
+
+	public static void updateCreditCardList(JPanel creditCardTab, DefaultListModel<String> creditCardModel) {
+		creditCardModel.clear();
+		String[] creditCards = SafeStore.getUsersCreditCards();
+		Arrays.sort(creditCards,String.CASE_INSENSITIVE_ORDER);
+		for(String card : creditCards) {
+			creditCardModel.addElement(card);
+		}
+		JList<String> creditCardList = new JList<String>(creditCardModel);
+		JScrollPane creditCardScrollPane = new JScrollPane(creditCardList);
+		creditCardScrollPane.setBounds(195, 64, 113, 248);
+		creditCardTab.add(creditCardScrollPane);
+
+		MouseListener mouseListener = new MouseAdapter() {
+			public void mouseClicked(MouseEvent e) {
+				creditCardSearchNicknameInput.setText(creditCardModel.get(creditCardList.getSelectedIndex()));
+				creditCardSearchButton.doClick();
+			}
+		};
+		creditCardList.addMouseListener(mouseListener);
 	}
 	
 	private void resetAddCreditCard() {
@@ -108,7 +146,7 @@ public class CreditCardTab {
 		creditCardAddExpDateInput.setText("");
 		creditCardAddStateInput.setText("");
 		creditCardAddCityInput.setText("");
-		creditCardAddStreetAdressInput.setText("");
+		creditCardAddStreetAddressInput.setText("");
 		creditCardAddZipInput.setText("");
 		creditCardAddCVVInput.setText("");
 	}
@@ -118,7 +156,7 @@ public class CreditCardTab {
 	 * 
 	 */
 	private void initializeCreditCardAddTab(JTabbedPane creditCardTabbedPane) {
-		JPanel creditCardAddTab = new JPanel();
+		creditCardAddTab = new JPanel();
 		creditCardTabbedPane.addTab("Add", null, creditCardAddTab, null);
 		creditCardAddTab.setLayout(null);
 
@@ -154,11 +192,9 @@ public class CreditCardTab {
 		creditCardAddZipLabel.setBounds(384, 241, 77, 16);
 		creditCardAddTab.add(creditCardAddZipLabel);
 
-		JTextArea creditCardDisplayNicknamesAdd = new JTextArea();
-		creditCardDisplayNicknamesAdd.setText("will display\nthe list of \nnicknames");
-		creditCardDisplayNicknamesAdd.setBounds(95, 45, 168, 212);
-		creditCardAddTab.add(creditCardDisplayNicknamesAdd);
 
+		updateCreditCardList(creditCardAddTab, creditCardModel); 
+		
 		creditCardAddNicknameInput = new JTextField();
 		creditCardAddNicknameInput.setBounds(458, 68, 222, 26);
 		creditCardAddTab.add(creditCardAddNicknameInput);
@@ -179,10 +215,10 @@ public class CreditCardTab {
 		creditCardAddCVVInput.setBounds(424, 124, 256, 26);
 		creditCardAddTab.add(creditCardAddCVVInput);
 
-		creditCardAddStreetAdressInput = new JTextField();
-		creditCardAddStreetAdressInput.setColumns(10);
-		creditCardAddStreetAdressInput.setBounds(494, 152, 185, 26);
-		creditCardAddTab.add(creditCardAddStreetAdressInput);
+		creditCardAddStreetAddressInput = new JTextField();
+		creditCardAddStreetAddressInput.setColumns(10);
+		creditCardAddStreetAddressInput.setBounds(494, 152, 185, 26);
+		creditCardAddTab.add(creditCardAddStreetAddressInput);
 
 		creditCardAddCityInput = new JTextField();
 		creditCardAddCityInput.setColumns(10);
@@ -202,18 +238,29 @@ public class CreditCardTab {
 		JButton creditCardAddButton = new JButton("Add");
 		creditCardAddButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				String errors = Validation.validateCreditCardParams(creditCardAddNumberInput.getText(), creditCardAddExpDateInput.getText(), creditCardAddCVVInput.getText());
-				if(creditCardAddNumberInput.getText().isEmpty() || creditCardAddExpDateInput.getText().isEmpty() || creditCardAddCVVInput.getText().isEmpty() || creditCardAddStreetAdressInput.getText().isEmpty() || creditCardAddCityInput.getText().isEmpty() || creditCardAddStateInput.getText().isEmpty() || creditCardAddZipInput.getText().isEmpty()) {
+				String cardNickname = creditCardAddNicknameInput.getText().trim();
+				String cardNumber = creditCardAddNumberInput.getText().trim();
+				String cardExpDate =  creditCardAddExpDateInput.getText().trim();
+				String cardCVV = creditCardAddCVVInput.getText().trim();
+				String cardStAddress = creditCardAddStreetAddressInput.getText().trim();
+				
+				String cardCity = creditCardAddCityInput.getText().trim();
+				String cardState = creditCardAddStateInput.getText().trim();
+				String cardZip = creditCardAddZipInput.getText().trim();
+				
+				String errors = Validation.validateCreditCardParams(cardNumber, cardExpDate,cardCVV);
+				if(cardNumber.isEmpty() || cardExpDate.isEmpty() || cardCVV.isEmpty() || cardStAddress.isEmpty() || cardCity.isEmpty() || cardState.isEmpty() || cardZip.isEmpty()) {
 					JOptionPane.showMessageDialog(frame, "All fields marked with * must have a value");
 				} else if (!errors.equals("")) {
 					JOptionPane.showMessageDialog(frame, errors);
 				}
 			    else {
-					if(SafeStore.addCreditCard(creditCardAddNumberInput.getText(),creditCardAddNicknameInput.getText(),creditCardAddExpDateInput.getText(),creditCardAddCVVInput.getText(),creditCardAddStreetAdressInput.getText(),creditCardAddCityInput.getText(),creditCardAddStateInput.getText(),creditCardAddZipInput.getText())) {
+					if(SafeStore.addCreditCard(cardNumber,cardNickname,cardExpDate,cardCVV,cardStAddress,cardCity,cardState,cardZip)) {
 						JOptionPane.showMessageDialog(frame, "Credit Card Added");
 						resetAddCreditCard();
+						updateCreditCardList(creditCardAddTab, creditCardModel);
 					}else {
-						JOptionPane.showMessageDialog(frame, "Credit card already added with number (and/or nickname): " + creditCardAddNumberLabel.getText());
+						JOptionPane.showMessageDialog(frame, "Credit card already added with number (and/or nickname): " + cardNumber);
 						resetAddCreditCard();
 					}
 				}
@@ -246,15 +293,12 @@ public class CreditCardTab {
 	 * 
 	 */
 	private void initializeCreditCardModifyTab(JTabbedPane creditCardTabbedPane) {
-		JPanel creditCardModifyTab = new JPanel();
+		creditCardModifyTab = new JPanel();
 		creditCardTabbedPane.addTab("Modify", null, creditCardModifyTab, null);
 		creditCardModifyTab.setLayout(null);
 
-		JTextArea creditCardDisplayNicknamesAdd_1 = new JTextArea();
-		creditCardDisplayNicknamesAdd_1.setText("will display\nthe list of \nnicknames");
-		creditCardDisplayNicknamesAdd_1.setBounds(83, 27, 168, 244);
-		creditCardModifyTab.add(creditCardDisplayNicknamesAdd_1);
-
+		updateCreditCardList(creditCardModifyTab, creditCardModel); 
+		
 		JLabel modifyCreditCardNumLabel = new JLabel("Card Number:");
 		modifyCreditCardNumLabel.setBounds(371, 58, 98, 16);
 		creditCardModifyTab.add(modifyCreditCardNumLabel);
@@ -330,17 +374,27 @@ public class CreditCardTab {
 		JButton modifyCreditCardButton = new JButton("Modify");
 		modifyCreditCardButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				String errors = Validation.validateCreditCardParams(creditCardModifyNumberInput.getText(), creditCardModifyExpDateInput.getText(), creditCardModifyCVVInput.getText());
+				String cardCurNickname = creditCardModifyCurNicknameInput.getText().trim();
+				String cardNewNickname = creditCardModifyNewNicknameInput.getText().trim();
+				String cardNumber = creditCardModifyNumberInput.getText().trim();
+				String cardExpDate =  creditCardModifyExpDateInput.getText().trim();
+				String cardCVV = creditCardModifyCVVInput.getText().trim();
+				String cardStAddress = creditCardModifyStreetAddressInput.getText().trim();
+				String cardCity = creditCardModifyCityInput.getText().trim();
+				String cardState = creditCardModifyStateInput.getText().trim();
+				String cardZip = creditCardModifyZipInput.getText().trim();
+				String errors = Validation.validateCreditCardParams(cardNumber, cardExpDate, cardCVV);
 				if(creditCardModifyCurNicknameInput.getText().isEmpty()) {
 					JOptionPane.showMessageDialog(frame, "Enter a credit card to modify");
 				} else if (!errors.equals("")) {
 					JOptionPane.showMessageDialog(frame, errors);
 				} else {
-					if(SafeStore.modifyCreditCard(creditCardModifyCurNicknameInput.getText(),creditCardModifyNewNicknameInput.getText(),creditCardModifyNumberInput.getText(),creditCardModifyExpDateInput.getText(),creditCardModifyCVVInput.getText(),creditCardModifyStreetAddressInput.getText(),creditCardModifyCityInput.getText(),creditCardModifyStateInput.getText(),creditCardModifyZipInput.getText())) {
+					if(SafeStore.modifyCreditCard(cardCurNickname,cardNewNickname,cardNumber,cardExpDate,cardCVV,cardStAddress,cardCity,cardState,cardZip)) {
 						JOptionPane.showMessageDialog(frame, "Credit Card Updated");
 						resetModifyCreditCard();
+						updateCreditCardList(creditCardModifyTab, creditCardModel);
 					}else {
-						JOptionPane.showMessageDialog(frame, "Couldn't update credit card named" + creditCardModifyCurNicknameInput.getText());
+						JOptionPane.showMessageDialog(frame, "Couldn't update credit card named" + cardCurNickname);
 						resetModifyCreditCard();
 					}
 				}
@@ -393,6 +447,18 @@ public class CreditCardTab {
 		initializeCreditCardViewTab(creditCardTabbedPane);
 		initializeCreditCardAddTab(creditCardTabbedPane);
 		initializeCreditCardModifyTab(creditCardTabbedPane);
+		
+		JPanel[] panels = {creditCardViewTab, creditCardAddTab, creditCardModifyTab};
+
+		creditCardTabbedPane.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				updateCreditCardList(panels[creditCardTabbedPane.getSelectedIndex()],creditCardModel);
+				
+			}
+
+
+		});
 
 	}
 

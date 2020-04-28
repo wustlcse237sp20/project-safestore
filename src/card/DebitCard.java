@@ -7,11 +7,13 @@ import java.util.Map;
 
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
+import com.j256.ormlite.dao.ForeignCollection;
 import com.j256.ormlite.support.ConnectionSource;
 
 import encryption.Encryption;
 import tables.DebitCardEntity;
 import tables.UserEntity;
+import tables.WebsiteAccountEntity;
 import user.User;
 
 public class DebitCard implements Card {
@@ -268,7 +270,24 @@ public class DebitCard implements Card {
 		}
 
 	}
-	
+	/**
+	 * gets the foreign collection of all debit card rows for that user
+	 * @param databaseConnection
+	 * @param safeStoreUser of type User
+	 * @return a ForeignCollection<WebsiteAccountEntity> that holds all the db rows of debit cards
+	 * 			for the safeStoreUser
+	 */
+	public static ForeignCollection<DebitCardEntity> getAllDebitCards(ConnectionSource databaseConnection, User safeStoreUser) {
+		Dao<UserEntity, String> userDao;
+		try {
+			userDao = DaoManager.createDao(databaseConnection, UserEntity.class);
+			UserEntity userEntity = userDao.queryForSameId(safeStoreUser.getUserEntity());
+			return userEntity.getDebitCards();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
 	/**
 	 * Gets a Debit card from the database based off the nickname and SafeStore user
 	 * 
