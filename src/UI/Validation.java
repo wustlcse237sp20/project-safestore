@@ -12,7 +12,9 @@ public class Validation {
 	 * @return true if the card number is all digits and 13-16 in length
 	 */
 	public static boolean validateCardNumber(String cardNumber) {
-		return Pattern.matches("^\\d{13,16}$", cardNumber) || cardNumber.trim().equals("");
+		//Empty string also returns true since other methods in front end check for that
+		return Pattern.matches("^\\d{13,16}$", cardNumber) || cardNumber.trim().equals(""); 
+																					
 	}
 	
 	/**
@@ -34,7 +36,7 @@ public class Validation {
 		
 		// format M/YYYY
 		boolean formatFour = Pattern.matches("^\\d/\\d{4}", expirationDate);
-		
+		//Empty string also returns true since other methods in front end check for that
 		return (formatOne || formatTwo || formatThree || formatFour || expirationDate.trim().equals(""));
 	}
 	
@@ -44,6 +46,7 @@ public class Validation {
 	 * @return
 	 */
 	public static boolean validateCvv(String cvv) {
+		//Empty string also returns true since other methods in front end check for that
 		return Pattern.matches("^\\d{3,4}$", cvv) || cvv.trim().equals("");
 	}
 	
@@ -53,6 +56,7 @@ public class Validation {
 	 * @return
 	 */
 	public static boolean validatePin(String pin) {
+		//Empty string also returns true since other methods in front end check for that
 		return Pattern.matches("^\\d{4}$", pin) || pin.trim().equals("");
 	}
 	
