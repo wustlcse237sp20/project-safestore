@@ -70,10 +70,6 @@ public class WebsiteAccountTab {
 		websiteAccountSearchLabel.setBounds(47, 76, 67, 16);
 		websiteAccounts.add(websiteAccountSearchLabel);
 
-//		JTextArea websiteAccountNicknames = new JTextArea();
-//		websiteAccountNicknames.setText("will hold account \nnicknames in \nnext iteration");
-//		websiteAccountNicknames.setBounds(47, 109, 130, 257);
-//		websiteAccounts.add(websiteAccountNicknames);
 		websiteModel = new DefaultListModel<String>();
 		updateAccountList(websiteAccounts, websiteModel);
 		

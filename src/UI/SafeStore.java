@@ -17,6 +17,8 @@ import card.Address;
 import card.CreditCard;
 import card.DebitCard;
 import encryption.Encryption;
+import tables.CreditCardEntity;
+import tables.DebitCardEntity;
 import tables.UserEntity;
 import tables.WebsiteAccountEntity;
 import user.User;
@@ -109,7 +111,18 @@ public class SafeStore {
 		return creditCard;
 
 	}
-
+	public static String[] getUsersCreditCards() {
+		ForeignCollection<CreditCardEntity> creditCardEntities = CreditCard.getAllCreditCards(databaseConnection, safeStoreUser);
+		LinkedList<String> creditCardNicknamesList = new LinkedList<String>();
+		for(CreditCardEntity creditCardEntity :  creditCardEntities) {
+			creditCardNicknamesList.add(Encryption.decrypt(creditCardEntity.getNickname()));
+		}
+		String[] creditCardNicknamesArray = creditCardNicknamesList.toArray(new String[0]);
+		
+		return creditCardNicknamesArray;
+		
+	}
+	
 	public static boolean addCreditCard(String cardNumber, String nickname,String expDate, String cvv, String streetAddress, String city, String state, String zip) {
 		Address billingAddress = new Address(streetAddress, city, state, zip);
 		CreditCard creditCard;
@@ -161,6 +174,18 @@ public class SafeStore {
 	public static boolean modifyDebitCard(String currentNickname, String nickname, String cardNumber,String expDate, String cvv, String pin, String streetAddress, String city, String state, String zip) {
 		String[] newInputs = {nickname,cardNumber,expDate,cvv,pin,streetAddress,city,state,zip};
 		return DebitCard.updateDebitCardInformation(currentNickname, databaseConnection, safeStoreUser, newInputs);
+	}
+
+	public static String[] getUsersDebitCards() {
+		ForeignCollection<DebitCardEntity> debitCardEntities = DebitCard.getAllDebitCards(databaseConnection, safeStoreUser);
+		LinkedList<String> debitCardNicknamesList = new LinkedList<String>();
+		for(DebitCardEntity debitCardEntity :  debitCardEntities) {
+			debitCardNicknamesList.add(Encryption.decrypt(debitCardEntity.getNickname()));
+		}
+		String[] debitCardNicknamesArray = debitCardNicknamesList.toArray(new String[0]);
+		
+		return debitCardNicknamesArray;
+		
 	}
 
 }
