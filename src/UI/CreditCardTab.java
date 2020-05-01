@@ -32,6 +32,7 @@ public class CreditCardTab {
 	private JFrame frame;
 	private static JTextField creditCardSearchNicknameInput;
 	private static JButton creditCardSearchButton;
+	private JButton creditCardClearInfo;
 	private JTextField creditCardAddNicknameInput;
 	private JTextField creditCardAddNumberInput;
 	private JTextField creditCardAddExpDateInput;
@@ -80,7 +81,16 @@ public class CreditCardTab {
 		creditCardSearchNicknameInput.setBounds(313, 8, 130, 26);
 		creditCardSearchNicknameInput.setColumns(10);
 		creditCardViewTab.add(creditCardSearchNicknameInput);
-
+		
+		creditCardClearInfo = new JButton("Clear");
+		creditCardClearInfo.setBounds(530, 6, 85, 29);
+		creditCardViewTab.add(creditCardClearInfo);
+		creditCardClearInfo.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				creditCardViewDisplay.setText("");
+			}
+		});
+		
 		creditCardSearchButton = new JButton("Search");
 		creditCardSearchButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
