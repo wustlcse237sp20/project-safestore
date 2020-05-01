@@ -470,6 +470,15 @@ public class DebitCardTab {
 		initializeDebitCardAddTab(debitCardTabbedPane);
 		initializeDebitCardModifyTab(debitCardTabbedPane);
 
+		JButton debitCardLogoutButton = new JButton("Logout");
+		debitCardLogoutButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				SafeStore.logout();
+			}
+		});
+		debitCardLogoutButton.setBounds(656, 6, 117, 29);
+		debitCards.add(debitCardLogoutButton);
+
 		JPanel[] panels = {debitCardViewTab, debitCardAddTab, debitCardModifyTab};
 
 		debitCardTabbedPane.addChangeListener(new ChangeListener() {

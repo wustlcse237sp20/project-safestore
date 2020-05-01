@@ -448,6 +448,15 @@ public class CreditCardTab {
 		initializeCreditCardAddTab(creditCardTabbedPane);
 		initializeCreditCardModifyTab(creditCardTabbedPane);
 		
+		JButton creditCardLogoutButton = new JButton("Logout");
+		creditCardLogoutButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				SafeStore.logout();
+			}
+		});
+		creditCardLogoutButton.setBounds(656, 4, 117, 29);
+		creditCards.add(creditCardLogoutButton);
+		
 		JPanel[] panels = {creditCardViewTab, creditCardAddTab, creditCardModifyTab};
 
 		creditCardTabbedPane.addChangeListener(new ChangeListener() {

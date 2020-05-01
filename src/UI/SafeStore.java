@@ -47,7 +47,6 @@ public class SafeStore {
 	public static boolean createUser(String username, String password) {
 		User newUser = new User(username, password);
 		return newUser.createSafeStoreAccountThroughDatabase(databaseConnection);
-
 	}
 	
 	public static boolean loginUser(String username, String password) {
@@ -58,7 +57,6 @@ public class SafeStore {
 		Dao<UserEntity, String> userDao;
 		try {
 			userDao = DaoManager.createDao(databaseConnection, UserEntity.class);
-
 			UserEntity userEntity = userDao.queryForId(username);
 			safeStoreUser = new User(userEntity);
 			UserSignInWindow.closeWindow();
@@ -67,7 +65,12 @@ public class SafeStore {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
+	}
+	
+	public static void logout() {
+		FrontEnd.closeWindow();
+		safeStoreUser = null;
+		UserSignInWindow.launchWindow();
 	}
 	
 	public static String[] getUsersWebsites() {
