@@ -8,7 +8,7 @@ import java.awt.BorderLayout;
 
 public class FrontEnd {
 
-	private JFrame frame;
+	private static JFrame frame;
 	
 	/**
 	 * Launch the application.
@@ -24,6 +24,14 @@ public class FrontEnd {
 				}
 			}
 		});
+	}
+	
+	/**
+	 * Close the window
+	 */
+	public static void closeWindow() {
+		frame.setVisible(false);
+		frame.dispose();
 	}
 
 	/**

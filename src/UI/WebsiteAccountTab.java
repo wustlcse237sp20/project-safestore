@@ -43,6 +43,9 @@ public class WebsiteAccountTab {
 	private JButton websiteAccountSearchButton;
 	private DefaultListModel<String> websiteModel;
 
+	/**
+	 * @wbp.parser.entryPoint
+	 */
 	public WebsiteAccountTab(JFrame frame) {
 		this.frame = frame;
 	}
@@ -334,9 +337,18 @@ public class WebsiteAccountTab {
 		initializeWebAccountViewSection(websiteAccounts);
 		intializeWebAccountAddSection(websiteAccounts);
 		initializeWebAccountModifySection(websiteAccounts);	
-
+		
+		JButton webAcctTabLogoutButton = new JButton("Logout");
+		webAcctTabLogoutButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				SafeStore.logout();
+			}
+		});
+		webAcctTabLogoutButton.setBounds(656, 6, 117, 29);
+		websiteAccounts.add(webAcctTabLogoutButton);
 	}
 	
+
 
 
 }
