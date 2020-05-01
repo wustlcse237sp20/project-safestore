@@ -1,35 +1,24 @@
 # Safe Store
 
 ## Completed User Stories:
-1. UI Research #14
-2. Login to SafeStore Login From UI #19
-3. Create SafeStore Login From UI #18
-4. Add Username & Password for Web Account From UI #20
-5. Modify Username & Password for Web Account From UI #21
-6. View Password based on Web Account From UI #24
-7. View Username based on Web Account From UI #22
-8. Modify Credit Card Information From UI #25
-9. Add Credit Card Information From UI #23
-10. View Credit Card Information From UI #26
-11. Credit/Debit Card Unique Nickname #64
-
-## Iteration Three User Stories:
-1. Modify Debit Card Information From UI #29
-2. Add Debit Card Information From UI #28
-3. View Debit Card Information From UI #27
-4. Clear Shown Information #70
-5. Logout #69
-6. Validate Debit card input #68
-7. Validate Credit card input #67
-8. Validate Password input #66
-9. Retrieve keys #46
+1. From the UI, a user should be able to modify a billing address, card number, expiration date, CVV, PIN, and card nickname (default is last 4 digits) associated with a debit card so they can update their account with current information.
+2. From the UI, a user should be able to add a billing address, card number, expiration date, CVV, PIN, and card nickname (default is last 4 digits) associated with a debit card so that they can view it later.
+3. From the UI, a user should be able to view a billing address, card number, expiration date, CVV, PIN, and/or a card nickname (default is last 4 digits) associated with a debit card so they can use it to make online transactions.
+4. A user should be able to clear their information (i.e. passwords, card numbers, etc) that is shown to them when they search account or card info.
+5. A user should be able to log out of SafeStore.
+6. A user should have their debit card information validated (i.e. debit card number is all numbers, etc.) so that they can't just store garbage information.
+7. A user should have their credit card information validated (i.e. credit card number is all numbers, etc.) so that they can't just store garbage information.
+8. A user should have to retype the password when creating an account to ensure they properly input their desired password.
+9. A user should be able to retrieve a list of keys (nicknames) for their Website Accounts, Debit Cards, and Credit Cards so that if they forget what they nicknamed it they can find out.
 
 ## Implemented but Non-Working Stories:
-- Everything we implemented is working, but just know that Debit Card is not supposed to be working from the UI yet (it'll be done next iteration).
+- Everything we implemented is working!
 ## Commands to Compile and Run Code:
 Note: Do not copy and paste the $, they represent your terminal new lines
 
 Note 2: You will not be able to run this from Eclipse, this is intentional.
+
+Note 3: GUI does not seem to be compatible with Windows Subsystem for Linux. If this is what you're running, our project probably won't run/work.
 ```sh
 $ git clone https://github.com/wustlcse237sp20/project-safestore.git
 $ cd project-safestore/
