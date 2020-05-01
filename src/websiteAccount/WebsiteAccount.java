@@ -40,6 +40,23 @@ public class WebsiteAccount {
 		return Encryption.decrypt(this.websiteAccountEntity.getNickname());
 	}
 
+	public String getWebsiteLogin() {
+		return Encryption.decrypt(this.websiteAccountEntity.getWebsiteLogin());
+	}
+
+	public String getWebsitePassword() {
+		return Encryption.decrypt(this.websiteAccountEntity.getWebsitePassword());
+	}
+
+	public WebsiteAccountEntity getWebsiteAccountEntity() {
+		return this.websiteAccountEntity;
+	}
+
+	/**
+	 * 
+	 * @param nickname new nickname
+	 * @return true if successful database update 
+	 */
 	public boolean setNickname(String nickname) {
 		this.websiteAccountEntity.setNickname(Encryption.encrypt(nickname));
 		try {
@@ -51,10 +68,11 @@ public class WebsiteAccount {
 		}
 	}
 
-	public String getWebsiteLogin() {
-		return Encryption.decrypt(this.websiteAccountEntity.getWebsiteLogin());
-	}
-
+	/**
+	 * 
+	 * @param websiteLogin new website account login 
+	 * @return true if successful database update
+	 */
 	public boolean setWebsiteLogin(String websiteLogin) {
 		this.websiteAccountEntity.setWebsiteLogin(Encryption.encrypt(websiteLogin));
 		try {
@@ -66,10 +84,11 @@ public class WebsiteAccount {
 		}
 	}
 
-	public String getWebsitePassword() {
-		return Encryption.decrypt(this.websiteAccountEntity.getWebsitePassword());
-	}
-
+	/**
+	 * 
+	 * @param websitePassword new website account password
+	 * @return true if successful database update
+	 */
 	public boolean setWebsitePassword(String websitePassword) {
 		this.websiteAccountEntity.setWebsitePassword(Encryption.encrypt(websitePassword));
 		try {
@@ -81,10 +100,6 @@ public class WebsiteAccount {
 		}
 	}
 
-	public WebsiteAccountEntity getWebsiteAccountEntity() {
-		return this.websiteAccountEntity;
-	}
-
 	public String toString() {
 		return this.getNickname() + " - Login: " + this.getWebsiteLogin() + ", Password: " + this.getWebsitePassword();
 	}
@@ -92,8 +107,8 @@ public class WebsiteAccount {
 	/**
 	 * Adds the WebsiteAccount to the database
 	 * @param databaseConnection - the ConnectionSource object to the database where the 
-	 * 								the web account will be stored
-	 * @throws SQLException
+	 * web account will be stored
+	 * @return true if successful database update
 	 */
 	public boolean addWebsiteAccount(ConnectionSource databaseConnection) {
 		try {
@@ -108,28 +123,26 @@ public class WebsiteAccount {
 			PreparedQuery<WebsiteAccountEntity> preparedQuery = queryBuilder.prepare();
 			List<WebsiteAccountEntity> accountsWithMatchingNicknames = websiteAccountDao.query(preparedQuery);
 
-			// there is an account with this existing nickname
-			if (accountsWithMatchingNicknames.size() != 0) {
-				return false;
-			}
-			else {
+			// nicknames must be unique 
+			if (accountsWithMatchingNicknames.size() == 0) {
 				websiteAccountDao.create(websiteAccountEntity);
 				return true;
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
-			return false;
 		}
+		return false;
 	}	
 
 	/**
 	 * gets the foreign collection of all website account rows for that user
 	 * @param databaseConnection
 	 * @param safeStoreUser of type User
-	 * @return a ForeignCollection<WebsiteAccountEntity> that holds all the db rows of accounts
-	 * 			for the safeStoreUser
+	 * @return a ForeignCollection<WebsiteAccountEntity> that holds all the db rows of web accounts
+	 * 	for the safeStoreUser
 	 */
-	public static ForeignCollection<WebsiteAccountEntity> getAllWebsiteAccounts(ConnectionSource databaseConnection, User safeStoreUser) {
+	public static ForeignCollection<WebsiteAccountEntity> getAllWebsiteAccounts(ConnectionSource databaseConnection, 
+			User safeStoreUser) {
 		Dao<UserEntity, String> userDao;
 		try {
 			userDao = DaoManager.createDao(databaseConnection, UserEntity.class);
@@ -141,17 +154,17 @@ public class WebsiteAccount {
 		}
 	}
 
-
 	/**
-	 * Gets a WebsiteAccount based on a User and a nickname. If it doesn't exist, returns an 
+	 * Gets a WebsiteAccount based on a User and a nickname. If it doesn't exist, throws an 
 	 * exception
 	 * @param databaseConnection
 	 * @param nickname
 	 * @param safeStoreUser
-	 * @return - the WebsiteAccount associated with the nickname and user inputted
+	 * @return - the WebsiteAccount associated with the nickname and inputed user 
 	 * @throws Exception
 	 */
-	public static WebsiteAccount getWebsiteAccountFromNickname(ConnectionSource databaseConnection, String nickname, User safeStoreUser) throws Exception {
+	public static WebsiteAccount getWebsiteAccountFromNickname(ConnectionSource databaseConnection, 
+			String nickname, User safeStoreUser) throws Exception {
 		try {
 			Dao<WebsiteAccountEntity, Integer> websiteAccountDao = DaoManager.createDao(databaseConnection, WebsiteAccountEntity.class);
 			QueryBuilder<WebsiteAccountEntity, Integer> queryBuilder = websiteAccountDao.queryBuilder();
@@ -173,26 +186,40 @@ public class WebsiteAccount {
 		}
 	}
 
-	public static boolean updateWebsiteAccount(ConnectionSource databaseConnection, String currentAccountNickname, User safeStoreUser, String[] newInputs) {
+	/**
+	 * 
+	 * @param databaseConnection
+	 * @param currentAccountNickname
+	 * @param safeStoreUser
+	 * @param newInputs user inputs to modify web acct info. User only fills in input fields they wish to change.
+	 * User has the option to modify: nickname in newInputs[0], web login in newInputs[1], 
+	 * and web password in newInputs[2]
+	 * 
+	 * @return true if successful database update 
+	 */
+	public static boolean updateWebsiteAccount(ConnectionSource databaseConnection, 
+			String currentAccountNickname, User safeStoreUser, String[] newInputs) {
 		try {
-			WebsiteAccount accountToModify = WebsiteAccount.getWebsiteAccountFromNickname(databaseConnection,currentAccountNickname, safeStoreUser);
+			WebsiteAccount accountToModify = 
+					WebsiteAccount.getWebsiteAccountFromNickname(databaseConnection, currentAccountNickname, safeStoreUser);
 
-				if (!newInputs[0].isEmpty()) {
-					accountToModify.setNickname(newInputs[0]);
-				}
-				if (!newInputs[1].isEmpty()) {
-					accountToModify.setWebsiteLogin(newInputs[1]);
-				}
-				if (!newInputs[2].isEmpty()) {
-					accountToModify.setWebsitePassword(newInputs[2]);
-				}
-			
+			if (!newInputs[0].isEmpty()) {
+				accountToModify.setNickname(newInputs[0]);
+			}
+			if (!newInputs[1].isEmpty()) {
+				accountToModify.setWebsiteLogin(newInputs[1]);
+			}
+			if (!newInputs[2].isEmpty()) {
+				accountToModify.setWebsitePassword(newInputs[2]);
+			}
+
 			return true;
 		} catch (SQLException e) {
-			return false;
+			e.printStackTrace();
 		} catch (Exception e) {
-			return false;
+			e.printStackTrace();
 		}
+		return false;
 	}
 
 }

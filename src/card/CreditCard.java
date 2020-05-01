@@ -20,24 +20,29 @@ public class CreditCard implements Card{
 	private CreditCardEntity creditCardEntity;
 	private Address billingAddress;
 
-	public CreditCard(User safeStoreUser, String creditCardNumber, String expirationDate, String cvv, Address billingAddress) {
+	public CreditCard(User safeStoreUser, String creditCardNumber, 
+			String expirationDate, String cvv, Address billingAddress) {
+		//last 4 digits of card number is default card nickname if no nickname provided 
 		String defaultNickname = creditCardNumber.substring(creditCardNumber.length() - 4, creditCardNumber.length());
 		defaultNickname = Encryption.encrypt(defaultNickname);
 		UserEntity safeStoreUserEntity = safeStoreUser.getUserEntity();
 		String encryptedCCNumber = Encryption.encrypt(creditCardNumber);
 		String encryptedExpDate = Encryption.encrypt(expirationDate);
 		String encryptedCvv = Encryption.encrypt(cvv);
-		this.creditCardEntity = new CreditCardEntity(safeStoreUserEntity, defaultNickname, encryptedCCNumber, encryptedExpDate, encryptedCvv, billingAddress.getAddressEntity());
+		this.creditCardEntity = new CreditCardEntity(safeStoreUserEntity, defaultNickname, 
+				encryptedCCNumber, encryptedExpDate, encryptedCvv, billingAddress.getAddressEntity());
 		this.billingAddress = billingAddress;
 	}
 
-	public CreditCard(User safeStoreUser, String nickname, String creditCardNumber, String expirationDate, String cvv, Address billingAddress) {
+	public CreditCard(User safeStoreUser, String nickname, String creditCardNumber, 
+			String expirationDate, String cvv, Address billingAddress) {
 		UserEntity safeStoreUserEntity = safeStoreUser.getUserEntity();
 		String encryptedNickname = Encryption.encrypt(nickname);
 		String encryptedCCNumber = Encryption.encrypt(creditCardNumber);
 		String encryptedExpDate = Encryption.encrypt(expirationDate);
 		String encryptedCvv = Encryption.encrypt(cvv);
-		this.creditCardEntity = new CreditCardEntity(safeStoreUserEntity, encryptedNickname, encryptedCCNumber, encryptedExpDate, encryptedCvv, billingAddress.getAddressEntity());
+		this.creditCardEntity = new CreditCardEntity(safeStoreUserEntity, encryptedNickname, 
+				encryptedCCNumber, encryptedExpDate, encryptedCvv, billingAddress.getAddressEntity());
 		this.billingAddress = billingAddress;
 	}
 
@@ -184,7 +189,8 @@ public class CreditCard implements Card{
 	 * @param nickname
 	 * @return true is the nickname given doens't exist in db for that user, false otherwise
 	 */
-	public static boolean cardNicknameIsUnique(ConnectionSource databaseConnection, UserEntity safeStoreUser, String nickname) {
+	public static boolean cardNicknameIsUnique(ConnectionSource databaseConnection, 
+			UserEntity safeStoreUser, String nickname) {
 		try {
 			Dao<CreditCardEntity, String> creditCardDao = DaoManager.createDao(databaseConnection, CreditCardEntity.class);
 			Map<String, Object> queryParams = new HashMap<String, Object>();
@@ -253,7 +259,8 @@ public class CreditCard implements Card{
 	 * @return a ForeignCollection<WebsiteAccountEntity> that holds all the db rows of credit cards
 	 * 			for the safeStoreUser
 	 */
-	public static ForeignCollection<CreditCardEntity> getAllCreditCards(ConnectionSource databaseConnection, User safeStoreUser) {
+	public static ForeignCollection<CreditCardEntity> getAllCreditCards(ConnectionSource databaseConnection, 
+			User safeStoreUser) {
 		Dao<UserEntity, String> userDao;
 		try {
 			userDao = DaoManager.createDao(databaseConnection, UserEntity.class);
@@ -274,7 +281,8 @@ public class CreditCard implements Card{
 	 * @return the Credit Card with that nickname and user
 	 * @throws Exception if no credit card is found, or if there is a database error
 	 */
-	public static CreditCard getCreditCardFromNickname(String nickname, User safeStoreUser, ConnectionSource databaseConnection) throws Exception{
+	public static CreditCard getCreditCardFromNickname(String nickname, User safeStoreUser, 
+			ConnectionSource databaseConnection) throws Exception{
 		nickname = Encryption.encrypt(nickname);
 		try {
 			Dao<CreditCardEntity, String> creditCardDao = DaoManager.createDao(databaseConnection, CreditCardEntity.class);
@@ -295,11 +303,24 @@ public class CreditCard implements Card{
 
 	}
 
-	public static boolean updateCreditCardInformation(String currentNickname, ConnectionSource databaseConnection, User safeStoreUser, String[] newInputs) {
+	/**
+	 * 
+	 * @param currentNickname
+	 * @param databaseConnection
+	 * @param safeStoreUser
+	 * @param newInputs user inputs to modify credit card info. User only fills in input fields they wish to change. 
+	 * 
+	 * User has the option to modify: nickname in newInputs[0], card number in newInputs[1], 
+	 * expiration date in newInputs[2], cvv in newInputs[3], street address in newInputs[4],
+	 * city in newInputs[5], state in newInputs[6], and zip code in newInputs[7]
+	 * 
+	 * @return true if successful update 
+	 */
+	public static boolean updateCreditCardInformation(String currentNickname, ConnectionSource databaseConnection, 
+			User safeStoreUser, String[] newInputs) {
 
 		try {
 			CreditCard requestedCreditCard = CreditCard.getCreditCardFromNickname(currentNickname, safeStoreUser, databaseConnection);
-
 
 			if(!newInputs[0].isEmpty()) {
 				if (cardNicknameIsUnique(databaseConnection, safeStoreUser.getUserEntity(), newInputs[0])) {
@@ -307,14 +328,12 @@ public class CreditCard implements Card{
 				}
 			}
 			if(!newInputs[1].isEmpty()) {
-
 				requestedCreditCard.setCardNumber(newInputs[1], databaseConnection);
 			}
 			if(!newInputs[2].isEmpty()) {
 				requestedCreditCard.setExpirationDate(newInputs[2], databaseConnection);
 			}
 			if(!newInputs[3].isEmpty()) {
-
 				requestedCreditCard.setCvv(newInputs[3], databaseConnection);
 			}
 
@@ -323,6 +342,7 @@ public class CreditCard implements Card{
 			String city = oldBillingAddress.getCity();
 			String state = oldBillingAddress.getState();
 			String zipCode = oldBillingAddress.getZipCode();
+			
 			if(!newInputs[4].isEmpty()) {
 				streetAddress = newInputs[4];
 			}

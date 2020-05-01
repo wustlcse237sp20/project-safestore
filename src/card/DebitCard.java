@@ -21,7 +21,9 @@ public class DebitCard implements Card {
 	private DebitCardEntity debitCardEntity;
 	private Address billingAddress;
 	
-	public DebitCard(User safeStoreUser, String debitCardNumber, String expirationDate, String cvv, String pin, Address billingAddress) {
+	public DebitCard(User safeStoreUser, String debitCardNumber, String expirationDate, 
+			String cvv, String pin, Address billingAddress) {
+		//last 4 digits of card number is default card nickname if no nickname provided 
 		String defaultNickname = debitCardNumber.substring(debitCardNumber.length() - 4, debitCardNumber.length());
 		defaultNickname = Encryption.encrypt(defaultNickname);
 		UserEntity safeStoreUserEntity = safeStoreUser.getUserEntity();
@@ -29,19 +31,21 @@ public class DebitCard implements Card {
 		String encryptedExpDate = Encryption.encrypt(expirationDate);
 		String encryptedCvv = Encryption.encrypt(cvv);
 		String encryptedPin = Encryption.encrypt(pin);
-		this.debitCardEntity = new DebitCardEntity(safeStoreUserEntity, defaultNickname, encryptedDCNumber, encryptedExpDate, encryptedCvv, encryptedPin, billingAddress.getAddressEntity());
+		this.debitCardEntity = new DebitCardEntity(safeStoreUserEntity, defaultNickname, 
+				encryptedDCNumber, encryptedExpDate, encryptedCvv, encryptedPin, billingAddress.getAddressEntity());
 		this.billingAddress = billingAddress;
 	}
 	
-	public DebitCard(User safeStoreUser, String nickname, String debitCardNumber, String expirationDate, String cvv, String pin, Address billingAddress) {
-		
+	public DebitCard(User safeStoreUser, String nickname, String debitCardNumber, String expirationDate, 
+			String cvv, String pin, Address billingAddress) {
 		String encryptedNickname = Encryption.encrypt(nickname);
 		UserEntity safeStoreUserEntity = safeStoreUser.getUserEntity();
 		String encryptedDCNumber = Encryption.encrypt(debitCardNumber);
 		String encryptedExpDate = Encryption.encrypt(expirationDate);
 		String encryptedCvv = Encryption.encrypt(cvv);
 		String encryptedPin = Encryption.encrypt(pin);
-		this.debitCardEntity = new DebitCardEntity(safeStoreUserEntity, encryptedNickname, encryptedDCNumber, encryptedExpDate, encryptedCvv, encryptedPin, billingAddress.getAddressEntity());
+		this.debitCardEntity = new DebitCardEntity(safeStoreUserEntity, encryptedNickname, 
+				encryptedDCNumber, encryptedExpDate, encryptedCvv, encryptedPin, billingAddress.getAddressEntity());
 		this.billingAddress = billingAddress;
 	}
 	
@@ -170,8 +174,8 @@ public class DebitCard implements Card {
 	 */
 	public boolean setBillingAddress(Address newBillingAddress, ConnectionSource databaseConnection) {		
 		Address oldAddress = this.billingAddress;
-		
 		this.billingAddress = newBillingAddress;
+		
 		if (this.billingAddress.addressExists(databaseConnection)) {
 			boolean updateSuccessful = newBillingAddress.updateToExistingAddress(databaseConnection);
 			this.debitCardEntity.setBillingAddress(this.billingAddress.getAddressEntity());
@@ -209,7 +213,8 @@ public class DebitCard implements Card {
 	 * @param nickname
 	 * @return true is the nickname given doens't exist in db for that user, false otherwise
 	 */
-	public static boolean cardNicknameIsUnique(ConnectionSource databaseConnection, UserEntity safeStoreUser, String nickname) {
+	public static boolean cardNicknameIsUnique(ConnectionSource databaseConnection, 
+			UserEntity safeStoreUser, String nickname) {
 		try {
 			Dao<DebitCardEntity, String> debitCardDao = DaoManager.createDao(databaseConnection, DebitCardEntity.class);
 			Map<String, Object> queryParams = new HashMap<String, Object>();
@@ -277,7 +282,8 @@ public class DebitCard implements Card {
 	 * @return a ForeignCollection<WebsiteAccountEntity> that holds all the db rows of debit cards
 	 * 			for the safeStoreUser
 	 */
-	public static ForeignCollection<DebitCardEntity> getAllDebitCards(ConnectionSource databaseConnection, User safeStoreUser) {
+	public static ForeignCollection<DebitCardEntity> getAllDebitCards(ConnectionSource databaseConnection, 
+			User safeStoreUser) {
 		Dao<UserEntity, String> userDao;
 		try {
 			userDao = DaoManager.createDao(databaseConnection, UserEntity.class);
@@ -297,7 +303,8 @@ public class DebitCard implements Card {
 	 * @return the Debit Card with that nickname and user
 	 * @throws Exception if no credit card is found, or if there is a database error
 	 */
-	public static DebitCard getDebitCardFromNickname(String nickname, User safeStoreUser,ConnectionSource databaseConnection) throws Exception {
+	public static DebitCard getDebitCardFromNickname(String nickname, User safeStoreUser,
+			ConnectionSource databaseConnection) throws Exception {
 		nickname = Encryption.encrypt(nickname);
 		try {
 			Dao<DebitCardEntity, String> debitCardDao = DaoManager.createDao(databaseConnection, DebitCardEntity.class);
@@ -318,8 +325,22 @@ public class DebitCard implements Card {
 		
 	}
 
-	public static boolean updateDebitCardInformation(String currentNickname, ConnectionSource databaseConnection, User safeStoreUser, String[] newInputs) {
-
+	/**
+	 * 
+	 * @param currentNickname
+	 * @param databaseConnection
+	 * @param safeStoreUser
+	 * @param newInputs user inputs to modify credit card info. User only fills in input fields they wish to change. 
+	 * 
+	 * User has the option to modify: nickname in newInputs[0], card number in newInputs[1], 
+	 * expiration date in newInputs[2], cvv in newInputs[3], pin in newInputs[4],
+	 * street address in newInputs[5], city in newInputs[6], state in newInputs[7], 
+	 * and zip code in newInputs[8]
+	 * 
+	 * @return true if successful update 
+	 */
+	public static boolean updateDebitCardInformation(String currentNickname, 
+			ConnectionSource databaseConnection, User safeStoreUser, String[] newInputs) {
 		try {
 			DebitCard requestedDebitCard = DebitCard.getDebitCardFromNickname(currentNickname, safeStoreUser, databaseConnection);
 
@@ -346,6 +367,7 @@ public class DebitCard implements Card {
 			String city = oldBillingAddress.getCity();
 			String state = oldBillingAddress.getState();
 			String zipCode = oldBillingAddress.getZipCode();
+			
 			if(!newInputs[5].isEmpty()) {
 				streetAddress = newInputs[5];
 			}
@@ -358,6 +380,7 @@ public class DebitCard implements Card {
 			if(!newInputs[8].isEmpty()) {
 				zipCode = newInputs[8];
 			}
+			
 			Address newBillingAddress = new Address(streetAddress, city, state, zipCode);	
 			requestedDebitCard.setBillingAddress(newBillingAddress, databaseConnection);
 
