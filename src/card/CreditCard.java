@@ -219,7 +219,7 @@ public class CreditCard implements Card{
 	 * 
 	 * @param databaseConnection
 	 * @return true if the credit card was successfully added, false if nickname already in use
-	 * @throws Exception if the 
+	 * @throws Exception if the database fails to connect or if the address is not added
 	 */
 	public boolean addCard(ConnectionSource databaseConnection) throws Exception {
 		if (this.billingAddress.addressExists(databaseConnection)) {
@@ -325,6 +325,8 @@ public class CreditCard implements Card{
 			if(!newInputs[0].isEmpty()) {
 				if (cardNicknameIsUnique(databaseConnection, safeStoreUser.getUserEntity(), newInputs[0])) {
 					requestedCreditCard.setNickname(newInputs[0], databaseConnection);
+				}else {
+					return false;
 				}
 			}
 			if(!newInputs[1].isEmpty()) {

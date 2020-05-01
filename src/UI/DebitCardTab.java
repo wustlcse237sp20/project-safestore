@@ -431,7 +431,7 @@ public class DebitCardTab {
 						updateDebitCardList(debitCardModifyTab, debitCardModel);
 						
 					}else {
-						JOptionPane.showMessageDialog(frame, "Couldn't update debit card named" + cardCurNickname);
+						JOptionPane.showMessageDialog(frame, "Couldn't update debit card named: " + cardCurNickname + " \nMake sure new nickname does not already exist");
 						resetModifyDebitCard();
 					}
 				}

@@ -211,7 +211,7 @@ public class DebitCard implements Card {
 	 * @param databaseConnection
 	 * @param safeStoreUser
 	 * @param nickname
-	 * @return true is the nickname given doens't exist in db for that user, false otherwise
+	 * @return true if the nickname given doens't exist in db for that user, false otherwise
 	 */
 	public static boolean cardNicknameIsUnique(ConnectionSource databaseConnection, 
 			UserEntity safeStoreUser, String nickname) {
@@ -347,6 +347,8 @@ public class DebitCard implements Card {
 			if(!newInputs[0].isEmpty()) {
 				if (cardNicknameIsUnique(databaseConnection, safeStoreUser.getUserEntity(), newInputs[0])) {
 					requestedDebitCard.setNickname(newInputs[0], databaseConnection);
+				}else {
+					return false;
 				}
 			}
 			if(!newInputs[1].isEmpty()) {

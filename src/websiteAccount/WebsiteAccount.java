@@ -1,7 +1,9 @@
 package websiteAccount;
 
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
@@ -12,6 +14,7 @@ import com.j256.ormlite.stmt.Where;
 import com.j256.ormlite.support.ConnectionSource;
 
 import encryption.Encryption;
+import tables.DebitCardEntity;
 import tables.UserEntity;
 import tables.WebsiteAccountEntity;
 import user.User;
@@ -103,7 +106,32 @@ public class WebsiteAccount {
 	public String toString() {
 		return this.getNickname() + " - Login: " + this.getWebsiteLogin() + ", Password: " + this.getWebsitePassword();
 	}
-
+	
+	/**
+	 * Checks to see if a website account with the supplied nickname already exists
+	 * @param databaseConnection
+	 * @param safeStoreUser
+	 * @param nickname
+	 * @return true if the nickname given doens't exist in db for that user, false otherwise
+	 */
+	public static boolean accountNicknameIsUnique(ConnectionSource databaseConnection, 
+			UserEntity safeStoreUser, String nickname) {
+		try {
+			Dao<WebsiteAccountEntity, String> websiteAccountDao = DaoManager.createDao(databaseConnection, WebsiteAccountEntity.class);
+			Map<String, Object> queryParams = new HashMap<String, Object>();
+			queryParams.put("nickname", Encryption.encrypt(nickname));
+			queryParams.put("safe_store_username", safeStoreUser);
+			List<WebsiteAccountEntity> returnedWebsiteAccounts = websiteAccountDao.queryForFieldValues(queryParams);
+			if (returnedWebsiteAccounts.isEmpty()) {
+				System.out.println("empty");
+				return true;
+			} 
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return false;
+		
+	}
 	/**
 	 * Adds the WebsiteAccount to the database
 	 * @param databaseConnection - the ConnectionSource object to the database where the 
@@ -115,18 +143,12 @@ public class WebsiteAccount {
 			Dao<WebsiteAccountEntity, Integer> websiteAccountDao = 
 					DaoManager.createDao(databaseConnection, WebsiteAccountEntity.class);
 
-			QueryBuilder<WebsiteAccountEntity, Integer> queryBuilder = websiteAccountDao.queryBuilder();
-			Where<WebsiteAccountEntity, Integer> where = queryBuilder.where();
-			where.eq("nickname", Encryption.encrypt(this.getNickname()));
-			where.and();
-			where.eq("safe_store_username", this.websiteAccountEntity.getSafeStoreUser().getUsername());
-			PreparedQuery<WebsiteAccountEntity> preparedQuery = queryBuilder.prepare();
-			List<WebsiteAccountEntity> accountsWithMatchingNicknames = websiteAccountDao.query(preparedQuery);
-
 			// nicknames must be unique 
-			if (accountsWithMatchingNicknames.size() == 0) {
+			if (accountNicknameIsUnique(databaseConnection, this.websiteAccountEntity.getSafeStoreUser(), this.getNickname())) {
 				websiteAccountDao.create(websiteAccountEntity);
 				return true;
+			}else {
+				return false;
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -204,7 +226,11 @@ public class WebsiteAccount {
 					WebsiteAccount.getWebsiteAccountFromNickname(databaseConnection, currentAccountNickname, safeStoreUser);
 
 			if (!newInputs[0].isEmpty()) {
+				if(accountNicknameIsUnique(databaseConnection, safeStoreUser.getUserEntity(), newInputs[0])) {
 				accountToModify.setNickname(newInputs[0]);
+				}else {
+					return false;
+				}
 			}
 			if (!newInputs[1].isEmpty()) {
 				accountToModify.setWebsiteLogin(newInputs[1]);
