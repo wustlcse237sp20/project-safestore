@@ -13,6 +13,11 @@
 
 ## Implemented but Non-Working Stories:
 - Everything we implemented is working!
+
+## To see check our feature branch usage (not just using development and master):
+- Go to all pull requests (inlcudes non-open PR): https://github.com/wustlcse237sp20/project-safestore/pulls?q=is%3Apr+
+- You can click on any pull request and check at the top which branches are being merged
+- Example: This pull request (https://github.com/wustlcse237sp20/project-safestore/pull/75) merges validateCreditInput into development
 ## Commands to Compile and Run Code:
 Note: Do not copy and paste the $, they represent your terminal new lines
 
