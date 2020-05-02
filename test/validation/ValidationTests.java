@@ -1,26 +1,12 @@
 package validation;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.io.IOException;
-import java.sql.SQLException;
-
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.j256.ormlite.dao.Dao;
-import com.j256.ormlite.dao.DaoManager;
-import com.j256.ormlite.jdbc.JdbcConnectionSource;
 import com.j256.ormlite.support.ConnectionSource;
 
 import UI.Validation;
-import card.DebitCard;
-import tables.AddressEntity;
-import tables.CreditCardEntity;
-import tables.DebitCardEntity;
-import tables.UserEntity;
-import tables.WebsiteAccountEntity;
 
 public class ValidationTests {
 	ConnectionSource connectionSource;
