@@ -1,10 +1,7 @@
 package UI;
 
-import java.awt.List;
 import java.sql.SQLException;
 import java.util.LinkedList;
-
-import javax.swing.JList;
 
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
@@ -32,7 +29,7 @@ public class SafeStore {
 	public static void main(String[] args) {
 		// TODO Auto-generated constructor stub
 		System.setProperty(LocalLog.LOCAL_LOG_LEVEL_PROPERTY,"ERROR");
-		databaseUrl = "jdbc:sqlite:src/database/app.db";
+		databaseUrl = "jdbc:sqlite:database/app.db";
 		try {
 			databaseConnection = new JdbcConnectionSource(databaseUrl);
 		}

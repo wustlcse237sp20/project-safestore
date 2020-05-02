@@ -14,7 +14,8 @@
 ## Implemented but Non-Working Stories:
 - Everything we implemented is working!
 
-## To see check our feature branch usage (not just using development and master):
+## To check our feature branch usage (not just using development and master):
+- We delete our feature branches after we complete a feature. To check that we use feature branches do the following: 
 - Go to all pull requests (inlcudes non-open PR): https://github.com/wustlcse237sp20/project-safestore/pulls?q=is%3Apr+
 - You can click on any pull request and check at the top which branches are being merged
 - Example: This pull request (https://github.com/wustlcse237sp20/project-safestore/pull/75) merges validateCreditInput into development

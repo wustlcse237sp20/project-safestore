@@ -8,13 +8,10 @@ import java.util.Map;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.dao.ForeignCollection;
-import com.j256.ormlite.stmt.PreparedQuery;
 import com.j256.ormlite.stmt.QueryBuilder;
-import com.j256.ormlite.stmt.Where;
 import com.j256.ormlite.support.ConnectionSource;
 
 import encryption.Encryption;
-import tables.DebitCardEntity;
 import tables.UserEntity;
 import tables.WebsiteAccountEntity;
 import user.User;
