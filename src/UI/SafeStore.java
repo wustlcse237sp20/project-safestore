@@ -1,10 +1,7 @@
 package UI;
 
-import java.awt.List;
 import java.sql.SQLException;
 import java.util.LinkedList;
-
-import javax.swing.JList;
 
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;

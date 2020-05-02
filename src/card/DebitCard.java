@@ -13,7 +13,6 @@ import com.j256.ormlite.support.ConnectionSource;
 import encryption.Encryption;
 import tables.DebitCardEntity;
 import tables.UserEntity;
-import tables.WebsiteAccountEntity;
 import user.User;
 
 public class DebitCard implements Card {
