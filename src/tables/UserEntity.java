@@ -20,8 +20,7 @@ public class UserEntity extends BaseDaoEnabled<UserEntity, String> {
 	private byte[] salt;
 	
 	// these three are used to store the accounts and cards for the user
-	// 	they are NOT database columns, they are just used to store 
-	//	the objects to make life easier
+	// 	they are NOT database columns
 	@ForeignCollectionField(eager = true, orderColumnName = "nickname")
 	private ForeignCollection<WebsiteAccountEntity> websiteAccounts;
 	
@@ -45,27 +44,15 @@ public class UserEntity extends BaseDaoEnabled<UserEntity, String> {
 		return username;
 	}
 	
-	public void setUsername(String username) {
-		this.username = username;
-	}
-	
 	public String getPassordHashed() {
 		return passwordHashed;
-	}
-	
-	public void setPasswordHashed(String passwordHashed) {
-		this.passwordHashed = passwordHashed;
 	}
 	
 	public byte[] getSalt() {
 		return salt;
 	}
 	
-	public void setSalt(byte[] salt) {
-		this.salt = salt;
-	}
-	
-	// no setters here because the queries will do that automatically
+	// only getters for ForeignCollections because the queries will automatically set them
 	public ForeignCollection<WebsiteAccountEntity> getWebsiteAccounts() {
 		return websiteAccounts;
 	}
@@ -76,6 +63,18 @@ public class UserEntity extends BaseDaoEnabled<UserEntity, String> {
 	
 	public ForeignCollection<DebitCardEntity> getDebitCards() {
 		return debitCards;
+	}
+	
+	public void setUsername(String username) {
+		this.username = username;
+	}
+	
+	public void setPasswordHashed(String passwordHashed) {
+		this.passwordHashed = passwordHashed;
+	}
+
+	public void setSalt(byte[] salt) {
+		this.salt = salt;
 	}
 
 }

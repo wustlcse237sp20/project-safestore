@@ -404,7 +404,7 @@ public class CreditCardTab {
 						resetModifyCreditCard();
 						updateCreditCardList(creditCardModifyTab, creditCardModel);
 					}else {
-						JOptionPane.showMessageDialog(frame, "Couldn't update credit card named" + cardCurNickname);
+						JOptionPane.showMessageDialog(frame, "Couldn't update credit card named: " + cardCurNickname + " \nMake sure new nickname does not already exist");
 						resetModifyCreditCard();
 					}
 				}

@@ -42,6 +42,10 @@ public class User {
 		return userEntity;
 	}
 	
+	public void setUserEntity(UserEntity userEntity) {
+		this.userEntity = userEntity;
+	}
+	
 	/**
 	 * 
 	 * @param databaseConnection to connect to UserEntity table 
@@ -64,11 +68,60 @@ public class User {
 	}
 	
 	/**
-	 * login backend work (through database)
+	 *  method from: 
+	 *  https://howtodoinjava.com/security/how-to-generate-secure-password-hash-md5-sha-pbkdf2-bcrypt-examples/
+	 * @return random md5 salt
+	 * @throws NoSuchAlgorithmException
+	 */
+	public static byte[] getSalt()
+	{
+	    SecureRandom sr;
+		try {
+			sr = SecureRandom.getInstance("SHA1PRNG");
+			byte[] salt = new byte[16];
+		    sr.nextBytes(salt);
+		    return salt;
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	/**
+	 * method from: 
+	 * https://howtodoinjava.com/security/how-to-generate-secure-password-hash-md5-sha-pbkdf2-bcrypt-examples/
+	 * @param passwordToHash user plaintext password
+	 * @param salt randomly generated from getSalt()
+	 * @return
+	 */
+	public static String getSecurePassword(String passwordToHash, byte[] salt)
+    {
+        String generatedPassword = null;
+        try {
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            md.update(salt);
+            byte[] bytes = md.digest(passwordToHash.getBytes());
+            //This bytes[] has bytes in decimal format;
+            //Convert it to hexadecimal format
+            StringBuilder sb = new StringBuilder();
+            for(int i=0; i< bytes.length ;i++)
+            {
+                sb.append(Integer.toString((bytes[i] & 0xff) + 0x100, 16).substring(1));
+            }
+            generatedPassword = sb.toString();
+        } 
+        catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        return generatedPassword;
+    }
+	
+	/**
+	 * 
 	 * @param databaseConnection to connect to UserEntity table
-	 * @param username from user interaction 
-	 * @param password plaintext from user interaction
-	 * @return true if username and password match a registered user 
+	 * @param username from user input 
+	 * @param password plaintext from user input
+	 * @return true if username and hashed password match a registered user 
 	 */
 	public static boolean loginThroughDatabase(ConnectionSource databaseConnection, 
 			String username, 
@@ -92,59 +145,6 @@ public class User {
 	}
 	
 	/**
-	 *  method from: 
-	 *  https://howtodoinjava.com/security/how-to-generate-secure-password-hash-md5-sha-pbkdf2-bcrypt-examples/
-	 * @return random md5 salt
-	 * @throws NoSuchAlgorithmException
-	 */
-	public static byte[] getSalt()
-	{
-	    //Always use a SecureRandom generator
-	    SecureRandom sr;
-		try {
-			sr = SecureRandom.getInstance("SHA1PRNG");
-			byte[] salt = new byte[16];
-		    //Get a random salt
-		    sr.nextBytes(salt);
-		    return salt;
-		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-	
-	/**
-	 * method from: 
-	 * https://howtodoinjava.com/security/how-to-generate-secure-password-hash-md5-sha-pbkdf2-bcrypt-examples/
-	 * @param passwordToHash user plaintext password
-	 * @param salt randomly generated from getSalt()
-	 * @return
-	 */
-	public static String getSecurePassword(String passwordToHash, byte[] salt)
-    {
-        String generatedPassword = null;
-        try {
-            // Create MessageDigest instance for MD5
-            MessageDigest md = MessageDigest.getInstance("MD5");
-            md.update(salt);
-            byte[] bytes = md.digest(passwordToHash.getBytes());
-            //This bytes[] has bytes in decimal format;
-            //Convert it to hexadecimal format
-            StringBuilder sb = new StringBuilder();
-            for(int i=0; i< bytes.length ;i++)
-            {
-                sb.append(Integer.toString((bytes[i] & 0xff) + 0x100, 16).substring(1));
-            }
-            //Get complete hashed password in hex format
-            generatedPassword = sb.toString();
-        } 
-        catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
-        return generatedPassword;
-    }
-	
-	/**
 	 * Tries to input new SafeStore user account info into database
 	 * @param databaseConnection to connect to UserEntity table 
 	 * @return true if safe store account successfully created 
@@ -154,15 +154,9 @@ public class User {
 		try {
 			Dao<UserEntity, String> userEntityDao = 
 					DaoManager.createDao(databaseConnection, UserEntity.class);
-			//returns number of records user entity DAO created
 			//Can only be 1 or 0 here as username is id
 			int numRecordsCreated = userEntityDao.create(userEntity);
-			if(numRecordsCreated == 1) {
-				return true;
-			}
-			else {
-				return false;
-			}
+			return numRecordsCreated == 1;
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return false;

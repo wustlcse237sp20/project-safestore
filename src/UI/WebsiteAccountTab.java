@@ -108,7 +108,7 @@ public class WebsiteAccountTab {
 					websiteAccountViewUsernameResult.setText(website.getWebsiteLogin());
 					websiteAccountViewPasswordResult.setText(website.getWebsitePassword());
 					websiteAccountSearchNicknameInput.setText(website.getNickname());
-					
+					updateAccountList(websiteAccounts, websiteModel);
 				}else {
 					JOptionPane.showMessageDialog(frame, "You have no website stored under " + websiteAccountSearchNicknameInput.getText());
 					websiteAccountViewUsernameResult.setText("");
@@ -299,7 +299,7 @@ public class WebsiteAccountTab {
 						searchWebsite(siteNickname);
 						resetModifyWebsiteFields();
 					}else {
-						JOptionPane.showMessageDialog(frame, "Couldn't Modify website");
+						JOptionPane.showMessageDialog(frame, "Couldn't Modify website \nMake sure new nickname is unique");
 						resetModifyWebsiteFields();
 					}
 				}

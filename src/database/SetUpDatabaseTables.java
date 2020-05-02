@@ -16,9 +16,12 @@ import tables.WebsiteAccountEntity;
 
 public class SetUpDatabaseTables {
 	
+	// creates database tables
+	
 	// this will print out the create table query statements without the foreign key constraints
 	//	due to lack of functionality. You need to add the foreign keys as necessary if you want
 	// 	them in the database for SQLite
+	
 	public static void main(String[] args) {
 		String databaseUrl = "jdbc:sqlite:src/database/app.db";
 		ConnectionSource connectionSource;
