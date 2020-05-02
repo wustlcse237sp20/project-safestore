@@ -215,7 +215,6 @@ public class WebsiteAccountTab {
 						JOptionPane.showMessageDialog(frame, "Website Added Succesfully!");
 						searchWebsite(websiteNickname);
 						resetAddWebsiteFields();
-						websiteModel.addElement(websiteNickname);
 					}else {
 						JOptionPane.showMessageDialog(frame, "Could not add website - Website with nickname already exists");
 						resetAddWebsiteFields();
