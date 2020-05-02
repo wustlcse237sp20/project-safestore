@@ -14,13 +14,11 @@ public class DebitCardEntity extends BaseDaoEnabled<DebitCardEntity, String> {
 	@DatabaseField(columnName = "nickname")
 	private String nickname;
 	
-	// reason for String is that a card number is usually in the form:
-	//	#### #### #### #### which is easiest to store as a string in 
-	// 	a database for our uses
+	// card number stored in String as card numbers are usually in the form:
+	//	#### #### #### #### 
 	@DatabaseField(columnName = "debit_card_number", id = true, canBeNull = false)
 	private String debitCardNumber;
 	
-	//, dataType = DataType.DATE_STRING
 	@DatabaseField(columnName = "expiration_date", canBeNull = false)
 	private String expirationDate;
 	
@@ -53,52 +51,52 @@ public class DebitCardEntity extends BaseDaoEnabled<DebitCardEntity, String> {
 		return safeStoreUser;
 	}
 	
-	public void setSafeStoreUser(UserEntity safeStoreUser) {
-		this.safeStoreUser = safeStoreUser;
-	}
-	
 	public String getNickname() {
 		return nickname;
 	}
 	
-	public void setNickname(String nickname) {
-		this.nickname = nickname;
-	} 
-	
 	public String getDebitCardNumber() {
 		return debitCardNumber;
-	}
-	
-	public void setDebitCardNumber(String debitCardNumber) {
-		this.debitCardNumber = debitCardNumber;
 	}
 	
 	public String getExpirationDate() {
 		return expirationDate;
 	}
 	
-	public void setExpirationDate(String expirationDate) {
-		this.expirationDate = expirationDate;
-	}
-	
 	public String getCvv() {
 		return cvv;
-	}
-	
-	public void setCvv(String cvv) {
-		this.cvv = cvv;
 	}
 	
 	public String getPin() {
 		return pin;
 	}
 	
-	public void setPin(String pin) {
-		this.pin = pin;
-	}
-	
 	public AddressEntity getBillingAddress() {
 		return billingAddress;
+	}
+	
+	public void setSafeStoreUser(UserEntity safeStoreUser) {
+		this.safeStoreUser = safeStoreUser;
+	}
+
+	public void setNickname(String nickname) {
+		this.nickname = nickname;
+	} 
+	
+	public void setDebitCardNumber(String debitCardNumber) {
+		this.debitCardNumber = debitCardNumber;
+	}
+	
+	public void setExpirationDate(String expirationDate) {
+		this.expirationDate = expirationDate;
+	}
+	
+	public void setCvv(String cvv) {
+		this.cvv = cvv;
+	}
+	
+	public void setPin(String pin) {
+		this.pin = pin;
 	}
 	
 	public void setBillingAddress(AddressEntity billingAddress) {

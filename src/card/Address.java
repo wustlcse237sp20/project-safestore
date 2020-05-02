@@ -48,6 +48,13 @@ public class Address {
 		return this.addressEntity.getId();
 	}
 	
+	/**
+	 * 
+	 * @return address in format of:
+	 * street address 
+	 * city, state 
+	 * zipcode
+	 */
 	public String getFullAddress() {
 		return this.getStreetAddress() + "\n " + this.getCity() + ", " + this.getState() + "\n" + this.getZipCode();
 	}
@@ -123,10 +130,9 @@ public class Address {
 			queryParams.put("zip_code", this.addressEntity.getZipCode());
 			
 			List<AddressEntity> returnedAddresses = addressDao.queryForFieldValues(queryParams);
-			if (returnedAddresses.isEmpty()) {
-				return null;
+			if (!returnedAddresses.isEmpty()) {
+				return returnedAddresses.get(0);
 			}
-			return returnedAddresses.get(0);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -151,7 +157,7 @@ public class Address {
 	
 	/**
 	 * Adds an address to the database
-	 * @param databaseConnection
+	 * @param databaseConnection connection to the database
 	 * @return true if the address was added, false if not
 	 */
 	public boolean addAddress(ConnectionSource databaseConnection) {
@@ -168,7 +174,7 @@ public class Address {
 	
 	/**
 	 * Deletes an address from the database
-	 * @param databaseConnection
+	 * @param databaseConnection connection to the database
 	 */
 	public void deleteAddress(ConnectionSource databaseConnection) {
 		if (this.addressExists(databaseConnection)) {

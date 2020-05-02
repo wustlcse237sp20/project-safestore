@@ -1,15 +1,13 @@
 package card;
 
 import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
 
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
-import com.j256.ormlite.jdbc.JdbcConnectionSource;
+import com.j256.ormlite.dao.ForeignCollection;
 import com.j256.ormlite.support.ConnectionSource;
 
 import encryption.Encryption;
@@ -22,24 +20,29 @@ public class CreditCard implements Card{
 	private CreditCardEntity creditCardEntity;
 	private Address billingAddress;
 
-	public CreditCard(User safeStoreUser, String creditCardNumber, String expirationDate, String cvv, Address billingAddress) {
+	public CreditCard(User safeStoreUser, String creditCardNumber, 
+			String expirationDate, String cvv, Address billingAddress) {
+		//last 4 digits of card number is default card nickname if no nickname provided 
 		String defaultNickname = creditCardNumber.substring(creditCardNumber.length() - 4, creditCardNumber.length());
 		defaultNickname = Encryption.encrypt(defaultNickname);
 		UserEntity safeStoreUserEntity = safeStoreUser.getUserEntity();
 		String encryptedCCNumber = Encryption.encrypt(creditCardNumber);
 		String encryptedExpDate = Encryption.encrypt(expirationDate);
 		String encryptedCvv = Encryption.encrypt(cvv);
-		this.creditCardEntity = new CreditCardEntity(safeStoreUserEntity, defaultNickname, encryptedCCNumber, encryptedExpDate, encryptedCvv, billingAddress.getAddressEntity());
+		this.creditCardEntity = new CreditCardEntity(safeStoreUserEntity, defaultNickname, 
+				encryptedCCNumber, encryptedExpDate, encryptedCvv, billingAddress.getAddressEntity());
 		this.billingAddress = billingAddress;
 	}
 
-	public CreditCard(User safeStoreUser, String nickname, String creditCardNumber, String expirationDate, String cvv, Address billingAddress) {
+	public CreditCard(User safeStoreUser, String nickname, String creditCardNumber, 
+			String expirationDate, String cvv, Address billingAddress) {
 		UserEntity safeStoreUserEntity = safeStoreUser.getUserEntity();
 		String encryptedNickname = Encryption.encrypt(nickname);
 		String encryptedCCNumber = Encryption.encrypt(creditCardNumber);
 		String encryptedExpDate = Encryption.encrypt(expirationDate);
 		String encryptedCvv = Encryption.encrypt(cvv);
-		this.creditCardEntity = new CreditCardEntity(safeStoreUserEntity, encryptedNickname, encryptedCCNumber, encryptedExpDate, encryptedCvv, billingAddress.getAddressEntity());
+		this.creditCardEntity = new CreditCardEntity(safeStoreUserEntity, encryptedNickname, 
+				encryptedCCNumber, encryptedExpDate, encryptedCvv, billingAddress.getAddressEntity());
 		this.billingAddress = billingAddress;
 	}
 
@@ -186,7 +189,8 @@ public class CreditCard implements Card{
 	 * @param nickname
 	 * @return true is the nickname given doens't exist in db for that user, false otherwise
 	 */
-	public static boolean cardNicknameIsUnique(ConnectionSource databaseConnection, UserEntity safeStoreUser, String nickname) {
+	public static boolean cardNicknameIsUnique(ConnectionSource databaseConnection, 
+			UserEntity safeStoreUser, String nickname) {
 		try {
 			Dao<CreditCardEntity, String> creditCardDao = DaoManager.createDao(databaseConnection, CreditCardEntity.class);
 			Map<String, Object> queryParams = new HashMap<String, Object>();
@@ -215,7 +219,7 @@ public class CreditCard implements Card{
 	 * 
 	 * @param databaseConnection
 	 * @return true if the credit card was successfully added, false if nickname already in use
-	 * @throws Exception if the 
+	 * @throws Exception if the database fails to connect or if the address is not added
 	 */
 	public boolean addCard(ConnectionSource databaseConnection) throws Exception {
 		if (this.billingAddress.addressExists(databaseConnection)) {
@@ -249,78 +253,25 @@ public class CreditCard implements Card{
 	}
 
 	/**
-	 * A static method to prompt user for necessary information to make a credit card 
-	 * and add it to the database
-	 * 
-	 * @param databaseConnection 
-	 * @param keyboard
-	 * @param safeStoreUser
-	 * @return true if the credit card was successfully added, false if not
+	 * gets the foreign collection of all credit card rows for that user
+	 * @param databaseConnection
+	 * @param safeStoreUser of type User
+	 * @return a ForeignCollection<WebsiteAccountEntity> that holds all the db rows of credit cards
+	 * 			for the safeStoreUser
 	 */
-	public static boolean addCreditCard(ConnectionSource databaseConnection, Scanner keyboard, User safeStoreUser) {
-		String userInput = "";
-
-		//Setting up Credit Card Variables
-		String creditCardNumber = "";
-		String expirationDate = "";
-		String cvv = "";
-		boolean hasNickname = false;
-		String nickname = "";
-
-		//Setting up Address Variables
-		String streetAddress = "";
-		String city = "";
-		String state = "";
-		String zipCode = "";
-
-		System.out.println("What is the Credit Card Number? ");
-		creditCardNumber = keyboard.nextLine();
-		System.out.println("What is the Expiration Date?");
-		expirationDate = keyboard.nextLine();
-		System.out.println("What is the CVV?");
-		cvv = keyboard.nextLine();
-		System.out.println("Do you want a nickname for this credit card? Y/N (default is the last 4 digits)");
-		userInput = keyboard.nextLine();
-		while (!userInput.equals("Y") && !userInput.equals("N")) {
-			System.out.println("Enter 'Y' or 'N'");
-			userInput = keyboard.nextLine();
-		}
-		if (userInput.equals("Y")) {
-			hasNickname = true;
-		}
-		else {
-			hasNickname = false;
-		}
-		if(hasNickname) {
-			System.out.println("What is the nickname?");
-			nickname = keyboard.nextLine();
-		}
-
-		System.out.println("What is the street address?");
-		streetAddress = keyboard.nextLine();
-		System.out.println("What is the city?");
-		city = keyboard.nextLine();
-		System.out.println("What is the state?");
-		state = keyboard.nextLine();
-		System.out.println("What is the zip code?");
-		zipCode = keyboard.nextLine();
-
-		Address billingAddress = new Address(streetAddress, city, state, zipCode);	        
-		CreditCard creditCard;
-		if(hasNickname) {
-			creditCard = new CreditCard(safeStoreUser, nickname, creditCardNumber, expirationDate, cvv, billingAddress);
-		}
-		else {
-			creditCard = new CreditCard(safeStoreUser, creditCardNumber, expirationDate, cvv, billingAddress);
-		}
+	public static ForeignCollection<CreditCardEntity> getAllCreditCards(ConnectionSource databaseConnection, 
+			User safeStoreUser) {
+		Dao<UserEntity, String> userDao;
 		try {
-			return creditCard.addCard(databaseConnection);
-		} catch (Exception e) {
-			System.out.println(e);
-			return false;
+			userDao = DaoManager.createDao(databaseConnection, UserEntity.class);
+			UserEntity userEntity = userDao.queryForSameId(safeStoreUser.getUserEntity());
+			return userEntity.getCreditCards();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
 		}
 	}
-
+	
 	/**
 	 * Gets a Credit card from the database based off the nickname and SafeStore user
 	 * 
@@ -330,7 +281,8 @@ public class CreditCard implements Card{
 	 * @return the Credit Card with that nickname and user
 	 * @throws Exception if no credit card is found, or if there is a database error
 	 */
-	public static CreditCard getCreditCardFromNickname(String nickname, User safeStoreUser, ConnectionSource databaseConnection) throws Exception{
+	public static CreditCard getCreditCardFromNickname(String nickname, User safeStoreUser, 
+			ConnectionSource databaseConnection) throws Exception{
 		nickname = Encryption.encrypt(nickname);
 		try {
 			Dao<CreditCardEntity, String> creditCardDao = DaoManager.createDao(databaseConnection, CreditCardEntity.class);
@@ -352,148 +304,38 @@ public class CreditCard implements Card{
 	}
 
 	/**
-	 * Returns and prints the requested information about a credit card
+	 * 
+	 * @param currentNickname
 	 * @param databaseConnection
-	 * @param keyboard
 	 * @param safeStoreUser
-	 * @return requested credit card info
+	 * @param newInputs user inputs to modify credit card info. User only fills in input fields they wish to change. 
+	 * 
+	 * User has the option to modify: nickname in newInputs[0], card number in newInputs[1], 
+	 * expiration date in newInputs[2], cvv in newInputs[3], street address in newInputs[4],
+	 * city in newInputs[5], state in newInputs[6], and zip code in newInputs[7]
+	 * 
+	 * @return true if successful update 
 	 */
-	public static String getCreditCardInformation(ConnectionSource databaseConnection, Scanner keyboard, User safeStoreUser) {
-		String userPrompt = "What is the card nickname you'd like to retrieve info for (default is the last four digits of the card number)";
-		System.out.println(userPrompt);
-		String nickname = keyboard.nextLine();
-
-		try {
-			CreditCard requestedCreditCard = CreditCard.getCreditCardFromNickname(nickname, safeStoreUser, databaseConnection);
-
-			userPrompt = "What information would you like to view? Type: 'Card Number', 'Expiration Date', 'CVV', 'Zip Code', 'Billing Address', or 'All'";
-			System.out.println(userPrompt);
-
-			String userInput = keyboard.nextLine();
-			String[] acceptableInput = {"Card Number", "Expiration Date", "CVV", "Zip Code", "Billing Address", "All"};
-			while(!Arrays.asList(acceptableInput).contains(userInput)) {
-				userPrompt = "Enter: 'Card Number', 'Expiration Date', 'CVV', 'Zip Code', 'Billing Address', or 'All'";
-				System.out.println(userPrompt);
-				userInput = keyboard.nextLine();
-			}
-
-			String requestedInformation = "An Error Occurred";
-			if(userInput.equals("Card Number")) {
-				requestedInformation = requestedCreditCard.getCardNumber();
-			}
-			if(userInput.equals("Expiration Date")) {
-				requestedInformation = requestedCreditCard.getExpirationDate();
-			}
-			if(userInput.equals("CVV")) {
-				requestedInformation = requestedCreditCard.getCvv();
-			}
-			if(userInput.equals("Zip Code")) {
-				requestedInformation = requestedCreditCard.getZipCode();
-			}
-			if(userInput.equals("Billing Address")) {
-				requestedInformation = requestedCreditCard.getBillingAddress();
-			}
-			if(userInput.equals("All")) {
-				requestedInformation = requestedCreditCard.toString();
-			}
-			System.out.println(requestedInformation);
-			return requestedInformation;
-		} catch (Exception e) {
-			System.out.println(e);
-			return(e.toString());
-		}
-	}
-
-	/**
-	 * Updates the credit card in the database based off user input 
-	 * @param databaseConnection
-	 * @param keyboard
-	 * @param safeStoreUser
-	 * @return true if the information is updated, false if not
-	 */
-	public static boolean updateCreditCardInformation(ConnectionSource databaseConnection, Scanner keyboard, User safeStoreUser) {
-		String userPrompt = "What is the card nickname you'd like to update info for (default is the last four digits of the card number)";
-		System.out.println(userPrompt);
-		String nickname = keyboard.nextLine();
-
-		try {
-			CreditCard requestedCreditCard = CreditCard.getCreditCardFromNickname(nickname, safeStoreUser, databaseConnection);
-			userPrompt = "What information would you like to update? Type: 'Nickname', 'Card Number', 'Expiration Date', 'CVV', or 'Billing Address'";
-			System.out.println(userPrompt);
-			String userInput = keyboard.nextLine();
-
-			String[] acceptableInput = {"Nickname", "Card Number", "Expiration Date", "CVV", "Billing Address"};
-			while(!Arrays.asList(acceptableInput).contains(userInput)) {
-				userPrompt = "Enter: 'Nickname', 'Card Number', 'Expiration Date', 'CVV', or 'Billing Address'";
-				System.out.println(userPrompt);
-				userInput = keyboard.nextLine();
-			}
-
-			if(userInput.equals("Nickname")) {
-				userPrompt = "What is the new nickname you'd like to use?";
-				System.out.println(userPrompt);
-				String newNickname = keyboard.nextLine();
-				return requestedCreditCard.setNickname(newNickname, databaseConnection);
-			}
-			if(userInput.equals("Card Number")) {
-				userPrompt = "What is the new card number?";
-				System.out.println(userPrompt);
-				String newCardNum = keyboard.nextLine();
-				return requestedCreditCard.setCardNumber(newCardNum, databaseConnection);
-			}
-			if(userInput.equals("Expiration Date")) {
-				userPrompt = "What is the new expiration date?";
-				System.out.println(userPrompt);
-				String newExpDate = keyboard.nextLine();
-				return requestedCreditCard.setExpirationDate(newExpDate, databaseConnection);
-			}
-			if(userInput.equals("CVV")) {
-				userPrompt = "What is the new CVV?";
-				System.out.println(userPrompt);
-				String newCvv = keyboard.nextLine();
-				return requestedCreditCard.setCvv(newCvv, databaseConnection);
-			}
-			if(userInput.equals("Billing Address")) {
-				System.out.println("What is the street address?");
-				String streetAddress = keyboard.nextLine();
-				System.out.println("What is the city?");
-				String city = keyboard.nextLine();
-				System.out.println("What is the state?");
-				String state = keyboard.nextLine();
-				System.out.println("What is the zip code?");
-				String zipCode = keyboard.nextLine();
-
-				Address newBillingAddress = new Address(streetAddress, city, state, zipCode);	
-				return requestedCreditCard.setBillingAddress(newBillingAddress, databaseConnection);
-			}
-			return false;
-		} catch (Exception e) {
-			System.out.println(e);
-			return false;
-		}
-	}
-
-	
-	public static boolean updateCreditCardInformation(String currentNickname, ConnectionSource databaseConnection, User safeStoreUser, String[] newInputs) {
+	public static boolean updateCreditCardInformation(String currentNickname, ConnectionSource databaseConnection, 
+			User safeStoreUser, String[] newInputs) {
 
 		try {
 			CreditCard requestedCreditCard = CreditCard.getCreditCardFromNickname(currentNickname, safeStoreUser, databaseConnection);
 
-
 			if(!newInputs[0].isEmpty()) {
 				if (cardNicknameIsUnique(databaseConnection, safeStoreUser.getUserEntity(), newInputs[0])) {
 					requestedCreditCard.setNickname(newInputs[0], databaseConnection);
+				}else {
+					return false;
 				}
 			}
 			if(!newInputs[1].isEmpty()) {
-
 				requestedCreditCard.setCardNumber(newInputs[1], databaseConnection);
 			}
 			if(!newInputs[2].isEmpty()) {
 				requestedCreditCard.setExpirationDate(newInputs[2], databaseConnection);
 			}
 			if(!newInputs[3].isEmpty()) {
-
 				requestedCreditCard.setCvv(newInputs[3], databaseConnection);
 			}
 
@@ -502,6 +344,7 @@ public class CreditCard implements Card{
 			String city = oldBillingAddress.getCity();
 			String state = oldBillingAddress.getState();
 			String zipCode = oldBillingAddress.getZipCode();
+			
 			if(!newInputs[4].isEmpty()) {
 				streetAddress = newInputs[4];
 			}

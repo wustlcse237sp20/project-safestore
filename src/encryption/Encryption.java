@@ -40,19 +40,17 @@ public class Encryption {
 	
 	/**
 	 * Encrypts a string using AES-128
-	 * @param stringToEncrypt
+	 * @param stringToEncrypt plaintext string
 	 * @return the encrypted string
 	 */
 	public static String encrypt(String stringToEncrypt) {
 		try {
-			
 			byte[] iv = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 	        IvParameterSpec ivspec = new IvParameterSpec(iv);
 	         
 	        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
 	        cipher.init(Cipher.ENCRYPT_MODE, secretKey, ivspec);
 	        return Base64.getEncoder().encodeToString(cipher.doFinal(stringToEncrypt.getBytes("UTF-8")));
-	        
 		} catch (Exception e) {
 			System.out.println("Error while encrypting: " + e.toString());
 			e.printStackTrace();		
@@ -64,8 +62,8 @@ public class Encryption {
 	
 	/**
 	 * Decrypts a string that was encrypted using AES-128
-	 * @param stringToDecrypt
-	 * @return the decrypted string
+	 * @param stringToDecrypt 
+	 * @return the decrypted string into plaintext string 
 	 */
 	public static String decrypt(String stringToDecrypt) {
 		try {	

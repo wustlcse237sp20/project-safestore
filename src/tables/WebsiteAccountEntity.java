@@ -29,7 +29,8 @@ public class WebsiteAccountEntity extends BaseDaoEnabled<WebsiteAccountEntity, I
 	// ORMLite needs a no-argument constructor
 	public WebsiteAccountEntity() {}
 	
-	public WebsiteAccountEntity(UserEntity safeStoreUser, String nickname, String websiteLogin, String websitePassword) {
+	public WebsiteAccountEntity(UserEntity safeStoreUser, String nickname, 
+			String websiteLogin, String websitePassword) {
 		this.safeStoreUser = safeStoreUser;
 		this.nickname = nickname;
 		this.websiteLogin = websiteLogin;
@@ -43,44 +44,40 @@ public class WebsiteAccountEntity extends BaseDaoEnabled<WebsiteAccountEntity, I
 		return decryptedNickname + " - Login: " + decryptedLogin + ", Password: " + decryptedPassword;
 	}
 	
+	// no setter for id because it is auto-generated and shouldn't be changed once made
 	public int getId() {
 		return id;
 	}
 	
-	// didn't make an setter for id because it is unique, auto generated, and shouldn't 
-	//	be adjusted once created and put in the database
-	
 	public UserEntity getSafeStoreUser() {
 		return safeStoreUser;
-	}
-	
-	public void setSafeStoreUser(UserEntity safeStoreUser) {
-		this.safeStoreUser = safeStoreUser;
 	}
 	
 	public String getNickname() {
 		return nickname;
 	}
 	
-	public void setNickname(String nickname) {
-		this.nickname = nickname;
-	}
-	
 	public String getWebsiteLogin() {
 		return websiteLogin;
-	}
-	
-	public void setWebsiteLogin(String websiteLogin) {
-		this.websiteLogin = websiteLogin;
 	}
 	
 	public String getWebsitePassword() {
 		return websitePassword;
 	}
 	
+	public void setSafeStoreUser(UserEntity safeStoreUser) {
+		this.safeStoreUser = safeStoreUser;
+	}
+
+	public void setNickname(String nickname) {
+		this.nickname = nickname;
+	}
+	
+	public void setWebsiteLogin(String websiteLogin) {
+		this.websiteLogin = websiteLogin;
+	}
+
 	public void setWebsitePassword(String websitePassword) {
 		this.websitePassword = websitePassword;
 	}
-	
-	
 }

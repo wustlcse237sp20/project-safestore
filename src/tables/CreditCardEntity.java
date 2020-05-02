@@ -7,9 +7,8 @@ import com.j256.ormlite.table.DatabaseTable;
 @DatabaseTable(tableName = "CreditCards")
 public class CreditCardEntity extends BaseDaoEnabled<CreditCardEntity, String> {
 	
-	// reason for String is that a card number is usally in the form:
-	//	#### #### #### #### which is easiest to store as a string in 
-	// 	a database for our uses
+	// card number stored in String as card numbers are usually in the form:
+	//	#### #### #### #### 
 	@DatabaseField(columnName = "credit_card_number", id = true, canBeNull = false)
 	private String creditCardNumber;
 	
@@ -49,49 +48,47 @@ public class CreditCardEntity extends BaseDaoEnabled<CreditCardEntity, String> {
 		return safeStoreUser;
 	}
 	
-	public void setSafeStoreUser(UserEntity safeStoreUser) {
-		this.safeStoreUser = safeStoreUser;
-	}
-	
 	public String getNickname() {
 		return nickname;
-	}
-	
-	public void setNickname(String nickname) {
-		this.nickname = nickname;
 	}
 	
 	public String getCreditCardNumber() {
 		return creditCardNumber;
 	}
 	
-	public void setCreditCardNumber(String creditCardNumber) {
-		this.creditCardNumber = creditCardNumber;
-	}
-	
 	public String getExpirationDate() {
 		return expirationDate;
-	}
-	
-	public void setExpirationDate(String expirationDate) {
-		this.expirationDate = expirationDate;
 	}
 	
 	public String getCvv() {
 		return cvv;
 	}
 	
-	public void setCvv(String cvv) {
-		this.cvv = cvv;
-	}
-	
 	public AddressEntity getBillingAddress() {
 		return billingAddress;
 	}
-	
+
+	public void setSafeStoreUser(UserEntity safeStoreUser) {
+		this.safeStoreUser = safeStoreUser;
+	}
+
+	public void setNickname(String nickname) {
+		this.nickname = nickname;
+	}
+
+	public void setCreditCardNumber(String creditCardNumber) {
+		this.creditCardNumber = creditCardNumber;
+	}
+
+	public void setExpirationDate(String expirationDate) {
+		this.expirationDate = expirationDate;
+	}
+
+	public void setCvv(String cvv) {
+		this.cvv = cvv;
+	}
+
 	public void setBillingAddress(AddressEntity billingAddress) {
 		this.billingAddress = billingAddress;
 	}
-	
-	
 }
