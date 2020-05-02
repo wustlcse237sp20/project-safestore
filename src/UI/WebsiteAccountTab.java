@@ -41,6 +41,7 @@ public class WebsiteAccountTab {
 	private JLabel websiteAccountViewUsernameResult;
 	private JLabel websiteAccountViewPasswordResult;
 	private JButton websiteAccountSearchButton;
+	private JButton websiteAccountClearInfo;
 	private DefaultListModel<String> websiteModel;
 
 	/**
@@ -85,6 +86,10 @@ public class WebsiteAccountTab {
 		websiteAccountViewPasswordLabel.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		websiteAccountViewPasswordLabel.setBounds(189, 209, 61, 16);
 		websiteAccounts.add(websiteAccountViewPasswordLabel);
+		
+		websiteAccountClearInfo = new JButton("Clear");
+		websiteAccountClearInfo.setBounds(189, 240, 61, 16);
+		websiteAccounts.add(websiteAccountClearInfo);
 
 		//Label for displaying the username when it is gotten
 		websiteAccountViewUsernameResult = new JLabel("");
@@ -111,6 +116,13 @@ public class WebsiteAccountTab {
 					websiteAccountSearchNicknameInput.setText("");
 
 				}
+			}
+		});
+		
+		websiteAccountClearInfo.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				websiteAccountViewUsernameResult.setText("");
+				websiteAccountViewPasswordResult.setText("");
 			}
 		});
 	}

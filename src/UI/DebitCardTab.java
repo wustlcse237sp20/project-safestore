@@ -32,6 +32,7 @@ public class DebitCardTab {
 	private JFrame frame;
 	private static JTextField debitCardSearchInput;
 	private static JButton debitCardSearchButton;
+	private JButton debitCardClearInfo;
 	private JTextField debitCardAddNicknameInput;
 	private JTextField debitCardAddNumberInput;
 	private JTextField debitCardAddExpDateInput;
@@ -90,6 +91,15 @@ public class DebitCardTab {
 		debitCardDefaultNicknameDisclaimer.setFont(new Font("Lucida Grande", Font.PLAIN, 9));
 		debitCardDefaultNicknameDisclaimer.setBounds(477, 315, 251, 16);
 		debitCardViewTab.add(debitCardDefaultNicknameDisclaimer);
+		
+		debitCardClearInfo = new JButton("Clear");
+		debitCardClearInfo.setBounds(500, 6, 85, 29);
+		debitCardViewTab.add(debitCardClearInfo);
+		debitCardClearInfo.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				debitCardViewDisplay.setText("");
+			}
+		});
 
 		debitCardSearchButton = new JButton("Search");
 		debitCardSearchButton.addActionListener(new ActionListener() {
