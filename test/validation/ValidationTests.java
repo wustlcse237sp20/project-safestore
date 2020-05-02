@@ -31,7 +31,7 @@ public class ValidationTests {
 		String testCases[] = {"1234567890123456", "1234-5678-9012-3456", " 2222333344445555", "2222333344445555 ", 
 							  "123456789a123456", "bbbbeeeekkkkllll", "123456789012345", "1234567890123", "12345678901234",
 							  "                ", "anotherbatdoneya"};
-		boolean expectedResults[] = {true, false, false, false, false, false, true, true, true, false, false};
+		boolean expectedResults[] = {true, false, false, false, false, false, true, true, true, true, false};
 		for (int i = 0; i < testCases.length; ++i) {
 			assertEquals(expectedResults[i], Validation.validateCardNumber(testCases[i]));
 		}
